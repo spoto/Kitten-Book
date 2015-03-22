@@ -306,7 +306,7 @@ Si consideri il programma in Figura~\ref{fig:fibonacci}. Assumiamo che esso
 sia scritto all'interno di un file testo di nome \texttt{Fibonacci.kit}.
 Il suo metodo \texttt{main} chiede all'utente di immettere un numero intero
 (positivo) \texttt{s} e quindi stampa l'\texttt{s}-esimo numero di Fibonacci.
-Si noti che \texttt{s} \e una stringa, e che \e possibile leggere l'input da
+Si noti che \texttt{s} \e una stringa e che \e possibile leggere l'input da
 tastiera e memorizzarlo dentro a una stringa tramite il metodo
 \texttt{input()} della classe \texttt{String.kit}. Va osservato che, come
 per tutte le invocazioni di metodo, la variabile \texttt{s} deve contenere
@@ -371,85 +371,98 @@ ottiene con la barretta \texttt{|} e che nel comando
 condizionale \e obbligatorio
 usare la parola chiave \texttt{then}, che \e invece sottintesa in C e Java.
 %
-\section{Le diverse compilazioni del compilatore Kitten}
-  \label{sec:kitten_compilations}
+\section{I diversi task Ant del compilatore Kitten}\label{sec:kitten_compilations}
 %
-Nella Sezione~\ref{sec:kitten_compiler} abbiamo usato il comando
-\texttt{make generatejb} per compilare il compilatore Kitten. Tale comando
-esegue una sequenza di comandi di compilazione specificati dentro al file
-\texttt{makefile} e il cui risultato \`e la compilazione del compilatore
-Kitten in modo che esso possa poi
-generare il Java bytecode dei file sorgenti. Esistono
-altri modi per compilare il compilatore Kitten, in modo da attivare \piu o
-meno fasi della compilazione. Esse sono le seguenti:
+Una caratteristiche del compilatore Kitten \`e di potere essere compilato ed
+eseguito in modo diverso, in modo da fermare la sua esecuzione a una delle
+fasi tipiche di un compilatore e ispezionare i risultati intermedi.
+La Figura~\ref{fig:ant_tasks} mostra i vari task Ant che si possono eseguire,
+corrispondenti a compilazioni ed esecuzioni diverse del compilatore.
+Per esempio, \`e possibile fare doppio click sul task
+\texttt{compile-lexical-analyzer}, ottende solo la compilazione dell'analizzatore
+lessicale del compilatore Kitten (la prima fase di compilazione). Oppure \`e
+possibile compilare l'analizzatore lessicale \emph{ed} eseguirlo, facendo
+doppio click sul task \texttt{run-lexical-analyzer}.
+
+Riportiamo sotto le alternative disponibili e il loro effetto. Esse verranno riviste
+nei prossimi capitoli, man mano che affronteremo le varie fasi della compilazione.
 %
 \begin{description}
-\item[\texttt{make lexical}:]
-  Compila il compilatore Kitten in modo che esso esegua
+\item[\texttt{generate-lexical-analyzer}:]
+  Rigenera l'analizzatore lessicale di Kitten, utilizzando il programma JLex
+  (Capitolo~\ref{chap:lexical});
+\item[\texttt{compile-lexical-analyzer}:]
+  Compila il compilatore Kitten in modo che esso effettui
   la sola analisi lessicale
   del sorgente da compilare (Capitolo~\ref{chap:lexical});
-\item[\texttt{make syntactical}:]
-  Compila il compilatore Kitten in modo che esso esegua
+\item[\texttt{run-lexical-analyzer}:]
+  Compila ed esegue il compilatore Kitten in modo che esso effettui
+  la sola analisi lessicale
+  del sorgente da compilare (Capitolo~\ref{chap:lexical});
+\item[\texttt{generate-syntactical-analyzer}:]
+  Rigenera l'analizzatore sintattico di Kitten, utilizzando il programma JavaCup
+  (Capitolo~\ref{chap:syntactical});
+\item[\texttt{compile-syntactical-analyzer}:]
+  Compila il compilatore Kitten in modo che esso effettui
   le sole analisi lessicale
   e sintattica (Capitolo~\ref{chap:syntactical}) del sorgente da compilare;
-\item[\texttt{make semantical}:]
-  Compila il compilatore Kitten in modo da eseguire solo le analisi lessicale,
+\item[\texttt{run-syntactical-analyzer}:]
+  Compila ed esegue il compilatore Kitten in modo che esso effettui
+  le sole analisi lessicale
+  e sintattica (Capitolo~\ref{chap:syntactical}) del sorgente da compilare;
+\item[\texttt{compile-semantical-analyzer}:]
+  Compila il compilatore Kitten in modo che effettui solo le analisi lessicale,
   sintattica e semantica (o type-checking,
   Capitolo~\ref{chap:semantical}) del sorgente da compilare;
-\item[\texttt{make translate}:]
-  Compila il compilatore Kitten in modo da eseguire solo le analisi lessicale,
+\item[\texttt{run-semantical-analyzer}:]
+  Compila ed esegue il compilatore Kitten in modo che effettui solo le analisi lessicale,
+  sintattica e semantica (o type-checking,
+  Capitolo~\ref{chap:semantical}) del sorgente da compilare;
+\item[\texttt{compile-kitten-bytecode-generator}:]
+  Compila il compilatore Kitten in modo che effettui solo le analisi lessicale,
   sintattica e semantica del sorgente da compilare e la generazione del
-  codice intermedio Kitten bytecode
-  (Capitolo~\ref{chap:translate});
-\item[\texttt{make generatejb}:]
-  Compila il compilatore Kitten in modo da eseguire solo le analisi lessicale,
+  codice intermedio Kitten bytecode (Capitolo~\ref{chap:translate});
+\item[\texttt{run-kitten-bytecode-generator}:]
+  Compila ed esegue il compilatore Kitten in modo che effettui solo le analisi lessicale,
+  sintattica e semantica del sorgente da compilare e la generazione del
+  codice intermedio Kitten bytecode (Capitolo~\ref{chap:translate});
+\item[\texttt{compile-java-bytecode-generator}:]
+  Compila il compilatore Kitten in modo che effettui solo le analisi lessicale,
   sintattica e semantica del sorgente da compilare, la generazione del codice
   intermedio Kitten bytecode e la sua trasformazione nel codice eseguibile
   Java bytecode (Capitolo~\ref{chap:translate});
-\item[\texttt{make analyse}:]
-  Compila il compilatore Kitten in modo da eseguire le analisi lessicale,
+\item[\texttt{run-java-bytecode-generator}:]
+  Compila ed esegue il compilatore Kitten in modo che effettui solo le analisi lessicale,
   sintattica e semantica del sorgente da compilare, la generazione del codice
-  intermedio Kitten bytecode, alcune sue analisi statiche
-  e la sua trasformazione nel codice eseguibile
-  Java bytecode (Capitolo~\ref{chap:analyse}).
+  intermedio Kitten bytecode e la sua trasformazione nel codice eseguibile
+  Java bytecode (Capitolo~\ref{chap:translate}).
 \end{description}
 %
-\greycomment{Si noti che solo le due ultime modalit\`a di compilazione
-generano un compilatore Kitten il quale a sua volta genera dei file eseguibili
-\texttt{.class} scritti in Java bytecode. Non c`\`e quindi da meravigliarsi
-se dopo un \texttt{make syntactical} il comando \texttt{./run} non funzioni
-o esegua una vecchia versione del programma che si vuole eseguire:
-a quel punto, il compilatore Kitten non genera pi\`u alcun file
-\texttt{.class} eseguibile. \`E necessario eseguire nuovamente un
-\texttt{make generatejb} oppure un \texttt{make analyse} per ottenere
-un compilatore Kitten che genera file \texttt{.class} eseguibili.}
+\greycomment{Si noti che solo l'ultimo task genera un compilatore Kitten completo
+e lo esegue in modo da ottenere dei file eseguibili
+\texttt{.class} scritti in Java bytecode.}
 
-Altri comandi \texttt{make} effettuano operazioni
-di pulizia o documentazione del codice:
+Un altro task Ant \e quello che permette di pulire la directory dai file temporanei:
 %
 \begin{description}
-\item[\texttt{make clean}:]
-  Pulisce le directory dell'installazione Kitten, eliminando file temporanei
-  di \texttt{emacs}, i file \texttt{.class} di Java e file \texttt{dot}
-  generati dentro la directory \texttt{testcases};
-\item[\texttt{make javadocs}:]
-  Rigenera la documentazione JavaDoc del compilatore Kitten.
-  Tale documentazione viene scritta dentro la directory
-  \texttt{javadocs} ed \`e consultabile con un qualsiasi browser
-  internet a partire dal file \texttt{index.html}.
+\item[\texttt{clean-bin}:]
+  Pulisce la directory dove vengono compilati i file del compilatore Kitten.
 \end{description}
+
+La documentazione JavaDoc di Kitten pu\`o essere rigenerata automaticamente dentro Eclipse
+ma \e comunque inclusa nella directory \texttt{javadoc}.
 %
 \javatip{Ci si abitui subito a consultare tale documentazione. Per
 esempio, si inserisca una url del tipo
-\texttt{file:///home/spoto/kitten\_XXX/javadocs/index.html}
+\texttt{file:///.../javadoc/index.html}
 dentro un browser internet. Ovviamente dovrete usare un nome di directory
 corrispondente al vostro punto di installazione del compilatore Kitten
 e alla struttura del vostro file system.
 Dovreste poter vedere l'elenco di tutti i package e di tutte le classi
 che compongono il compilatore Kitten, e consultare la documentazione
 dei loro campi e
-metodi. Usare tale documentazione facilita estremamente lo sviluppo di
-modifiche del compilatore Kitten, come per esempio
+metodi. Usare tale documentazione facilita estremamente l'apprendimento
+e lo sviluppo di modifiche del compilatore Kitten, come per esempio
 eventuali progetti assegnati allo studente.}
 
 Adesso che abbiamo capito come installare e compilare il compilatore
