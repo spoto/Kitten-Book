@@ -1,0 +1,131 @@
+digraph signatures {
+size = "11,7.5";
+node [style = filled]
+
+Bytecode [label = "Bytecode"]
+BranchingBytecode [label = "BranchingBytecode"]
+NonBranchingBytecode [label = "NonBranchingBytecode"]
+
+Bytecode -> BranchingBytecode
+Bytecode -> NonBranchingBytecode [minlen = 3]
+
+BranchingComparisonBytecode [label = "BranchingComparisonBytecode"]
+BranchingConstantComparisonBytecode [label = "BranchingConstantComparisonBytecode"]
+IF_FALSE [label = "IF_FALSE" shape = box]
+IF_TRUE [label = "IF_TRUE" shape = box]
+
+BranchingBytecode -> BranchingComparisonBytecode
+BranchingBytecode -> BranchingConstantComparisonBytecode
+BranchingConstantComparisonBytecode -> IF_FALSE
+BranchingConstantComparisonBytecode -> IF_TRUE
+
+BranchingNumericalComparisonBytecode [label = "BranchingNumericalComparisonBytecode"]
+IF_CMPEQ [label = "IF_CMPEQ" shape = box]
+IF_CMPNE [label = "IF_CMPNE" shape = box]
+
+BranchingComparisonBytecode -> BranchingNumericalComparisonBytecode
+BranchingComparisonBytecode -> IF_CMPEQ
+BranchingComparisonBytecode -> IF_CMPNE
+
+IF_CMPGE [label = "IF_CMPGE" shape = box]
+IF_CMPGT [label = "IF_CMPGT" shape = box]
+IF_CMPLE [label = "IF_CMPLE" shape = box]
+IF_CMPLT [label = "IF_CMPLT" shape = box]
+
+BranchingNumericalComparisonBytecode -> IF_CMPGE
+BranchingNumericalComparisonBytecode -> IF_CMPGT
+BranchingNumericalComparisonBytecode -> IF_CMPLE
+BranchingNumericalComparisonBytecode -> IF_CMPLT
+
+SequentialBytecode [label = "SequentialBytecode"]
+FinalBytecode [label = "FinalBytecode"]
+
+NonBranchingBytecode -> SequentialBytecode [minlen = 3]
+NonBranchingBytecode -> FinalBytecode
+
+RETURN [label = "RETURN" shape = box]
+
+FinalBytecode -> RETURN
+
+ARRAYLOAD [label = "ARRAYLOAD" shape = box]
+ARRAYSTORE [label = "ARRAYSTORE" shape = box]
+CAST [label = "CAST" shape = box]
+CONST [label = "CONST" shape = box]
+CONSTRUCTORCALL [label = "CONSTRUCTORCALL" shape = box]
+DUP [label = "DUP" shape = box]
+GETFIELD [label = "GETFIELD" shape = box]
+BinOpBytecode [label = "BinOpBytecode"]
+LOAD [label = "LOAD" shape = box]
+NEG [label = "NEG" shape = box]
+NEW [label = "NEW" shape = box]
+NEWARRAY [label = "NEWARRAY" shape = box]
+NEWSTRING [label = "NEWSTRING" shape = box]
+NOP [label = "NOP" shape = box]
+POP [label = "POP" shape = box]
+PUTFIELD [label = "PUTFIELD" shape = box]
+STORE [label = "STORE" shape = box]
+VIRTUALCALL [label = "VIRTUALCALL" shape = box]
+
+
+SequentialBytecode -> ARRAYLOAD
+SequentialBytecode -> ARRAYSTORE
+SequentialBytecode -> CAST [minlen = 2]
+SequentialBytecode -> CONST [minlen = 2]
+SequentialBytecode -> CONSTRUCTORCALL [minlen = 3]
+SequentialBytecode -> DUP [minlen = 3]
+SequentialBytecode -> GETFIELD [minlen = 4]
+SequentialBytecode -> BinOpBytecode [minlen = 5]
+SequentialBytecode -> LOAD [minlen = 5]
+SequentialBytecode -> NEG [minlen = 4]
+SequentialBytecode -> NEW [minlen = 4]
+SequentialBytecode -> NEWARRAY [minlen = 4]
+SequentialBytecode -> NEWSTRING [minlen = 3]
+SequentialBytecode -> NOP [minlen = 3]
+SequentialBytecode -> POP [minlen = 2]
+SequentialBytecode -> PUTFIELD [minlen = 2]
+SequentialBytecode -> STORE
+SequentialBytecode -> VIRTUALCALL
+
+ArithmeticBinOp [label = "ArithmeticBinOp"]
+BooleanBinOp [label = "BooleanBinOp"]
+ComparisonBinOp [label = "ComparisonBinOp"]
+
+BinOpBytecode -> ArithmeticBinOp
+BinOpBytecode -> BooleanBinOp
+BinOpBytecode -> ComparisonBinOp
+
+ADD [label ="ADD" shape = box]
+DIV [label ="DIV" shape = box]
+MUL [label ="MUL" shape = box]
+SUB [label ="SUB" shape = box]
+
+ArithmeticBinOp -> ADD
+ArithmeticBinOp -> DIV
+ArithmeticBinOp -> MUL
+ArithmeticBinOp -> SUB
+
+AND [label ="AND" shape = box]
+OR [label ="OR" shape = box]
+
+BooleanBinOp -> AND
+BooleanBinOp -> OR
+
+ComparisonNumericalBinOpBytecode [label = "ComparisonNumericalBinOpBytecode"]
+EQ [label ="EQ" shape = box]
+NE [label ="NE" shape = box]
+
+ComparisonBinOp -> ComparisonNumericalBinOpBytecode
+ComparisonBinOp -> EQ
+ComparisonBinOp -> NE
+
+GE [label ="GE" shape = box]
+GT [label ="GT" shape = box]
+LE [label ="LE" shape = box]
+LT [label ="LT" shape = box]
+
+ComparisonNumericalBinOpBytecode -> GE
+ComparisonNumericalBinOpBytecode -> GT
+ComparisonNumericalBinOpBytecode -> LE
+ComparisonNumericalBinOpBytecode -> LT
+
+}

@@ -1,0 +1,18 @@
+digraph signatures {
+size = "11,7.5";
+node [style = filled]
+
+ClassMemberSignature [label = "ClassMemberSignature"]
+
+CodeSignature [label = "CodeSignature"]
+FieldSignature [label = "FieldSignature" shape = box]
+
+ClassMemberSignature -> CodeSignature
+ClassMemberSignature -> FieldSignature
+
+MethodSignature [label = "MethodSignature" shape = box]
+ConstructorSignature [label = "ConstructorSignature" shape = box]
+
+CodeSignature -> MethodSignature
+CodeSignature -> ConstructorSignature
+}

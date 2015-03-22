@@ -1,0 +1,36 @@
+digraph semantical_types {
+  size = "11,7.5";
+  node [style = filled]
+  Type [label = "Type"]
+  ComparableType [label = "ComparableType"]
+  VoidType [label = "VoidType" shape = box]
+
+  Type -> ComparableType
+  Type -> VoidType
+
+  PrimitiveType [label = "PrimitiveType"]
+  ReferenceType [label = "ReferenceType"]
+
+  ComparableType -> ReferenceType
+  ComparableType -> PrimitiveType
+
+  ClassType [label = "ClassType" shape = box]
+  ArrayType [label = "ArrayType" shape = box]
+
+  ReferenceType -> ClassType
+  ReferenceType -> ArrayType
+
+  BooleanType [label = "BooleanType" shape = box]
+  NumericalType [label = "NumericalType"]
+  NilType [label = "NilType" shape = box]
+
+  PrimitiveType -> BooleanType
+  PrimitiveType -> NumericalType
+  PrimitiveType -> NilType
+
+  IntType [label = "IntType" shape = box]
+  FloatType [label = "FloatType" shape = box]
+
+  NumericalType -> IntType
+  NumericalType -> FloatType
+}

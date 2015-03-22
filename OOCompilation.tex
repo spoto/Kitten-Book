@@ -1,0 +1,61 @@
+\documentclass[12pt]{book}
+
+\usepackage[italian]{babel}
+\usepackage{a4wide}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{epsfig}
+%\usepackage{listings}
+%\usepackage{chapterbib}  % Put References at the end of each chapter
+\usepackage{fancyhdr}    % Fancy Header and Footer
+\usepackage{txfonts}     % Public Times New Roman text & math font
+%\usepackage{showkeys}
+\usepackage[all]{xy}
+
+%\lstloadlanguages{Java}
+%\lstset{language=Java, basicstyle={\texttt\small}, stringspaces=false}
+%\lstset{keywordstyle={\small\textbf}}
+%\lstset{identifierstyle={\small\textsf}}
+
+%%% Fancy Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fancy Header Style Options
+\pagestyle{fancy}                      % Sets fancy header and footer
+\fancyfoot{}                           % Delete current footer settings
+\renewcommand{\chaptermark}[1]{        % Lower Case Chapter marker style
+  \markboth{\chaptername\ \thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{        % Lower case Section marker style
+  \markright{\thesection.\ #1}}        %
+\fancyhead[LE,RO]{\bfseries\thepage}   % Page number (boldface) in left on even
+                                       % pages and right on odd pages
+\fancyhead[RE]{\bfseries\leftmark}     % Chapter in the right on even pages
+\fancyhead[LO]{\bfseries\rightmark}    % Section in the left on odd pages
+\renewcommand{\headrulewidth}{0.3pt}   % Width of head rule
+
+%%% Clear Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Clear Header Style on the Last Empty Odd pages
+\makeatletter
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else%
+    \hbox{}%
+    \thispagestyle{empty}%             % Empty header styles
+    \newpage%
+    \if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\makeatother
+
+\include{macros}
+
+\begin{document}
+
+\include{title}
+\include{kitten}
+\include{lexical}
+\include{syntactical}
+\include{recursive_descent}
+\include{semantical}
+\include{translate}
+
+\bibliographystyle{plain}
+\bibliography{OOCompilation}
+
+\end{document}

@@ -1,0 +1,1449 @@
+%!PS-Adobe-2.0
+%%Creator: dot version 1.9 (Wed Apr 30 10:28:47 EDT 2003)
+%%For: (spoto) Fausto Spoto
+%%Title: Led
+%%Pages: (atend)
+%%BoundingBox: 35 35 425 577
+%%EndComments
+save
+%%BeginProlog
+/DotDict 200 dict def
+DotDict begin
+
+/setupLatin1 {
+mark
+/EncodingVector 256 array def
+ EncodingVector 0
+
+ISOLatin1Encoding 0 255 getinterval putinterval
+
+EncodingVector
+  dup 306 /AE
+  dup 301 /Aacute
+  dup 302 /Acircumflex
+  dup 304 /Adieresis
+  dup 300 /Agrave
+  dup 305 /Aring
+  dup 303 /Atilde
+  dup 307 /Ccedilla
+  dup 311 /Eacute
+  dup 312 /Ecircumflex
+  dup 313 /Edieresis
+  dup 310 /Egrave
+  dup 315 /Iacute
+  dup 316 /Icircumflex
+  dup 317 /Idieresis
+  dup 314 /Igrave
+  dup 334 /Udieresis
+  dup 335 /Yacute
+  dup 376 /thorn
+  dup 337 /germandbls
+  dup 341 /aacute
+  dup 342 /acircumflex
+  dup 344 /adieresis
+  dup 346 /ae
+  dup 340 /agrave
+  dup 345 /aring
+  dup 347 /ccedilla
+  dup 351 /eacute
+  dup 352 /ecircumflex
+  dup 353 /edieresis
+  dup 350 /egrave
+  dup 355 /iacute
+  dup 356 /icircumflex
+  dup 357 /idieresis
+  dup 354 /igrave
+  dup 360 /dcroat
+  dup 361 /ntilde
+  dup 363 /oacute
+  dup 364 /ocircumflex
+  dup 366 /odieresis
+  dup 362 /ograve
+  dup 365 /otilde
+  dup 370 /oslash
+  dup 372 /uacute
+  dup 373 /ucircumflex
+  dup 374 /udieresis
+  dup 371 /ugrave
+  dup 375 /yacute
+  dup 377 /ydieresis  
+
+% Set up ISO Latin 1 character encoding
+/starnetISO {
+        dup dup findfont dup length dict begin
+        { 1 index /FID ne { def }{ pop pop } ifelse
+        } forall
+        /Encoding EncodingVector def
+        currentdict end definefont
+} def
+/Times-Roman starnetISO def
+/Times-Italic starnetISO def
+/Times-Bold starnetISO def
+/Times-BoldItalic starnetISO def
+/Helvetica starnetISO def
+/Helvetica-Oblique starnetISO def
+/Helvetica-Bold starnetISO def
+/Helvetica-BoldOblique starnetISO def
+/Courier starnetISO def
+/Courier-Oblique starnetISO def
+/Courier-Bold starnetISO def
+/Courier-BoldOblique starnetISO def
+cleartomark
+} bind def
+
+%%BeginResource: procset
+/coord-font-family /Times-Roman def
+/default-font-family /Times-Roman def
+/coordfont coord-font-family findfont 8 scalefont def
+
+/InvScaleFactor 1.0 def
+/set_scale {
+	dup 1 exch div /InvScaleFactor exch def
+	dup scale
+} bind def
+
+% styles
+/solid { [] 0 setdash } bind def
+/dashed { [9 InvScaleFactor mul dup ] 0 setdash } bind def
+/dotted { [1 InvScaleFactor mul 6 InvScaleFactor mul] 0 setdash } bind def
+/invis {/fill {newpath} def /stroke {newpath} def /show {pop newpath} def} bind def
+/bold { 2 setlinewidth } bind def
+/filled { } bind def
+/unfilled { } bind def
+/rounded { } bind def
+/diagonals { } bind def
+
+% hooks for setting color 
+/nodecolor { sethsbcolor } bind def
+/edgecolor { sethsbcolor } bind def
+/graphcolor { sethsbcolor } bind def
+/nopcolor {pop pop pop} bind def
+
+/beginpage {	% i j npages
+	/npages exch def
+	/j exch def
+	/i exch def
+	/str 10 string def
+	npages 1 gt {
+		gsave
+			coordfont setfont
+			0 0 moveto
+			(\() show i str cvs show (,) show j str cvs show (\)) show
+		grestore
+	} if
+} bind def
+
+/set_font {
+	findfont exch
+	scalefont setfont
+} def
+
+% draw aligned label in bounding box aligned to current point
+/alignedtext {			% width adj text
+	/text exch def
+	/adj exch def
+	/width exch def
+	gsave
+		width 0 gt {
+			text stringwidth pop adj mul 0 rmoveto
+		} if
+		[] 0 setdash
+		text show
+	grestore
+} def
+
+/boxprim {				% xcorner ycorner xsize ysize
+		4 2 roll
+		moveto
+		2 copy
+		exch 0 rlineto
+		0 exch rlineto
+		pop neg 0 rlineto
+		closepath
+} bind def
+
+/ellipse_path {
+	/ry exch def
+	/rx exch def
+	/y exch def
+	/x exch def
+	matrix currentmatrix
+	newpath
+	x y translate
+	rx ry scale
+	0 0 1 0 360 arc
+	setmatrix
+} bind def
+
+/endpage { showpage } bind def
+
+/layercolorseq
+	[	% layer color sequence - darkest to lightest
+		[0 0 0]
+		[.2 .8 .8]
+		[.4 .8 .8]
+		[.6 .8 .8]
+		[.8 .8 .8]
+	]
+def
+
+/layerlen layercolorseq length def
+
+/setlayer {/maxlayer exch def /curlayer exch def
+	layercolorseq curlayer 1 sub layerlen mod get
+	aload pop sethsbcolor
+	/nodecolor {nopcolor} def
+	/edgecolor {nopcolor} def
+	/graphcolor {nopcolor} def
+} bind def
+
+/onlayer { curlayer ne {invis} if } def
+
+/onlayers {
+	/myupper exch def
+	/mylower exch def
+	curlayer mylower lt
+	curlayer myupper gt
+	or
+	{invis} if
+} def
+
+/curlayer 0 def
+
+%%EndResource
+%%EndProlog
+%%BeginSetup
+14 default-font-family set_font
+1 setmiterlimit
+% /arrowlength 10 def
+% /arrowwidth 5 def
+
+% make sure pdfmark is harmless for PS-interpreters other than Distiller
+/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse
+% make '<<' and '>>' safe on PS Level 1 devices
+/languagelevel where {pop languagelevel}{1} ifelse
+2 lt {
+    userdict (<<) cvn ([) cvn load put
+    userdict (>>) cvn ([) cvn load put
+} if
+
+%%EndSetup
+%%Page: 1 1
+%%PageBoundingBox: 36 36 425 577
+%%PageOrientation: Portrait
+gsave
+35 35 390 542 boxprim clip newpath
+36 36 translate
+0 0 1 beginpage
+0.5294 set_scale
+0 0 translate 0 rotate
+0.000 0.000 0.000 graphcolor
+14.00 /Times-Roman set_font
+
+%	node27
+gsave 10 dict begin
+219 994 63 18 ellipse_path
+stroke
+gsave 10 dict begin
+219 989 moveto 105 -0.5 (ClassDefinition) alignedtext
+end grestore
+end grestore
+
+%	symbol_Led
+gsave 10 dict begin
+newpath 172 926 moveto
+118 926 lineto
+118 890 lineto
+172 890 lineto
+closepath
+stroke
+gsave 10 dict begin
+14.00 /Times-Italic set_font
+145 903 moveto 26 -0.5 (Led) alignedtext
+end grestore
+end grestore
+
+%	node27 -> symbol_Led
+newpath 202 976 moveto
+197 971 191 964 185 958 curveto
+178 950 171 942 165 934 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 167 933 moveto
+159 926 lineto
+163 936 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+203 948 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	symbol_Object
+gsave 10 dict begin
+newpath 248 926 moveto
+190 926 lineto
+190 890 lineto
+248 890 lineto
+closepath
+stroke
+gsave 10 dict begin
+14.00 /Times-Italic set_font
+219 903 moveto 45 -0.5 (Object) alignedtext
+end grestore
+end grestore
+
+%	node27 -> symbol_Object
+newpath 219 976 moveto
+219 964 219 949 219 936 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 222 936 moveto
+219 926 lineto
+217 936 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+254 948 moveto 63 -0.5 (superclassName) alignedtext
+end grestore
+
+%	node26
+gsave 10 dict begin
+333 908 67 18 ellipse_path
+stroke
+gsave 10 dict begin
+333 903 moveto 112 -0.5 (FieldDeclaration) alignedtext
+end grestore
+end grestore
+
+%	node27 -> node26
+newpath 258 980 moveto
+270 974 283 967 294 958 curveto
+302 951 310 942 317 933 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 318 936 moveto
+322 926 lineto
+314 933 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+336 948 moveto 46 -0.5 (declarations) alignedtext
+end grestore
+
+%	node0
+gsave 10 dict begin
+130 822 94 18 ellipse_path
+stroke
+gsave 10 dict begin
+130 817 moveto 166 -0.5 (BooleanTypeExpression) alignedtext
+end grestore
+end grestore
+
+%	node26 -> node0
+newpath 297 893 moveto
+264 879 214 857 177 842 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 179 840 moveto
+169 838 lineto
+177 845 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+265 862 moveto 17 -0.5 (type) alignedtext
+end grestore
+
+%	symbol_state
+gsave 10 dict begin
+newpath 510 130 moveto
+456 130 lineto
+456 94 lineto
+510 94 lineto
+closepath
+stroke
+gsave 10 dict begin
+14.00 /Times-Italic set_font
+483 107 moveto 30 -0.5 (state) alignedtext
+end grestore
+end grestore
+
+%	node26 -> symbol_state
+newpath 400 906 moveto
+507 901 704 883 704 822 curveto
+704 822 704 822 704 198 curveto
+704 119 615 156 542 130 curveto
+530 126 528 120 520 116 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 520 113 moveto
+510 113 lineto
+519 118 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+719 518 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node25
+gsave 10 dict begin
+333 822 91 18 ellipse_path
+stroke
+gsave 10 dict begin
+333 817 moveto 160 -0.5 (ConstructorDeclaration) alignedtext
+end grestore
+end grestore
+
+%	node26 -> node25
+gsave 10 dict begin
+bold
+newpath 333 890 moveto
+333 878 333 863 333 850 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 336 850 moveto
+333 840 lineto
+331 850 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+345 862 moveto 17 -0.5 (next) alignedtext
+end grestore
+end grestore
+
+%	node1
+gsave 10 dict begin
+211 736 27 18 ellipse_path
+stroke
+gsave 10 dict begin
+211 731 moveto 30 -0.5 (Skip) alignedtext
+end grestore
+end grestore
+
+%	node25 -> node1
+newpath 308 805 moveto
+287 790 258 769 237 754 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 240 753 moveto
+230 749 lineto
+237 757 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+299 776 moveto 19 -0.5 (body) alignedtext
+end grestore
+
+%	node24
+gsave 10 dict begin
+333 736 77 18 ellipse_path
+stroke
+gsave 10 dict begin
+333 731 moveto 133 -0.5 (MethodDeclaration) alignedtext
+end grestore
+end grestore
+
+%	node25 -> node24
+gsave 10 dict begin
+bold
+newpath 333 804 moveto
+333 792 333 777 333 764 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 336 764 moveto
+333 754 lineto
+331 764 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+345 776 moveto 17 -0.5 (next) alignedtext
+end grestore
+end grestore
+
+%	node2
+gsave 10 dict begin
+83 650 83 18 ellipse_path
+stroke
+gsave 10 dict begin
+83 645 moveto 144 -0.5 (VoidTypeExpression) alignedtext
+end grestore
+end grestore
+
+%	node24 -> node2
+newpath 272 725 moveto
+217 709 163 687 126 670 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 128 668 moveto
+118 666 lineto
+126 673 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+229 690 moveto 45 -0.5 (returnType) alignedtext
+end grestore
+
+%	symbol_on
+gsave 10 dict begin
+newpath 238 668 moveto
+184 668 lineto
+184 632 lineto
+238 632 lineto
+closepath
+stroke
+gsave 10 dict begin
+14.00 /Times-Italic set_font
+211 645 moveto 17 -0.5 (on) alignedtext
+end grestore
+end grestore
+
+%	node24 -> symbol_on
+newpath 309 719 moveto
+290 706 265 688 244 673 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 247 672 moveto
+237 668 lineto
+244 676 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+300 690 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node6
+gsave 10 dict begin
+615 284 52 18 ellipse_path
+stroke
+gsave 10 dict begin
+615 279 moveto 82 -0.5 (Assignment) alignedtext
+end grestore
+end grestore
+
+%	node24 -> node6
+newpath 406 730 moveto
+497 721 641 699 641 650 curveto
+641 650 641 650 641 370 curveto
+641 349 634 327 627 310 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 630 310 moveto
+624 302 lineto
+625 312 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+655 518 moveto 19 -0.5 (body) alignedtext
+end grestore
+
+%	node23
+gsave 10 dict begin
+333 650 77 18 ellipse_path
+stroke
+gsave 10 dict begin
+333 645 moveto 133 -0.5 (MethodDeclaration) alignedtext
+end grestore
+end grestore
+
+%	node24 -> node23
+gsave 10 dict begin
+bold
+newpath 333 718 moveto
+333 706 333 691 333 678 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 336 678 moveto
+333 668 lineto
+331 678 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+345 690 moveto 17 -0.5 (next) alignedtext
+end grestore
+end grestore
+
+%	node4
+gsave 10 dict begin
+615 198 50 18 ellipse_path
+stroke
+gsave 10 dict begin
+615 193 moveto 79 -0.5 (FieldAccess) alignedtext
+end grestore
+end grestore
+
+%	node6 -> node4
+newpath 615 266 moveto
+615 254 615 239 615 226 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 618 226 moveto
+615 216 lineto
+613 226 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+630 238 moveto 23 -0.5 (lvalue) alignedtext
+end grestore
+
+%	node5
+gsave 10 dict begin
+520 198 27 18 ellipse_path
+stroke
+gsave 10 dict begin
+520 193 moveto 33 -0.5 (True) alignedtext
+end grestore
+end grestore
+
+%	node6 -> node5
+newpath 596 267 moveto
+581 253 559 234 543 219 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 545 218 moveto
+536 213 lineto
+542 221 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+592 238 moveto 25 -0.5 (rvalue) alignedtext
+end grestore
+
+%	node4 -> symbol_state
+newpath 587 183 moveto
+560 167 533 149 514 135 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 517 134 moveto
+507 130 lineto
+514 138 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+570 152 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node3
+gsave 10 dict begin
+591 112 40 18 ellipse_path
+stroke
+gsave 10 dict begin
+591 107 moveto 59 -0.5 (Variable) alignedtext
+end grestore
+end grestore
+
+%	node4 -> node3
+newpath 610 180 moveto
+607 168 602 153 599 139 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 602 139 moveto
+596 130 lineto
+597 140 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+623 152 moveto 30 -0.5 (receiver) alignedtext
+end grestore
+
+%	symbol_this
+gsave 10 dict begin
+newpath 357 44 moveto
+303 44 lineto
+303 8 lineto
+357 8 lineto
+closepath
+stroke
+gsave 10 dict begin
+14.00 /Times-Italic set_font
+330 21 moveto 24 -0.5 (this) alignedtext
+end grestore
+end grestore
+
+%	node3 -> symbol_this
+newpath 562 100 moveto
+521 83 441 52 366 32 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 367 30 moveto
+357 30 lineto
+366 35 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+521 66 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node7
+gsave 10 dict begin
+172 564 83 18 ellipse_path
+stroke
+gsave 10 dict begin
+172 559 moveto 144 -0.5 (VoidTypeExpression) alignedtext
+end grestore
+end grestore
+
+%	node23 -> node7
+newpath 295 634 moveto
+262 619 230 600 207 586 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 209 584 moveto
+199 581 lineto
+206 588 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+286 604 moveto 45 -0.5 (returnType) alignedtext
+end grestore
+
+%	symbol_off
+gsave 10 dict begin
+newpath 327 582 moveto
+273 582 lineto
+273 546 lineto
+327 546 lineto
+closepath
+stroke
+gsave 10 dict begin
+14.00 /Times-Italic set_font
+300 559 moveto 23 -0.5 (off) alignedtext
+end grestore
+end grestore
+
+%	node23 -> symbol_off
+newpath 326 632 moveto
+321 620 315 604 310 591 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 313 591 moveto
+307 582 lineto
+308 592 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+335 604 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node11
+gsave 10 dict begin
+61 284 52 18 ellipse_path
+stroke
+gsave 10 dict begin
+61 279 moveto 82 -0.5 (Assignment) alignedtext
+end grestore
+end grestore
+
+%	node23 -> node11
+newpath 269 640 moveto
+263 637 257 635 247 632 curveto
+164 605 61 652 61 564 curveto
+61 564 61 564 61 370 curveto
+61 350 61 327 61 310 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 64 312 moveto
+61 302 lineto
+59 312 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+75 475 moveto 19 -0.5 (body) alignedtext
+end grestore
+
+%	node22
+gsave 10 dict begin
+422 564 77 18 ellipse_path
+stroke
+gsave 10 dict begin
+422 559 moveto 133 -0.5 (MethodDeclaration) alignedtext
+end grestore
+end grestore
+
+%	node23 -> node22
+gsave 10 dict begin
+bold
+newpath 351 632 moveto
+365 619 382 602 397 588 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 398 590 moveto
+404 582 lineto
+395 587 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+397 604 moveto 17 -0.5 (next) alignedtext
+end grestore
+end grestore
+
+%	node9
+gsave 10 dict begin
+129 198 50 18 ellipse_path
+stroke
+gsave 10 dict begin
+129 193 moveto 79 -0.5 (FieldAccess) alignedtext
+end grestore
+end grestore
+
+%	node11 -> node9
+newpath 75 267 moveto
+85 254 98 237 109 223 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 110 225 moveto
+115 216 lineto
+107 222 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+116 238 moveto 23 -0.5 (lvalue) alignedtext
+end grestore
+
+%	node10
+gsave 10 dict begin
+33 198 28 18 ellipse_path
+stroke
+gsave 10 dict begin
+33 193 moveto 34 -0.5 (False) alignedtext
+end grestore
+end grestore
+
+%	node11 -> node10
+newpath 55 266 moveto
+51 254 46 238 42 225 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 45 225 moveto
+39 216 lineto
+40 226 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+66 238 moveto 25 -0.5 (rvalue) alignedtext
+end grestore
+
+%	node9 -> symbol_state
+newpath 167 186 moveto
+174 184 181 182 188 180 curveto
+220 171 229 173 259 162 curveto
+273 157 275 152 288 148 curveto
+292 146 432 131 435 130 curveto
+442 126 442 121 447 117 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 448 119 moveto
+456 113 lineto
+446 115 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+303 152 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node8
+gsave 10 dict begin
+139 112 40 18 ellipse_path
+stroke
+gsave 10 dict begin
+139 107 moveto 59 -0.5 (Variable) alignedtext
+end grestore
+end grestore
+
+%	node9 -> node8
+newpath 131 180 moveto
+133 168 134 153 136 139 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 138 140 moveto
+137 130 lineto
+133 140 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+155 152 moveto 30 -0.5 (receiver) alignedtext
+end grestore
+
+%	node8 -> symbol_this
+newpath 163 97 moveto
+192 80 243 53 294 34 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 294 37 moveto
+303 31 lineto
+293 32 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+243 66 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node12
+gsave 10 dict begin
+208 478 94 18 ellipse_path
+stroke
+gsave 10 dict begin
+208 473 moveto 166 -0.5 (BooleanTypeExpression) alignedtext
+end grestore
+end grestore
+
+%	node22 -> node12
+newpath 360 553 moveto
+338 545 311 533 298 528 curveto
+280 519 261 509 245 499 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 247 497 moveto
+237 495 lineto
+245 502 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+331 518 moveto 45 -0.5 (returnType) alignedtext
+end grestore
+
+%	symbol_isOn
+gsave 10 dict begin
+newpath 374 496 moveto
+320 496 lineto
+320 460 lineto
+374 460 lineto
+closepath
+stroke
+gsave 10 dict begin
+14.00 /Times-Italic set_font
+347 473 moveto 31 -0.5 (isOn) alignedtext
+end grestore
+end grestore
+
+%	node22 -> symbol_isOn
+newpath 386 548 moveto
+377 543 368 536 361 528 curveto
+356 522 353 513 351 505 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 354 505 moveto
+349 496 lineto
+349 506 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+379 518 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node15
+gsave 10 dict begin
+256 424 35 18 ellipse_path
+stroke
+gsave 10 dict begin
+256 419 moveto 49 -0.5 (Return) alignedtext
+end grestore
+end grestore
+
+%	node22 -> node15
+newpath 420 546 moveto
+417 522 408 482 383 460 curveto
+371 448 330 438 297 432 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 299 430 moveto
+289 430 lineto
+298 435 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+433 518 moveto 19 -0.5 (body) alignedtext
+end grestore
+
+%	node21
+gsave 10 dict begin
+518 478 77 18 ellipse_path
+stroke
+gsave 10 dict begin
+518 473 moveto 133 -0.5 (MethodDeclaration) alignedtext
+end grestore
+end grestore
+
+%	node22 -> node21
+gsave 10 dict begin
+bold
+newpath 442 546 moveto
+457 533 476 515 491 501 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 492 503 moveto
+498 495 lineto
+489 500 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+488 518 moveto 17 -0.5 (next) alignedtext
+end grestore
+end grestore
+
+%	node14
+gsave 10 dict begin
+247 198 50 18 ellipse_path
+stroke
+gsave 10 dict begin
+247 193 moveto 79 -0.5 (FieldAccess) alignedtext
+end grestore
+end grestore
+
+%	node15 -> node14
+newpath 255 406 moveto
+253 366 250 272 248 225 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 251 226 moveto
+248 216 lineto
+246 226 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+274 324 moveto 33 -0.5 (returned) alignedtext
+end grestore
+
+%	node14 -> symbol_state
+newpath 277 183 moveto
+301 172 334 158 365 148 curveto
+397 137 408 142 438 130 curveto
+443 128 446 125 449 123 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 449 126 moveto
+456 118 lineto
+446 122 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+380 152 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node13
+gsave 10 dict begin
+273 112 40 18 ellipse_path
+stroke
+gsave 10 dict begin
+273 107 moveto 59 -0.5 (Variable) alignedtext
+end grestore
+end grestore
+
+%	node14 -> node13
+newpath 227 181 moveto
+218 172 211 159 217 148 curveto
+221 141 228 135 235 129 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 236 131 moveto
+243 124 lineto
+233 127 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+236 152 moveto 30 -0.5 (receiver) alignedtext
+end grestore
+
+%	node13 -> symbol_this
+newpath 285 95 moveto
+293 82 304 66 313 52 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 315 54 moveto
+318 44 lineto
+311 51 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+321 66 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node16
+gsave 10 dict begin
+447 370 94 18 ellipse_path
+stroke
+gsave 10 dict begin
+447 365 moveto 166 -0.5 (BooleanTypeExpression) alignedtext
+end grestore
+end grestore
+
+%	node21 -> node16
+newpath 498 461 moveto
+493 455 487 448 482 442 curveto
+472 428 463 410 457 396 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 460 396 moveto
+454 388 lineto
+455 398 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+508 421 moveto 45 -0.5 (returnType) alignedtext
+end grestore
+
+%	symbol_isOff
+gsave 10 dict begin
+newpath 613 388 moveto
+559 388 lineto
+559 352 lineto
+613 352 lineto
+closepath
+stroke
+gsave 10 dict begin
+14.00 /Times-Italic set_font
+586 365 moveto 37 -0.5 (isOff) alignedtext
+end grestore
+end grestore
+
+%	node21 -> symbol_isOff
+newpath 529 460 moveto
+540 442 557 415 570 395 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 571 398 moveto
+575 388 lineto
+567 395 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+576 421 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node20
+gsave 10 dict begin
+300 370 35 18 ellipse_path
+stroke
+gsave 10 dict begin
+300 365 moveto 49 -0.5 (Return) alignedtext
+end grestore
+end grestore
+
+%	node21 -> node20
+newpath 466 465 moveto
+412 443 359 411 329 390 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 331 388 moveto
+321 385 lineto
+328 392 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+431 421 moveto 19 -0.5 (body) alignedtext
+end grestore
+
+%	node19
+gsave 10 dict begin
+375 284 27 18 ellipse_path
+stroke
+gsave 10 dict begin
+375 279 moveto 26 -0.5 (Not) alignedtext
+end grestore
+end grestore
+
+%	node20 -> node19
+newpath 314 353 moveto
+326 339 342 321 355 307 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 356 309 moveto
+361 300 lineto
+353 306 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+363 324 moveto 33 -0.5 (returned) alignedtext
+end grestore
+
+%	node18
+gsave 10 dict begin
+409 198 50 18 ellipse_path
+stroke
+gsave 10 dict begin
+409 193 moveto 79 -0.5 (FieldAccess) alignedtext
+end grestore
+end grestore
+
+%	node19 -> node18
+newpath 382 266 moveto
+387 254 393 238 398 225 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 400 226 moveto
+402 216 lineto
+396 224 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+420 238 moveto 40 -0.5 (expression) alignedtext
+end grestore
+
+%	node18 -> symbol_state
+newpath 426 181 moveto
+432 175 439 168 444 162 curveto
+451 154 458 146 464 138 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 466 140 moveto
+469 130 lineto
+462 137 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+468 152 moveto 22 -0.5 (name) alignedtext
+end grestore
+
+%	node17
+gsave 10 dict begin
+389 112 40 18 ellipse_path
+stroke
+gsave 10 dict begin
+389 107 moveto 59 -0.5 (Variable) alignedtext
+end grestore
+end grestore
+
+%	node18 -> node17
+newpath 405 180 moveto
+403 168 399 153 395 139 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 398 139 moveto
+393 130 lineto
+393 140 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+421 152 moveto 30 -0.5 (receiver) alignedtext
+end grestore
+
+%	node17 -> symbol_this
+newpath 377 95 moveto
+369 82 357 66 348 52 curveto
+stroke
+gsave 10 dict begin
+solid
+0.000 0.000 0.000 edgecolor
+newpath 350 51 moveto
+343 44 lineto
+346 54 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+end grestore
+gsave 10 dict begin
+8.00 /Times-Roman set_font
+382 66 moveto 22 -0.5 (name) alignedtext
+end grestore
+endpage
+grestore
+%%PageTrailer
+%%EndPage: 1
+%%Trailer
+%%Pages: 1
+end
+restore
+%%EOF

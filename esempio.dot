@@ -1,0 +1,17 @@
+digraph "protected static julia.Julia.disclaimer(julia.graphics.Gfx):void" {
+size = "11,7.5";
+codeblock_562 [ shape = box, label = "load 0 of type julia.graphics.Gfx\nconst \nJulia version 1.0 (December 12, 2006), Copyright (C) 2006 Fausto Spoto\nopen call julia.graphics.Gfx.println(java.lang.String):void ([])"];
+codeblock_555 [ shape = box, label = "catch throws 0\nathrow java.lang.Throwable"];
+codeblock_562->codeblock_555 [color = blue label = "" fontsize = 8]
+codeblock_560 [ shape = box, label = "load 0 of type julia.graphics.Gfx\nconst \nJulia comes with ABSOLUTELY NO WARRANTY; for details use `-gpl'.\nopen call julia.graphics.Gfx.println(java.lang.String):void ([])"];
+codeblock_560->codeblock_555 [color = blue label = "" fontsize = 8]
+codeblock_558 [ shape = box, label = "load 0 of type julia.graphics.Gfx\nconst This is free software, and you are welcome to redistribute it\nopen call julia.graphics.Gfx.println(java.lang.String):void ([])"];
+codeblock_558->codeblock_555 [color = blue label = "" fontsize = 8]
+codeblock_556 [ shape = box, label = "load 0 of type julia.graphics.Gfx\nconst under certain conditions; use `-redistribute' for details.\n\nopen call julia.graphics.Gfx.println(java.lang.String):void ([])"];
+codeblock_556->codeblock_555 [color = blue label = "" fontsize = 8]
+codeblock_554 [ shape = box, label = "return void"];
+codeblock_556->codeblock_554 [color = blue label = "" fontsize = 8]
+codeblock_558->codeblock_556 [color = blue label = "" fontsize = 8]
+codeblock_560->codeblock_558 [color = blue label = "" fontsize = 8]
+codeblock_562->codeblock_560 [color = blue label = "" fontsize = 8]
+}

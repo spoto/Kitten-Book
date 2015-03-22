@@ -1,0 +1,25 @@
+digraph expressions {
+size = "11,7.5";
+node [style = filled]
+Absyn [label = "Absyn"]
+Command [label = "Command"]
+Assignment [label = "Assignment" shape = box]
+For [label = "For" shape = box]
+IfThenElse [label = "IfThenElse" shape = box]
+LocalDeclaration [label = "LocalDeclaration" shape = box]
+LocalScope [label = "LocalScope" shape = box]
+MethodCallCommand [label = "MethodCallCommand" shape = box]
+Return [label = "Return" shape = box]
+Skip [label = "Skip" shape = box]
+While [label = "While" shape = box]
+Absyn -> Command
+Command -> Assignment [minlen = 1]
+Command -> For [minlen = 2]
+Command -> IfThenElse [minlen = 3]
+Command -> LocalDeclaration [minlen = 4]
+Command -> LocalScope [minlen = 4]
+Command -> MethodCallCommand [minlen = 4]
+Command -> Return [minlen = 3]
+Command -> Skip [minlen = 2]
+Command -> While [minlen = 1]
+}

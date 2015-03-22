@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html><head><script src="lr1notslr_files/bmi" language="javascript"></script><title>3.3.4 SLR(1), LR(1), and LALR(1) Grammars</title> <meta name="resource-type" content="document"><meta name="distribution" content="global"><meta name="Generator" content="jLaTeX2HTML v2002-2-1 JA patch-1.4"><meta http-equiv="Content-Style-Type" content="text/css"><link rel="STYLESHEET" href="lr1notslr_files/notes"><link rel="next" href="http://lambda.uta.edu/cse5317/notes/node21.html"><link rel="previous" href="http://lambda.uta.edu/cse5317/notes/node19.html"><link rel="up" href="http://lambda.uta.edu/cse5317/notes/node16.html"><link rel="next" href="http://lambda.uta.edu/cse5317/notes/node21.html"></head><body><a name="tex2html365" href="http://lambda.uta.edu/cse5317/notes/node21.html"><img alt="next" src="lr1notslr_files/next" align="bottom" border="0" height="24" width="37"></a> <a name="tex2html361" href="http://lambda.uta.edu/cse5317/notes/node16.html"><img alt="up" src="lr1notslr_files/up" align="bottom" border="0" height="24" width="26"></a> <a name="tex2html355" href="http://lambda.uta.edu/cse5317/notes/node19.html"><img alt="previous" src="lr1notslr_files/prev" align="bottom" border="0" height="24" width="63"></a> <a name="tex2html363" href="http://lambda.uta.edu/cse5317/notes/node1.html"><img alt="contents" src="lr1notslr_files/contents" align="bottom" border="0" height="24" width="65"></a><br><b>Next:</b> <a name="tex2html366" href="http://lambda.uta.edu/cse5317/notes/node21.html">3.3.5 Practical Considerations for</a> <b>Up:</b> <a name="tex2html362" href="http://lambda.uta.edu/cse5317/notes/node16.html">3.3 Bottom-up Parsing</a> <b>Previous:</b> <a name="tex2html356" href="http://lambda.uta.edu/cse5317/notes/node19.html">3.3.3 Table Construction</a><br><p></p><h3><a name="SECTION00043400000000000000">3.3.4 SLR(1), LR(1), and LALR(1) Grammars</a></h3><p>Here is an example of a grammar that is not LR(0):</p><p></p><pre>1)  S ::= E $
+2)  E ::= E + T
+3)      | T
+4)  T ::= T * F
+5)      | F
+6)  F ::= id
+7)     | ( E )
+</pre><p>Let's focus on two item sets only:</p><p></p><pre>I0:  S ::= . E $                  I1:  E ::= T .
+     E ::= . E + T                     T ::= T . * F
+     E ::= . T                    
+     T ::= . T * F
+     T ::= . F
+     F ::= . id
+     F ::= . ( E )
+</pre><p>State <code>I1</code> has a shift-reduce conflict. Another example is:</p><p></p><pre>S ::= X
+X ::= Y
+    | id
+Y ::= id
+</pre> which includes the following two item sets:<p></p><pre>I0:  S ::= . X $
+     X ::= . Y             I1:  X ::= id .
+     X ::= . id                 Y ::= id .
+     Y ::= . id
+</pre><p>State <code>I1</code> has a reduce-reduce conflict.</p><p>Can we find an easy fix for the reduce-reduce and the shift-reduce conflicts? Consider the state <code>I1</code> of the first example above. The FOLLOW of <code>E</code> is <code>{$,+,)}</code>. We can see that <code>*</code> is not in the <code>FOLLOW[E]</code>, which means that if we could see the next token (called the <em>lookahead token</em>) and this token is <code>*</code>, then we can use the item <code>T ::= T . * F</code> to do a shift; otherwise, if the lookahead is one of <code>{$,+,)}</code>, we reduce by <code>E ::= T</code>. The same trick can be used in the case of a reduce-reduce conflict. For example, if we have a state with the items <code>A ::= a .</code> and <code>B ::= b .</code>, then if <code>FOLLOW[A]</code> doesn't overlap with <code>FOLLOW[B]</code>,
+then we can deduce which production to reduce by inspecting the
+lookahead token. This grammar (where we can look one token ahead) is
+called SLR(1) and is more powerful than LR(0).</p><p>The previous trick is not always possible. Consider the grammar:</p><p></p><pre>S ::= E $
+E ::= L = R
+    | R
+L ::= * R
+    | id
+R ::= L
+</pre> for C-style variable assignments. Consider the two states:<p></p><pre>I0:  S ::= . E $
+     E ::= . L = R             I1:  E ::= L . = R
+     E ::= . R                      R ::= L .
+     L ::= . * R
+     L ::= . id
+     R ::= . L
+</pre> we have a shift-reduce conflict in <code>I1</code>. The FOLLOW of <code>R</code> is the union of the FOLLOW of <code>E</code> and the FOLLOW of <code>L</code>, ie, it is <code>{$,=}</code>. In this case, <code>=</code> is a member of the FOLLOW of <code>R</code>, so we can't decide shift or reduce using just one lookahead.<p>An
+even more powerful grammar is LR(1), described below. This grammar is
+not used in practice because of the large number of states it
+generates. A simplified version of this grammar, called LALR(1), has
+the same number of states as LR(0) but it is far more powerful than
+LR(0) (but less powerful than LR(1)). It is the most important grammar
+from all grammars we learned so far. CUP, Bison, and Yacc recognize
+LALR(1) grammars.</p><p>Both LR(1) and LALR(1) check one lookahead
+token (they read one token ahead from the input stream - in addition to
+the current token). An item used in LR(1) and LALR(1) is like an LR(0)
+item but with the addition of a set of expected lookaheads which
+indicate what lookahead tokens would make us perform a reduction when
+we are ready to reduce using this production rule. The expected
+lookahead symbols for a rule <code>X ::= a</code> are always a subset or equal to <code>FOLLOW[X]</code>.
+The idea is that an item in an itemset represents a potential for a
+reduction using the rule associated with the item. But each itemset
+(ie. state) can be reached after a number of transitions in the state
+diagram, which means that each itemset has an implicit context, which,
+in turn, implies that there are only few terminals permitted to appear
+in the input stream after reducing by this rule. In SLR(1), we made the
+assumption that the followup tokens after the reduction by <code>X ::= a</code> are exactly equal to <code>FOLLOW[X]</code>.
+But this is too conservative and may not help us resolve the conflicts.
+So the idea is to restrict this set of followup tokens by making a more
+careful analysis by taking into account the context in which the item
+appears. This will reduce the possibility of overlappings in
+sift/reduce or reduce/reduce conflict states. For example,</p><pre>L ::= * . R, =$
+</pre> indicates that we have the item <code>L ::= * . R</code> and that we have parsed <code>*</code> and will reduce by <code>L ::= * R</code> only when we parse <code>R</code> and the next lookahead token is either <code>=</code> or <code>$</code> (end of file). It is very important to note that the FOLLOW of <code>L</code> (equal to <code>{$,=}</code>)
+is always a superset or equal to the expected lookaheads. The point of
+propagating expected lookaheads to the items is that we want to
+restrict the FOLLOW symbols so that only the relevant FOLLOW symbols
+would affect our decision when to shift or reduce in the case of a
+shift-reduce or reduce-reduce conflict. For example, if we have a state
+with two items <code>A ::= a ., s1</code> and <code>B ::= b ., s2</code>, where <code>s1</code> and <code>s2</code> are sets of terminals, then if <code>s1</code> and <code>s2</code> are not overlapping, this is not a reduce-reduce error any more, since we can decide by inspecting the lookahead token.<p>So, when we construct the item sets, we also propagate the expected lookaheads. When we have a transition from <code>A ::= a . s b</code> by a symbol <code>s</code>,
+we just propagate the expected lookaheads. The tricky part is when we
+construct the closures of the items. Recall that when we have an item <code>A ::= a . B b</code>, where <code>B</code> is a nonterminal, then we add all rules <code>B ::= . c</code> in the item set. If <code>A ::= a . B b</code> has an expected lookahead <code>t</code>, then <code>B ::= . c</code> has all the elements of <code>FIRST[bt]</code> as expected lookaheads.</p><p>For example, consider the previous grammar:</p><p></p><pre>S ::= E $
+E ::= L = R
+    | R
+L ::= * R
+    | id
+R ::= L
+</pre><p>Two of the LR(1) item sets are:</p><p></p><pre>I0:  S ::= . E $     ?
+     E ::= . L = R   $          I1:  E ::= L . = R   $
+     E ::= . R       $               R ::= L .       $
+     L ::= . * R     =$
+     L ::= . id      =$
+     R ::= . L       $
+</pre><p>We always start with expected lookahead <code>?</code> for the rule <code>S ::= E $</code>, which basically indicates that we don't care what is after end-of-file. The closure of <code>L</code> will contain both <code>=</code> and <code>$</code> for expected lookaheads because in <code>E ::= . L = R</code> the first symbol after <code>L</code> is <code>=</code>, and in <code>R ::= . L</code> (the closure of <code>E ::= . R</code>) we use the <code>$</code> terminal for expected lookahead propagated from <code>E ::= . R</code> since there is no symbol after <code>L</code>. We can see that there is no shift reduce error in <code>I1</code>: if the lookahead token is <code>$</code> we reduce, otherwise we shift (for <code>=</code>).</p><p>In LR(1) parsing, an item <code>A ::= a, s1</code> is different from <code>A ::= a, s2</code> if <code>s1</code> is different from <code>s2</code>.
+This results to a large number of states since the combinations of
+expected lookahead symbols can be very large. To reduce the number of
+states, when we have two items like those two, instead of creating two
+states (one for each item), we combine the two states into one by
+creating an item <code>A := a, s3</code>, where <code>s3</code> is the union of <code>s1</code> and <code>s2</code>.
+Since we make the expected lookahead sets larger, there is a danger
+that some conflicts will have worse chances to be resolved. But the
+number of states we get is the same as that for LR(0). This grammar is
+called LALR(1).</p><p>There is an easier way to construct the LALR(1)
+item sets. Simply start by constructing the LR(0) item sets. Then we
+add the expected lookaheads as follows: whenever we find a new
+lookahead using the closure law given above we add it in the proper
+item; when we propagate lookaheads we propagate all of them. Sometimes
+when we insert a new lookahead we need to do all the lookahead
+propagations again for the new lookahead even in the case we have
+already constructed the new items. So we may have to loop through the
+items many times until no new lookaheads are generated. Sounds hard?
+Well that's why there are parser generators to do that automatically
+for you. This is how CUP work.</p><p></p><hr><a name="tex2html365" href="http://lambda.uta.edu/cse5317/notes/node21.html"><img alt="next" src="lr1notslr_files/next" align="bottom" border="0" height="24" width="37"></a> <a name="tex2html361" href="http://lambda.uta.edu/cse5317/notes/node16.html"><img alt="up" src="lr1notslr_files/up" align="bottom" border="0" height="24" width="26"></a> <a name="tex2html355" href="http://lambda.uta.edu/cse5317/notes/node19.html"><img alt="previous" src="lr1notslr_files/prev" align="bottom" border="0" height="24" width="63"></a> <a name="tex2html363" href="http://lambda.uta.edu/cse5317/notes/node1.html"><img alt="contents" src="lr1notslr_files/contents" align="bottom" border="0" height="24" width="65"></a><br><b>Next:</b> <a name="tex2html366" href="http://lambda.uta.edu/cse5317/notes/node21.html">3.3.5 Practical Considerations for</a> <b>Up:</b> <a name="tex2html362" href="http://lambda.uta.edu/cse5317/notes/node16.html">3.3 Bottom-up Parsing</a> <b>Previous:</b> <a name="tex2html356" href="http://lambda.uta.edu/cse5317/notes/node19.html">3.3.3 Table Construction</a><address><i>Leonidas Fegaras<br>2005-01-14</i></address><script language="javascript"><!--
+bmi_SafeAddOnload(bmi_load,"bmi_orig_img");//-->
+</script></body></html>

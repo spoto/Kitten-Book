@@ -1,0 +1,15 @@
+digraph example {
+  size = "11,7.5"
+
+  a [label = "a"]
+  b [label = "b" style = filled]
+  c [label = "c" shape = box]
+  d [label = "d" color = green style = filled]
+
+  a -> b
+  b -> c
+  c -> c
+  c -> a
+
+  d -> c [label = "X" fontsize = 6 style = bold]
+}

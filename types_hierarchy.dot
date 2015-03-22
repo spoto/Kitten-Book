@@ -1,0 +1,21 @@
+digraph types {
+size = "11,7.5";
+node [style = filled]
+Absyn [label = "Absyn"]
+TypeExpression [label = "TypeExpression"]
+Absyn -> TypeExpression
+
+ArrayTypeExpression [label = "ArrayTypeExpression" shape = box]
+BooleanTypeExpression [label = "BooleanTypeExpression" shape = box]
+ClassTypeExpression [label = "ClassTypeExpression" shape = box]
+FloatTypeExpression [label = "FloatTypeExpression" shape = box]
+IntTypeExpression [label = "IntTypeExpression" shape = box]
+VoidTypeExpression [label = "VoidTypeExpression" shape = box]
+
+TypeExpression -> ArrayTypeExpression [minlen = 1]
+TypeExpression -> BooleanTypeExpression [minlen = 2]
+TypeExpression -> ClassTypeExpression [minlen = 3]
+TypeExpression -> FloatTypeExpression [minlen = 3]
+TypeExpression -> IntTypeExpression [minlen = 2]
+TypeExpression -> VoidTypeExpression [minlen = 1]
+}

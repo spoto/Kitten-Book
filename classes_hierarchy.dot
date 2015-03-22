@@ -1,0 +1,19 @@
+digraph classes {
+size = "11,7.5";
+node [style = filled]
+Absyn [label = "Absyn"]
+ClassDefinition [label = "ClassDefinition" shape = box]
+ClassMemberDeclaration [label = "ClassMemberDeclaration"]
+Absyn -> ClassDefinition
+Absyn -> ClassMemberDeclaration
+
+CodeDeclaration [label = "CodeDeclaration"]
+FieldDeclaration [label = "FieldDeclaration" shape = box]
+ClassMemberDeclaration -> CodeDeclaration
+ClassMemberDeclaration -> FieldDeclaration
+
+ConstructorDeclaration [label = "ConstructorDeclaration" shape = box]
+MethodDeclaration [label = "MethodDeclaration" shape = box]
+CodeDeclaration -> ConstructorDeclaration
+CodeDeclaration -> MethodDeclaration
+}

@@ -1,0 +1,81 @@
+digraph expressions {
+size = "11,7.5";
+node [style = filled]
+Absyn [label = "Absyn"]
+Expression [label = "Expression"]
+Absyn -> Expression
+Cast [label = "Cast" shape = box]
+Lvalue [label = "Lvalue"]
+Literal [label = "Literal"]
+FloatLiteral [label = "FloatLiteral" shape = box]
+IntLiteral [label = "IntLiteral" shape = box]
+StringLiteral [label = "StringLiteral" shape = box]
+BinOp [label = "BinOp"]
+False [label = "False" shape = box]
+True [label = "True" shape = box]
+MethodCallExpression [label = "MethodCallExpression" shape = box]
+Minus [label = "Minus" shape = box]
+NewArray [label = "NewArray" shape = box]
+NewObject [label = "NewObject" shape = box]
+Nil [label = "Nil" shape = box]
+Not [label = "Not" shape = box]
+Expression -> BinOp [minlen = 3]
+Expression -> Cast
+Expression -> Literal
+Expression -> Lvalue [minlen = 5]
+Expression -> MethodCallExpression [minlen = 2]
+Expression -> Minus [minlen = 2]
+Expression -> NewArray [minlen = 3]
+Expression -> NewObject [minlen = 4]
+Expression -> Not [minlen = 5]
+Literal -> FloatLiteral [minlen = 3]
+Literal -> True [minlen = 2]
+Literal -> False
+Literal -> Nil
+Literal -> IntLiteral [minlen = 2]
+Literal -> StringLiteral [minlen = 3]
+
+ArrayAccess [label = "ArrayAccess" shape = box]
+FieldAccess [label = "FieldAccess" shape = box]
+Variable [label = "Variable" shape = box]
+Lvalue -> ArrayAccess [minlen = 2]
+Lvalue -> FieldAccess
+Lvalue -> Variable [minlen = 2]
+
+ArithmeticBinOp [label = "ArithmeticBinOp"]
+BooleanBinOp [label = "BooleanBinOp"]
+ComparisonBinOp [label = "ComparisonBinOp"]
+BinOp -> ArithmeticBinOp
+BinOp -> BooleanBinOp
+BinOp -> ComparisonBinOp
+
+Addition [label = "Addition" shape = box]
+Division [label = "Division" shape = box]
+Multiplication [label = "Multiplication" shape = box]
+Subtraction [label = "Subtraction" shape = box]
+ArithmeticBinOp -> Addition [minlen = 2]
+ArithmeticBinOp -> Division
+ArithmeticBinOp -> Multiplication
+ArithmeticBinOp -> Subtraction [minlen = 2]
+
+And [label = "And" shape = box]
+Or [label = "Or" shape = box]
+BooleanBinOp -> And
+BooleanBinOp -> Or [minlen = 2]
+
+Equal [label = "Equal" shape = box]
+NumericalComparisonBinOp [label = "NumericalComparisonBinOp"]
+NotEqual [label = "NotEqual" shape = box]
+ComparisonBinOp -> NumericalComparisonBinOp [minlen = 2]
+ComparisonBinOp -> Equal
+ComparisonBinOp -> NotEqual
+
+GreaterThan [label = "GreaterThan" shape = box]
+GreaterThanOrEqual [label = "GreaterThanOrEqual" shape = box]
+LessThan [label = "LessThan" shape = box]
+LessThanOrEqual [label = "LessThanOrEqual" shape = box]
+NumericalComparisonBinOp -> GreaterThan
+NumericalComparisonBinOp -> GreaterThanOrEqual
+NumericalComparisonBinOp -> LessThan
+NumericalComparisonBinOp -> LessThanOrEqual
+}
