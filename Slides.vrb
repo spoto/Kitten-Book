@@ -1,0 +1,21 @@
+\frametitle{Intermediate code generation}
+
+\begin{greenbox}{Intermediate Kitten bytecode}
+\begin{verbatim}
+  Led():                          isOn():
+    return void                     load 0 of type Led
+                                    getfield Led.state
+  on():                             return boolean
+    load 0 of type Led
+    const true                    isOff():
+    putfield Led.state              load 0 of type Led
+    return void                     getfield Led.state
+                                    neg boolean
+  off():                            return boolean
+    load 0 of type Led
+    const false
+    putfield Led.state
+    return void
+\end{verbatim}
+\end{greenbox}
+
