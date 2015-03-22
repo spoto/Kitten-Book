@@ -1,9 +1,9 @@
 \begin{titlepage}
-\title{\Huge{\textbf{Un Compilatore ad Oggetti per Kitten}}}
+\title{\Huge{\textbf{Un Compilatore a Oggetti per Kitten}}}
 \author{{\Large{\textbf{Fausto Spoto}}}\\{\normalsize\textit{Dipartimento di Informatica}}\\{\normalsize\textit{Universit\`a di Verona}}}
 \end{titlepage}
 \date{\vspace*{10ex}\begin{center}
-\epsfig{file = cat1.ps, width = 4cm}
+\includegraphics[width=7cm]{cat1.pdf}
 \end{center}
 }
 
@@ -43,7 +43,7 @@ e tuttora difficile arte di scrivere un compilatore. Ma gli anni passano
 ed ecco che da una parte i corsi di laurea relegano la compilazione
 nello spazio di poche lezioni; dall'altra l'evoluzione tecnologica dei
 linguaggi di programmazione rende il \emph{dragon book} carente quanto
-al trattamente della compilazione dei linguaggi \emph{ad} oggetti
+al trattamente della compilazione dei linguaggi \emph{a} oggetti
 e della stessa compilazione \emph{con} gli oggetti. Perch\'e
 la diffusione dei linguaggi a oggetti non \`e stata un cambiamento di
 facciata per quanto riguarda il mondo dei compilatori: essa valorizza
@@ -51,30 +51,29 @@ il sistema di tipaggio del linguaggio; richiede
 di spostare a tempo di esecuzione controlli e legami altrimenti
 effettuati a tempo di compilazione; rende desiderabili nuove tecniche
 di analisi e ottimizzazione del codice; infine, la stessa
-implementazione ad oggetti di un compilatore
+implementazione a oggetti di un compilatore
 rende pi\`u credibile la sua correttezza e permette l'implementazione
 di ottimizzazioni tramite specializzazioni di classi e metodi della
 sintassi astratta.
 
 Ecco quindi nascere la necessit\`a di questo libro sulla
-compilazione ad oggetti di un linguaggio ad oggetti. Non mancano certo
+compilazione a oggetti di un linguaggio a oggetti. Non mancano certo
 altri tentativi in questa direzione. Fra i tanti, non possiamo dimentivare
 il libro di Appel~\cite{Appel02},
 che ha inizialmente ispirato questo testo. Ma le
 nostre soluzioni per il tipaggio statico e la generazione del codice
-non sono assolutamente assimilabili alle tecniche, scarsamente ad oggetti,
-dell'Appel.
+non sono assolutamente assimilabili alle tecniche dell'Appel, scarsamente a oggetti.
 
 Questo libro si offre come supporto allo studente impegnato in un corso
 di compilazione che a Verona \`e organizzato in appena
 una quarantina di ore
 di lezione, laboratorio incluso. Le scelte
 che hanno guidato la selezione degli argomenti trattati sono quelle
-dell'utilizzo intensivo della programmazione ad oggetti; dell'evidenziazione
+dell'utilizzo intensivo della programmazione a oggetti; dell'evidenziazione
 continua della relazione biunivoca fra teoria e implementazione di
 un compilatore; della maggiore
 importanza data alle fasi avanzate della compilazione,
-come controllo dei tipi, generazione e ottimizzazione del codice,
+come controllo dei tipi e generazione del codice,
 rispetto alle prime fasi di analisi lessicale e sintattica.
 
 Un ringraziamento va agli studenti che hanno seguito a Verona
@@ -87,6 +86,14 @@ La scarsa presenza di bug nel compilatore Kitten \`e il risultato
 della loro, spesso involontaria, verifica.
 
 {\flushright Fausto Spoto\\\hfill Verona, gennaio 2007}
+
+La revisione di questo testo e del compilatore Kitten ha comportanto una
+semplificazione del codice e della sua presentazione, nonch\'e
+la sostituzione dei makefile con dei task Ant. Il risultato sono
+un compilatore Kitten e un libro pi\`u semplici e accessibili per
+gli studenti.
+
+{\flushright Fausto Spoto\\\hfill Verona, marzo 2015}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Acknowledgements                                                          %

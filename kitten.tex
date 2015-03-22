@@ -1,12 +1,12 @@
 \chapter{Introduzione a Kitten}\label{ch:kitten}
 \begin{center}
-\epsfig{file = cat4.ps, width = 4cm}
+\includegraphics[width=7cm]{cat4.jpg}
 \end{center}
 %
-Kitten \`e il linguaggio di programmazione di cui in questo libro
-vogliamo descrivere un compilatore scritto in Java.
+Kitten \`e il linguaggio di programmazione per il quale descriveremo in questo libro
+un compilatore scritto in Java.
 Bench\'e quindi questo libro non sia centrato solo su
-Kitten, \`e necessario cominciare a
+Kitten, \`e necessario comunque cominciare a
 prendere familiarit\`a con tale linguaggio, in modo da essere
 coscienti di quello che \`e lo scopo del nostro compilatore.
 Il fine di questo capitolo \`e di descrivere l'installazione del compilatore
@@ -20,20 +20,23 @@ l'esecuzione dei programmi Kitten consiste in una sequenza di passi
 specificati da \emph{comandi} e ciascun comando determina una modifica
 dello stato dell'esecutore. \E un linguaggio \emph{a oggetti} \poiche
 lo stato dell'esecutore lega le variabili del programma a degli \emph{oggetti}
-appunto, \cioe zone di memoria contenenti informazioni e che reagiscono
+appunto, \cioe zone di memoria con una propria identit\`a,
+contenenti informazioni e che reagiscono
 all'invocazione di \emph{metodi}. Va detto che Kitten non \`e un linguaggio
 a oggetti \emph{puro}, nel senso che alcune variabili possono non essere legate
 a oggetti, ma piuttosto a \emph{valori primitivi}. Esempi di valori primitivi
 sono gli interi e i numeri in virgola mobile. Esistono pochissimi linguaggi di
-programmazione puramente ad oggetti. In particolare, va ricordato
+programmazione puramente a oggetti. In particolare, va ricordato
 Smalltalk~\cite{GoldbergR89}. Java~\cite{GoslingJSB05}
-non \`e puramente ad oggetti, perch\'e anch'esso ha dei tipi primitivi
+non \`e puramente a oggetti, perch\'e anch'esso ha dei tipi primitivi
 (che per\`o coesistono con
-delle versioni ad oggetti dei tipi primitivi, \cioe le \emph{classi
+delle versioni a oggetti dei tipi primitivi, \cioe le \emph{classi
 involucro} tipo \texttt{java.lang.Integer} e simili).
-Il motivo per cui i linguaggi ad oggetti tendono a non essere puri
+Il motivo per cui i linguaggi a oggetti tendono a non essere puri
 \`e che i valori primitivi sono gestibili molto pi\`u efficientemente
-che gli oggetti.
+che gli oggetti e che per essi la semantica intesa dai programmatori
+sarebbe difficilmente compatibile con la condivisione del valore fra pi\`u
+variabili (\emph{aliasing}).
 
 Possiamo immaginare Kitten come una versione semplificata di Java,
 sia da un punto di vista sintattico che semantico. Lo scopo di Kitten \e
@@ -44,8 +47,8 @@ compilazione dei linguaggi di programmazione attuali tipo Java.
 In Kitten mancano all'appello aspetti \emph{secondari} di Java, come
 \emph{i modificatori di visibilit\`a} (\texttt{public}, \texttt{protected},
 \texttt{private}), i metodi e i campi \texttt{static}, le classi
-astratte e le interfacce, i package, i campi costanti, le eccezioni
-e i finalizzatori.
+astratte e le interfacce, le classi interne e quelle anonime,
+i package, i campi costanti, le eccezioni e i finalizzatori.
 
 \greycomment{Lo studente potrebbe domandarsi perch\'e non si \`e scelto
 Java come linguaggio da compilare, al posto di Kitten. In fin dei conti,
@@ -71,37 +74,19 @@ ex-novo in Kitten.}
 %
 \section{Il compilatore Kitten}\label{sec:kitten_compiler}
 %
-Il compilatore Kitten \e scritto in Java. Si tratta, allo stato attuale, di
+Il compilatore Kitten \e scritto in Java. Si tratta di
 uno strumento che permette di compilare dei sorgenti Kitten trasformandoli
 in file \texttt{.class} eseguibili da una qualsiasi Java virtual machine.
 Conseguentemente, sia il compilatore Kitten che il risultato della
 compilazione dei sorgenti Kitten possono essere eseguiti su qualsiasi
 architettura e sistema operativo, \purche sia installato un compilatore
-e interprete Java. Le istruzioni che seguono sono pensate per un'architettura
-basata su Unix, tipo Linux. La compilazione sotto Windows del compilatore
-Kitten \e possibile ma \e non ancora stata automatizzata.
+e interprete Java. Le istruzioni che seguono descrivono l'installazione,
+la compilazione e l'esecuzione del compilatore Kitten all'interno dell'ambiente
+di sviluppo integrato Eclipse. Si assume che Eclipse contenga il modulo per
+la gestione degli script Ant. Le istruzioni dovrebbero quindi essere eseguibili
+su qualsiasi sistema operativo, anche se nel seguito mostreremo le istruzioni
+per una shell di linux.
 
-Supponiamo di avere scaricato il file di installazione del compilatore
-Kitten. Esso sar\`a un file dal nome \texttt{kitten\_XXX.tgz}, dove
-\texttt{XXX} \e la versione del compilatore Kitten che si sta installando.
-Tale file dovr\`a essere posizionato nel punto in cui si vuole installare
-il compilatore.
-Basta quindi dare i seguenti comandi per installarlo:
-%
-\begin{verbatim}
-tar -zxf kitten_XXX.tgz
-cd kitten_XXX
-make generatejb
-\end{verbatim}
-%
-Con il primo comando scompattiamo il file di installazione. Con il secondo
-entriamo nella directory \cosi creata. Con il terzo compiliamo il
-compilatore.
-Se non \e stato segnalato alcun errore, il compilatore Kitten \e a questo
-punto utilizzabile.
-%
-\section{Il nostro primo programma Kitten}\label{sec:first_kitten_programme}
-%
 \begin{figure}[t]
 \begin{verbatim}
                             class Miao {
@@ -114,78 +99,132 @@ punto utilizzabile.
   \label{fig:miao}
 \end{figure}
 
-La Figura~\ref{fig:miao} mostra un esempio di programma Kitten. Si tratta
-di un programma che, una volta compilato ed eseguito, stampa a video la
-stringa \texttt{miao} seguita da un ritorno carrello.
-Supponiamo di avere inserito il programma
+La prima operazione da effettuare \`e di clonare il repository del compilatore Kitten,
+tramite il programma git di gestione delle versioni. Ci si sposti nel workspace
+di Eclipse e sia cloni il repository col comando:
+%
+\begin{verbatim}
+git clone https://github.com/HotMoka/Kitten.git
+\end{verbatim}
+%
+Verr\`a creata una directory di nome \texttt{Kitten}.
+Si lanci quindi Eclipse e si crei un nuovo progetto Java,
+di nome \texttt{Kitten}. Eclipse dovrebbe automaticamente riconoscere la presenza del progetto
+e permetterne la compilazione o compilarlo automaticamente se la relativa opzioni \`e stata
+attivata.
+
+\javatip{Come sempre con \texttt{git}, \`e possibile aggiornare il compilatore alle
+versioni successive che verranno prodotte, probabilmente pi\`u semplificate o debuggate.
+A tal fine, basta spostarsi dentro il progetto Eclipse \texttt{Kitten} \`e invocare il comando
+\texttt{git pull}.}
+
+\noindent
+A questo punto si apra la vista di Ant di Eclipse
+(Window $\rightarrow$ Show View $\rightarrow$ Other\ldots e si selezioni Ant).
+Quindi si selezioni il file \texttt{build.xml} col tasto sinistro del mouse e lo si trascini
+sulla vista di Ant. Dovrebbe apparire la lista di task di Ant mostrata in Figura~\ref{fig:ant_tasks}.
+Si faccia doppio click sul task di default \texttt{run-compiled-code}. Nella finestra della console
+si dovrebbe assistere alla compilazione del compilatore e alla sua esecuzione su un file
+Kitten di esempio, chiamato \texttt{Miao.kit}:
+
+\begin{verbatim}
+Buildfile: .../Kitten/build.xml
+clean-bin: ...
+generate-lexical-analyzer: ...
+compile-lexical-analyzer: ...
+generate-syntactical-analyzer: ...
+compile-syntactical-analyzer: ...
+compile-semantical-analyzer: ...
+compile-kitten-bytecode-generator: ...
+compile-java-bytecode-generator: ...
+run-java-bytecode-generator: ...
+     [java] Parsing and type-checking completed                 [51ms]
+     [java] Translation into Kitten bytecode completed          [5ms]
+     [java] Kitten bytecode dumping in dot format completed     [1ms]
+     [java] Java bytecode generation completed                  [79ms]
+     [java] Total compilation time was 135ms
+run-compiled-code:
+     [java] miao
+\end{verbatim}
+
+\noindent
+Le ultime due righe sono per adesso le pi\`u interessanti. Esse indicano che l'esecuzione del
+programma di esempio ha portato alla stampa della stringa \texttt{miao}. Quindi il programma
+ha terminato la sua esecuzione.
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=5cm, height = 7cm]{pictures/ant_tasks.jpg}
+\end{center}
+\caption{I task di Ant per la compilazione e l'esecuzione del compilatore Kitten.}
+\label{fig:ant_tasks}
+\end{figure}
+%
+\section{Il nostro primo programma Kitten}\label{sec:first_kitten_programme}
+%
+La Figura~\ref{fig:miao} mostra il codice sorgente del programma
+di esempio Kitten compilato ed eseguito nella sezione precedente. Si tratta
+di un programma che stampa a video la
+stringa \texttt{miao}, seguita da un ritorno carrello.
+Si assume di avere inserito il programma
 in Figura~\ref{fig:miao} dentro a un file testo di nome
 \texttt{Miao.kit} che si trova nella sottodirectory
-\texttt{testcases} della directory \texttt{kitten\_XXX}.
+\texttt{testcases} del progetto Eclipse.
 La sottodirectory \texttt{testcases} \e quella che utilizzeremo
 per i nostri esperimenti, in modo da non sporcare la directory
 principale di Kitten. Essa non ha comunque nulla di speciale:
 potevamo scegliere un qualsiasi altro nome. \E invece importante
-che il nome del file \texttt{Miao.kit} termini con \texttt{.kit}.
-In caso contrario esso non verr\`a riconosciuto dal compilatore
-come un file testo che contiene un sorgente Kitten.
-Si entri quindi nella sottodirectory \texttt{testcases}.
-La compilazione del nostro primo programma Kitten si ottiene scrivendo
+che il nome del file \texttt{Miao.kit} termini col suffisso \texttt{.kit}.
+In caso contrario tale file non verr\`a riconosciuto dal compilatore
+come un sorgente Kitten. La specifica del programma Kitten che
+intendiamo compilare avviene tramite una propriet\`a nel file
+\texttt{build.properties}:
 %
 \begin{verbatim}
-java -cp .. Kitten Miao.kit
+kitten.example = Miao
 \end{verbatim}
 %
-Questo comando chiama l'interprete Java chiedendo di eseguire un
-programma di nome \texttt{Kitten}. Si tratta del compilatore Kitten che
-abbiamo appena compilato.
-Dal momento che esso si trova dentro la directory \texttt{kitten\_XXX},
-siamo costretti a indicare che i file Java devono essere cercati in tale
-directory, \cioe nella directory padre di \texttt{testcases}, in cui
-siamo. Questo si ottiene con lo switch \texttt{-cp ..} che specifica
-il \emph{classpath} per l'interprete Java.
-Infine passiamo un parametro al compilatore Kitten. Si tratta del
-nome del file che contiene il programma Kitten che vogliamo compilare.
-In questo caso, si tratta di \texttt{Miao.kit}, il file sorgente Kitten da
-compilare.
+In futuro, occorrer\`a modificare tale propriet\`a per specificare un
+altro file Kitten da compilare.
 
-Il precedente comando
-\e \cosi frequente che \e stata prevista una macro per semplicarne
-l'esecuzione. Basta infatti digitare
+Ritorniamo un attimo all'output che ci \e stato stampato sulla console:
 %
 \begin{verbatim}
-./compile Miao.kit
-\end{verbatim}
-%
-per ottenere esattamente lo stesso effetto. Si noti che, per ulteriore
-semplificazione, questa macro deve essere invocata dalla directory
-\texttt{kitten\_XXX} e non da \texttt{testcases}.
-
-In ogni caso, se tutto \e andato a posto, il compilatore Kitten dovrebbe
-aver compilato il file in Figura~\ref{fig:miao} comunicando a video delle
-informazioni del tipo:
-%
-\begin{verbatim}
-Parsing and type-checking completed             [419ms]
-Translation into Kitten bytecode completed      [66ms]
-Kitten bytecode dumping in dot format completed [15ms]
-Java bytecode generation completed              [478ms]
-Total compilation time was 964ms
+     [java] Parsing and type-checking completed                 [51ms]
+     [java] Translation into Kitten bytecode completed          [5ms]
+     [java] Kitten bytecode dumping in dot format completed     [1ms]
+     [java] Java bytecode generation completed                  [79ms]
+     [java] Total compilation time was 135ms
 \end{verbatim}
 %
 La prima riga ci informa che Kitten ha effettuato un'analisi sintattica
 (\emph{parsing}) sul file \texttt{Miao.kit}, al fine di garantire che non
 contenga errori di sintassi. A questa fase ne \`e seguita una di verifica
-semantica (\emph{type-checking}). Il tutto ha richiesta $419$ millisecondi.
+semantica (\emph{type-checking}). Il tutto ha richiesto $51$ millisecondi.
 A queste due fasi ne \`e seguita una in cui il nostro programma \`e
 stato tradotto in un linguaggio chiamato \emph{Kitten bytecode}. Si tratta
-di un linguaggio molto simile al Java bytecode, sul quale \`e possibile
+di un linguaggio ispirato al Java bytecode ma molto pi\`u semplice di esso,
+sul quale \`e per esempio possibile
 ragionare per effettuare eventuali ottimizzazioni. Tale bytecode \`e
 stato anche salvato su disco in formato \texttt{dot}, un
 formato di descrizione di grafi che ci permette di visionare il risultato
 di questa fase della compilazione. Infine, il Kitten bytecode \`e stato
-tradotto in Java bytecode, il quale pu\`o finalmente essere eseguito.
+tradotto in Java bytecode e salvato dentro \texttt{Miao.class},
+che \`e proprio quello che alla fine \`e stato eseguito da Eclipse
+con una Java virtual machine. Si noti che l'esecuzione di tale classe
+pu\`o avvenire anche manualmente, fuori dal task Ant che ha compilato
+il sorgente. Basta spostarsi dentro il progetto Eclipse ed eseguire:
+%
+\begin{verbatim}
+java -cp bin:testcases Miao
+\end{verbatim}
+%
+in cui la Java virtual machine \e stata eseguita fornendo come classpath
+la directory \texttt{testcases} di \texttt{Miao.class} e la directory
+\texttt{bin} in cui \e stata compilata la classe runtime
+per le stringhe Kitten.
 
-Sono tre i file che sono stati in effetti compilati in Java
+Sono tre i file che sono stati infatti compilati in Java
 bytecode. Oltre a \texttt{Main.kit}, come ci aspettavamo, ci sono anche
 \texttt{Object.kit} e \texttt{String.kit}. Questi sono due file Kitten
 forniti insieme al compilatore. Il primo descrive la
@@ -197,29 +236,9 @@ Esso \e stato compilato \poiche il programma in Figura~\ref{fig:miao}
 chiama il metodo \texttt{output()} sulle stringhe e tale metodo \e
 definito proprio dentro \texttt{String.kit}.
 
-L'esecuzione del programma in Figura~\ref{fig:miao} pu\`o a questo punto
-essere effettuata eseguendo il file \texttt{Miao.class} generato
-dalla compilazione. Essendo quest'ultimo
-un file Java bytecode, esso pu\`o essere
-eseguito da una qualsiasi Java virtual machine. Per esempio, basta scrivere,
-dalla directory \texttt{testcases},
-%
-\begin{verbatim}
-java Miao
-\end{verbatim}
-%
-per vedersi stampare a video la stringa \texttt{miao}.
-Anche per questa operazione \e stata prevista una macro, che per ulteriore
-semplificazione va eseguita dalla directory \texttt{kitten\_XXX}. Essa \e
-%
-\begin{verbatim}
-./run Miao
-\end{verbatim}
-
 Adesso che siamo riusciti a compilare ed eseguire un programma Kitten,
-proviamo a guardarne \piu da vicino il sorgente in Figura~\ref{fig:miao} per
-iniziare a comprendere in cosa Kitten rassomiglia a Java o si differenzia
-da esso.
+proviamo a guardarne \piu da vicino il sorgente in Figura~\ref{fig:miao}, per
+iniziare a comprendere in cosa Kitten rassomigli a Java o si differenzi da esso.
 
 La Figura~\ref{fig:miao} definisce una \emph{classe} Kitten di nome
 \texttt{Miao}, \cioe una
@@ -229,20 +248,22 @@ Una classe pu\`o avere dei \emph{costruttori} che specificano come
 generare degli oggetti di tale classe. Serve almeno un costruttore
 per potere creare istanze di una classe. Dal momento che nessun costruttore
 \`e presente in Figura~\ref{fig:miao}, nessuna istanza della classe
-\texttt{Miao.kit} pu\`o essere creata. Una classe pu\`o anche avere
+\texttt{Miao.kit} pu\`o essere creata.
+Una classe pu\`o anche avere
 dei \emph{metodi}, \cioe del codice etichettato con un nome che viene
-eseguito al momento dell'\emph{invocazione} del metodo. Fin qui, troviamo
-solo somiglianze con Java. Ma guardando attentamente la Figura~\ref{fig:miao}
-notiamo anche molte differenze. Per esempio, i metodi
+eseguito al momento dell'\emph{invocazione} del metodo.
+Fin qui ci sono solo somiglianze con Java.
+Guardando attentamente la Figura~\ref{fig:miao},
+notiamo per\`o anche molte differenze con Java. Per esempio, i metodi
 sono introdotti dalle parole chiave \texttt{method}.
 Inoltre, il punto e virgola, che in Java \e un \emph{terminatore} di comandi,
-\e invece un \emph{separatore} di comandi in Kitten. Conseguentemente,
+in Kitten \e invece un \emph{separatore} di comandi. Conseguentemente,
 non si deve mettere alcun punto e virgola alla fine del metodo
 \texttt{main} in Figura~\ref{fig:miao}. Inoltre, va osservato che non
 ci sono costruttori di default in Kitten e che quindi una classe \emph{deve}
-avere il costruttore vuoto (cio\`e senza parametri) per potere essere
+avere almeno un costruttore esplicito per potere essere
 istanziata. Su tali istanze si possono poi chiamare i metodi
-della classe. Fa eccezione il metodo \texttt{main} che pu\`o essere
+della classe. Fa eccezione il metodo \texttt{main}, che pu\`o essere
 chiamato senza avere a disposizione alcuna istanza della classe.
 Il metodo \texttt{main}, senza parametri e con tipo di ritorno \texttt{void},
 \e in effetti quello che viene eseguito quando si esegue un programma Kitten.
