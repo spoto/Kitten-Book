@@ -1,7 +1,7 @@
 \chapter{Analisi Lessicale}\label{chap:lexical}
 %
 \begin{center}
-\epsfig{file = cat8.pdf, width = 4cm}
+\includegraphics[width=5cm]{cat8.jpeg}
 \end{center}
 %
 L'analisi lessicale scompone un sorgente Kitten in una sequenza di
@@ -17,8 +17,10 @@ usando degli automi a stati finiti e delle espressioni regolari
 e come automatizzare la creazione di un analizzatore lessicale che
 riconosce un dato insieme di token, specificato da una lista
 di espressioni regolari. Useremo a tal fine il generatore JLex di
-analizzatori lessicali, che \`e una versione Java del programma
-lex~\cite{Lesk75} inizialmente sviluppato per il linguaggio C.
+analizzatori
+lessicali\footnote{\texttt{https://www.cs.princeton.edu/\~{}appel/modern/java/JLex}},
+che \e una versione Java del programma
+\texttt{lex} inizialmente sviluppato per il linguaggio C.
 %
 \section{I token Kitten}\label{sec:token_kitten}
 %
@@ -34,7 +36,7 @@ la specifica stringa che essi rappresentano, caso per caso. Si consideri
 per esempio la classe \texttt{Led.kit} in Figura~\ref{fig:led}. Il risultato
 della sua analisi lessicale \`e in Figura~\ref{fig:led_lexical}.
 Si noti come le parole chiave del linguaggio, come \texttt{class},
-\texttt{field}, \texttt{void}, \texttt{boolean}, sono rappresentate
+\texttt{field}, \texttt{void}, \texttt{boolean}, siano rappresentate
 da un token specifico. Gli identificatori sono invece rappresentati
 dall'unico token \texttt{ID} con associato un valore lessicale, \cioe
 la stringa dell'identificatore. Si sarebbe potuto rappresentare anche
@@ -298,7 +300,7 @@ un'enumerazione di espressioni regolari.
 %
 Per rappresentare un token, usiamo la classe in
 Figura~\ref{fig:java_cup.runtime.Symbol}, che fa parte
-del programma \texttt{JavaCup} che \`e un generatore di analizzatori
+del programma JavaCup che \`e un generatore di analizzatori
 sintattici. Il motivo per cui usiamo tale classe \`e che \cosi
 facendo sar\`a \piu semplice interfacciare il nostro analizzatore lessicale
 con l'analizzatore sintattico che costruiremo nel
@@ -320,8 +322,8 @@ un token Kitten.}\label{fig:java_cup.runtime.Symbol}
 \end{figure}
 %
 I codici \texttt{sym} dei token sono enumerati dentro la classe
-\texttt{syntactical/sym.java}. Anche tale file fa parte del generatore di
-analizzatori sintattici in modo che sia l'analizzatore lessicale
+\texttt{syntactical/sym.java}. Anche tale file fa parte dell'analizzatore sintattico,
+in modo che sia l'analizzatore lessicale
 che quello sintattico usano gli stessi codici per i token
 (si veda anche la Sezione~\ref{sec:java_cup}).
 La Figura~\ref{fig:java_cup.runtime.Symbol} mostra che di ogni token \`e
@@ -365,11 +367,11 @@ modo in cui generiamo l'analizzatore lessicale usando JLex.
   \label{fig:jlex}
 \end{figure}
 %
-Dentro al file \texttt{lexical/Kitten.lex} enumeriamo
+Dentro al file \texttt{resources/Kitten.lex} enumeriamo
 le espressioni regolari che denotano i token del linguaggio
 Kitten, in una sintassi comprensibile dal programma JLex.
 Per ogni espressione regolare va fornito, nel file
-\texttt{lexical/Kitten.lex}, un pezzo di codice
+\texttt{resources/Kitten.lex}, un pezzo di codice
 Java che viene eseguito quando viene riconosciuto il token corrispondente.
 Normalmente tale codice Java non fa altro
 che sintetizzare il token opportuno (\cioe un oggetto della classe
@@ -377,12 +379,12 @@ che sintetizzare il token opportuno (\cioe un oggetto della classe
 e restituirlo.
 
 Fornendo al programma JLex la specifica
-\texttt{lexical/Kitten.lex} dei token, otteniamo un programma Java
+\texttt{resources/Kitten.lex} dei token, otteniamo un programma Java
 di nome \texttt{lexical/Lexer.java} che pu\`o essere compilato
 come un qualsiasi programma Java. Tale programma \`e l'analizzatore
 lessicale. Il nome \texttt{nextToken} della funzione che vogliamo generare
 (Figura~\ref{fig:lexer}) viene specificato scrivendo la sua specifica dentro
-\texttt{lexical/Kitten.lex}:
+\texttt{resources/Kitten.lex}:
 %
 \begin{verbatim}
 %function nextToken
@@ -393,12 +395,12 @@ con \texttt{\%type} abbiamo specificato il suo tipo di ritorno.
 
 Programmi generati in maniera automatica, come \texttt{lexical/Lexer.java},
 sono normalmente di difficile lettura per un essere umano.
-Fidiamoci quindi del risultato, e descriviamo invece in \piu dettagli
-il contenuto del file \texttt{lexical/Kitten.lex}.
+Fidiamoci quindi del risultato e descriviamo invece in \piu dettagli
+il contenuto del file \texttt{resources/Kitten.lex}.
 %
 \section{La specifica dei token}\label{sec:token_specification}
 %
-Abbiamo detto che il file \texttt{lexical/Kitten.lex} contiene la
+Abbiamo detto che il file \texttt{resources/Kitten.lex} contiene la
 descrizione dei token Kitten, sotto forma di espressioni regolari con
 associata un'azione di
 sintesi del token corrispondente. Per esempio esso contiene le
@@ -431,7 +433,7 @@ l'analizzatore lessicale \e nella \emph{modalit\`a} di default
 \texttt{YYINITIAL}.
 Parleremo \piu tardi delle modalit\`a (Sezione~\ref{sec:modes}).
 Per adesso ci basta sapere che, all'inizio, l'analizzatore lessicale \e
-in modalit\`a \texttt{YYINITIAL}, per cui le regole precedenti sono attive.
+in modalit\`a \texttt{YYINITIAL}, per cui le regole precedenti sono inizialmente attive.
 L'azione corrispondente a ciascuna regola, che viene eseguita quando
 il token corrispondente \`e stato riconosciuto, \`e fra parentesi graffe.
 Si tratta di codice Java. Per adesso, esso sintetizza il token
@@ -444,7 +446,7 @@ della classe in Figura~\ref{fig:java_cup.runtime.Symbol}:
 \begin{verbatim}
 private java_cup.runtime.Symbol tok(int kind, Object value) {
   return new java_cup.runtime.Symbol
-    (kind,yychar,yychar + yylength(),value);
+    (kind, yychar, yychar + yylength(), value);
 }
 \end{verbatim}
 %
@@ -452,7 +454,7 @@ La variabile \texttt{yychar} contiene il numero di caratteri tra l'inizio del
 file e l'inizio del token. Il metodo \texttt{yylength()} ritorna
 la lunghezza del token riconosciuto.
 Metodi di ausilio, come quello precedente, sono inseriti in
-\texttt{lexical/Kitten.lex} fra i delimitatori \verb!%{! e
+\texttt{resources/Kitten.lex} fra i delimitatori \verb!%{! e
 \verb!}%! e vengono ricopiati testualmente da JLex dentro
 \texttt{lexical/Lexer.java}.
 
@@ -461,30 +463,30 @@ complicata:
 %
 \begin{verbatim}
 <YYINITIAL>[a-zA-Z][a-zA-Z0-9_]*
-    {return tok(sym.ID,yytext());}
+    {return tok(sym.ID, yytext());}
 <YYINITIAL>[0-9]+
-    {return tok(sym.INTEGER,new Integer(yytext()));}
+    {return tok(sym.INTEGER, new Integer(yytext()));}
 <YYINITIAL>[0-9]*"."[0-9]+
-    {return tok(sym.FLOATING,new Float(yytext()));}
+    {return tok(sym.FLOATING, new Float(yytext()));}
 \end{verbatim}
 %
 Si noti come il valore lessicale degli identificatori \texttt{ID} sia
 la stringa che rappresenta l'identificatore, mentre per interi e numeri
-a virgola mobile si tratta, rispettivamente,
+in virgola mobile si tratta, rispettivamente,
 di un oggetto di classe \texttt{java.lang.Integer} e \texttt{java.lang.Float}.
 Il programma JLex accorda maggiore priorit\`a alle regole
-specificate prima in \texttt{lexical/Kitten.lex}. Al fine, per esempio, di non
+specificate prima in \texttt{resources/Kitten.lex}. Al fine, per esempio, di non
 fare riconoscere la parola chiave \texttt{while} come un
 identificatore, occorre mettere la regola per il \texttt{while}
 prima di quella per gli identificatori (Sezione~\ref{sec:regular_expressions}).
 
 Esiste infine una regola che riconosce qualsiasi carattere ma che, essendo
 messa alla fine, viene eseguita solo quando nessun'altra regola
-\`e applicabile. Tale regola segnala un'errore lessicale, \cioe
+\`e applicabile. Tale regola segnala un errore lessicale, \cioe
 la lettura di un carattere che non \e associabile ad alcun token:
 %
 \begin{verbatim}
-  <YYINITIAL>.            {errorMsg.error(yychar,"Unmatched input");}
+  <YYINITIAL>.            {errorMsg.error(yychar, "Unmatched input");}
 \end{verbatim}
 %
 Il carattere \texttt{.} (punto) \`e un'espressione regolare che denota
@@ -493,14 +495,14 @@ un'abbreviazione dell'alternanza fra tutti i caratteri dell'alfabeto.
 %
 \javatip{
 Se si dovessero aggiungere nuovi token all'enumerazione contenuta nel file
-\texttt{lexical/Kitten.lex}, occorre fare attenzione alla posizione in
+\texttt{resources/Kitten.lex}, occorrer\`a fare attenzione alla posizione in
 cui le loro espressioni regolari vengono inserite. Molti studenti tendono
 a inserire queste nuove espressioni regolari in fondo, dopo la regola
 che usa il carattere punto. Questa \`e la peggior scelta che si pu\`o
 fare: se il token \`e formato da un unico carattere, esso non verr\`a
 mai riconosciuto perch\'e la regola col punto avr\`a priorit\`a sulla nuova
 regola (Sezione~\ref{sec:regular_expressions}).
-Se il token \`e formato da pi\`u caratteri alfabetici, esso non
+Se il token \`e formato da caratteri alfabetici, esso non
 verr\`a mai riconosciuto perch\'e la regola per l'identificatore avr\`a
 priorit\`a sulla nuova regola. \`E quindi consigliabile inserire le
 espressioni regolari per nuovi token subito dopo l'enumerazione della
@@ -516,7 +518,7 @@ Tutti questi analizzatori usano la stessa classe
 errori. La sua interfaccia\footnote{
 Per \piu informazioni sulle classi e i metodi di Kitten, ricordiamo
 che \`e disponibile la documentazione JavaDoc dentro la
-directory \texttt{javadocs} della distribuzione di Kitten.}
+directory \texttt{javadoc} della distribuzione di Kitten.}
 \e in Figura~\ref{fig:errorMsg.ErrorMsg}.
 %
 \begin{figure}[t]
@@ -532,7 +534,7 @@ public class ErrorMsg {
   public error(int pos, String msg) { ... }
 
   /* dice se si e' verificato almeno un errore */
-  public static boolean anyErrors() { ... }
+  public boolean anyErrors() { ... }
 }
 \end{verbatim}
 \caption{La classe \texttt{errorMsg.ErrorMsg.java} per la segnalazione di errori.}\label{fig:errorMsg.ErrorMsg}
@@ -579,8 +581,7 @@ un insieme di stringhe, il loro linguaggio, ma certamente non per
 \emph{riconoscere} tale insieme: data una stringa, vogliamo sapere se
 appartiene o meno al linguaggio generato da una data espressione regolare.
 Al fine di riconoscere un linguaggio, useremo degli \emph{automi a stati
-finiti}, che ammettono anche una semplice implementazione tramite un
-calcolatore.
+finiti}, che ammettono una semplice implementazione algoritmica.
 %
 \begin{definition}[Automa Finito non Deterministico]\label{def:nfa}
 Un \emph{automa finito non deterministico} su un alfabeto $\Lambda$ \`e un
@@ -737,9 +738,9 @@ un numero arbitrario di volte, eventualmente anche nessuna volta:
 \end{center}
 %
 Si noti che lo stato di accettazione dell'automa per $r$ non \`e pi\`u
-di accettazione nell'automa per $r^*$, e che in quest'ultimo lo stato
+di accettazione nell'automa per $r^*$ e che in quest'ultimo lo stato
 finale e quello iniziale coincidono. Se inoltre l'automa corrispondente
-ad $r$ non avesse alcuno stato di accettazione, non si mette la transizione
+ad $r$ non avesse alcuno stato di accettazione, non si metterebbe la transizione
 etichettata con $\varepsilon$ che porta nello stato di accettazione.
 
 Si consideri per esempio l'espressione regolare
@@ -873,14 +874,14 @@ Tale automa pu\`o poi essere trasformato in un automa finito deterministico
 equivalente con la trasformazione appena descritta. Questo \`e proprio
 quello che fa JLex, ottenendo un automa deterministico che pu\`o
 essere \piu comodamente eseguito su una macchina sequenziale.
-Va detto comunque che, per una maggiore efficienza, JLex
+Va detto comunque che, per maggiore efficienza, JLex
 evita di costruire l'automa non deterministico ma costruisce invece
 direttamente quello deterministico. Si tratta comunque di una ottimizzazione
 della trasformazione fin qui descritta.
 
 In genere l'automa ottenuto eliminando il
 non determinismo potrebbe essere \emph{ridondante}, nel senso che
-esso pu\`o contenere due stati con identiche funzioni, che possono quindi
+esso potrebbe contenere due stati con identiche funzioni, che possono quindi
 venire fusi in un unico stato. Questo \`e per
 esempio il caso degli stati $\{9,12,15,16,20,21\}$ e
 $\{9,12,15,16,18,20,21\}$ in Figura~\ref{fig:dfa_built}. Essi potrebbero essere
@@ -902,7 +903,7 @@ Consideriamo questi aspetti nella sezione seguente.
 %
 \section{JLex: la costruzione di un automa non deterministico per un insieme di token}\label{sec:jlex_for_tokens}
 %
-In Sezione~\ref{sec:nfa} abbiamo visto come un'espressione regolare pu\`o
+In Sezione~\ref{sec:nfa} abbiamo visto come un'espressione regolare possa
 essere trasformata in un automa finito non deterministico che accetta lo
 stesso linguaggio denotato dall'espressione regolare. In Sezione~\ref{sec:dfa}
 abbiamo visto poi come tale automa possa venire trasformato in un automa
@@ -942,14 +943,14 @@ nostro esempio, \`e mostrato in Figura~\ref{fig:dfa_if_id}.
 \`E possibile che uno stesso stato dell'automa deterministico venga etichettato
 con \piu token, poich\'e contiene lo stato finale di \piu sotto-automi.
 Questo \`e il caso dello stato etichettato con \texttt{IF} ed \texttt{ID}
-in Figura~\ref{fig:dfa_if_id}. Questo significa che se si arriva in tale stato
+in Figura~\ref{fig:dfa_if_id}. Questo significa che, se si arriva in tale stato,
 allora i caratteri letti dall'inizio del file possono essere considerati sia
 come un'istanza del token \texttt{ID} che come un'istanza del token
 \texttt{IF}. Abbiamo gi\`a visto come si risolve questa ambiguit\`a:
 dando precedenza al token che figura prima nell'enumerazione
 (Sezione~\ref{sec:regular_expressions}).
 Nel nostro caso, il token \texttt{IF} \`e stato enumerato per prima e
-quindi l'etichetta \texttt{ID} viene rimossa e in tale stato si riconosce
+quindi l'etichetta \texttt{ID} viene rimossa e si decide che in tale stato si riconosce
 solo il token \texttt{IF}.
 
 Il risultato dell'elaborazione effettuata da JLex \`e quindi
@@ -989,12 +990,12 @@ JLex ha cura di riportare l'ultimo puntatore a coincidere col primo.
 %
 \section{Modalit\`a lessicali: commenti e stringhe}\label{sec:modes}
 %
-Le regole contenute in \texttt{lexical/Kitten.lex} hanno come
+Le regole contenute in \texttt{resources/Kitten.lex} hanno come
 prefisso una \emph{modalit\`a} che indica quando esse sono attive. Normalmente,
 l'analizzatore lessicale \`e nella modalit\`a di default \texttt{YYINITIAL}.
 \`E possibile per\`o cambiare modalit\`a tramite il metodo
 \texttt{yybegin()}. Occorre per prima cosa dichiarare le nuove modalit\`a
-dentro \texttt{lexical/Kitten.lex}:
+dentro \texttt{resources/Kitten.lex}:
 %
 \begin{verbatim}
   %state COMMENT
@@ -1030,7 +1031,7 @@ di registrare le posizioni dei caratteri di newline:
 Occorre evitare che il file sorgente termini con un commento
 ancora aperto. A tal fine usiamo il fatto che,
 quando l'analizzatore lessicale giunge alla fine del file sorgente,
-viene eseguito il codice specificato, dentro \texttt{lexical/Kitten.lex},
+viene eseguito il codice specificato, dentro \texttt{resources/Kitten.lex},
 fra i delimitatori \texttt{\%eofval\{} e \texttt{\%eofval\}}. Nel nostro
 caso abbiamo scelto di eseguire quanto segue:
 %
@@ -1057,19 +1058,19 @@ token \texttt{STRING}:
   <STRING>\\n     {myString += "\n";}
   <STRING>\\t     {myString += "\t";}
   ... altre sequenze di escape ...
-  <STRING>"\""    {yybegin(YYINITIAL); return tok(sym.STRING,myString);}
+  <STRING>"\""    {yybegin(YYINITIAL); return tok(sym.STRING, myString);}
   <STRING>\n      {errorMsg.newline(yychar); myString += "\n";}
   <STRING>.       {myString += yytext();}
 \end{verbatim}
 %
 La seconda e la terza regola inseriscono un carattere di escape
-dentro la stringa quando viene riconosciuto la corrispondente
+dentro la stringa quando viene riconosciuta la corrispondente
 espressione di escape dentro il file sorgente. Si noti che l'espressione
 regolare \verb!\\n! \`e formata da \emph{due} caratteri \verb!\\! e \texttt{n}.
 Il primo \`e a sua volta una sequenza di escape di JLex per
 esprimere il carattere \verb!\!. Esistono altre espressioni di escape
 per inserire, per esempio, un carattere a partire dal suo codice ASCII.
-Esse sono esaminabili dentro \texttt{lexical/Kitten.lex}.
+Esse sono esaminabili dentro \texttt{resources/Kitten.lex}.
 La terz'ultima regola riporta l'analizzatore in modalit\`a \texttt{YYINITIAL}
 quando si incontra il carattere doppio apice di chiusura della stringa.
 Le ultime due regole accumulano tutti caratteri dentro \texttt{myString}.
@@ -1092,38 +1093,29 @@ limitare l'uso di JLex allo scopo per cui
 \emph{concessione} all'uso di variabili Java per commenti e costanti
 stringhe. Nel
 Capitolo~\ref{chap:syntactical} useremo uno strumento \piu
-adeguato, chiamato \texttt{JavaCup},
+adeguato, chiamato JavaCup,
 per descrivere e riconoscere la struttura sintattica di Kitten.
 }
 %
 \section{L'uso di JLex}\label{sec:use_jlex}
 %
-Una volta inserita dentro \texttt{lexical/Kitten.lex} la specifica
+Una volta inserita dentro \texttt{resources/Kitten.lex} la specifica
 dell'analizzatore lessicale che vogliamo generare, non ci rimane
-che generarlo tramite JLex. A tal fine basta eseguire JLex:
+che generarlo tramite JLex. A tal fine basta eseguire un piccolo programma
+Java che chiama la classe di generazione dell'analizzatore lessicale
+fornita nel jar di JLex, specificando dov'\`e la specifica dei token e qual \`e
+il nome dell'analizzatore lessicale Java da generare:
 %
 \begin{verbatim}
-  java JLex.Main lexical/Kitten.lex
+public class Generator {
+  public static void main(String[] args) throws IOException {
+    new CLexGen("resources/Kitten.lex", "src/lexical/Lexer").generate();
+  }
+}
 \end{verbatim}
 %
-Per default, JLex scrive l'analizzatore lessicale nel file
-\texttt{lexical/Kitten.lex.java}, che contiene
-la dichiarazione di una classe di nome \texttt{Yylex}.
-Basta quindi rideno\-mi\-nare
-tale file in \texttt{lexical/Lexer.java}, dopo avere
-per\`o sostituito tutte le stringhe \texttt{Yylex} al suo interno con la
-stringa \texttt{Lexer}. A tal fine usiamo il programma Unix \texttt{sed}:
-%
-\begin{verbatim}
-  cat lexical/Kitten.lex.java | sed s/Yylex/Lexer/g > lexical/Lexer.java
-  rm lexical/Kitten.lex.java
-\end{verbatim}
-%
-Questi tre comandi sono stati inseriti dentro a un makefile al fine
-di semplificarne l'uso. Basta quindi scrivere \texttt{make lexical}
-per ottenere lo stesso effetto.
-
-In conclusione, abbiamo ottenuto un analizzatore lessicale
+Baster\`a quindi eseguire tale programma Java per generare \texttt{lexical/Lexer.java}
+dentro la directory \texttt{src}. Avremo in effetti ottenuto un analizzatore lessicale
 \texttt{lexical/Lexer.java} che contiene un costruttore
 %
 \begin{verbatim}
@@ -1136,8 +1128,27 @@ e un metodo
   public java_cup.runtime.Symbol nextToken()
 \end{verbatim}
 %
-che estrae e restituisce un token alla volta da \texttt{fileName}
-(Figura~\ref{fig:lexer}).
+che estrae e restituisce un token alla volta da \texttt{fileName} (Figura~\ref{fig:lexer}).
+Per comodit\`a, l'esecuzione
+di tale programma di generazione dell'analizzatore lessicale \e automatizzata
+tramite il task Ant \texttt{generate-lexical-analyzer}.
+
+Il passo successivo \e a questo punto quello di compilare
+anche \texttt{lexical/Lexer.java}.
+Anche questo processo \e stato automatizzato nel task Ant
+\texttt{compile-lexical-analyzer}. Infine, possiamo usare l'analizzatore lessicale
+per effettuare l'analisi lessicale di un sorgente Kitten.
+Questo viene effettuato dal programma Java \texttt{lexical/Main.java},
+che prima istanzia l'analizzatore lessicale:
+%
+\begin{verbatim}
+  Lexer lexer = new Lexer(fileName);
+\end{verbatim}
+%
+e poi chiama ripetutamente \texttt{lexer.nextToken()} in un ciclo, finch\'e non viene letto
+il token \texttt{EOF}. La compilazione di tale programma e la sua invocazione sul sorgente Kitten
+specificato dentro \verb|build.properties| sono state automatizzate con il task Ant
+\texttt{run-lexical-analyzer}.
 %
 \begin{exercise}\label{ex:regular_odd}
 Si consideri il linguaggio $\Lambda=\{\mathtt{0},\mathtt{1}\}$.
