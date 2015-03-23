@@ -303,11 +303,11 @@ implicitamente non \textit{statici}.}
 \section{Un esempio \piu complesso}\label{sec:fibonacci}
 %
 Si consideri il programma in Figura~\ref{fig:fibonacci}. Assumiamo che esso
-sia scritto all'interno di un file testo di nome \texttt{Fibonacci.kit}.
+sia scritto all'interno di un file di testo di nome \texttt{Fibonacci.kit}.
 Il suo metodo \texttt{main} chiede all'utente di immettere un numero intero
 (positivo) \texttt{s} e quindi stampa l'\texttt{s}-esimo numero di Fibonacci.
-Si noti che \texttt{s} \e una stringa e che \e possibile leggere l'input da
-tastiera e memorizzarlo dentro a una stringa tramite il metodo
+Si noti che \texttt{s} \e una stringa nella quale viene letto l'input da
+tastiera, memorizzato al suo interno tramite il metodo
 \texttt{input()} della classe \texttt{String.kit}. Va osservato che, come
 per tutte le invocazioni di metodo, la variabile \texttt{s} deve contenere
 un oggetto affinch\'e su di essa si possa chiamare
@@ -355,7 +355,6 @@ $s$\texttt{.concat(X)} & restituisce la concatenazione della stringa $s$ \\
 \caption{I metodi della classe Kitten \texttt{String.kit}.}
   \label{fig:string}
 \end{figure}
-%
 
 La Figura~\ref{fig:fibonacci} mostra come sia possibile creare un
 \emph{oggetto} tramite l'espressione \texttt{new}. Esattamente come
@@ -474,10 +473,10 @@ tale linguaggio.
 %
 Un \emph{comando} \e una porzione di codice Kitten la cui esecuzione
 pu\`o modificare lo stato dell'esecutore ma non fornisce alcun valore.
-Il concetto di \emph{stato} va preso nel senso \piu
+Il concetto di \emph{stato} va inteso nel senso \piu
 generale possibile: esso include l'insieme delle variabili del programma,
-il loro tipo e valore, ma anche il contenuto del video.
-Per esempio, la Figura~\ref{fig:miao} contiene il
+il loro tipo e valore, ma anche gli oggetti da esse raggiungibili
+e il contenuto del video. Per esempio, la Figura~\ref{fig:miao} contiene il
 comando \verb|"miao\n".output()|, il cui effetto \e di stampare su video
 la stringa \texttt{miao} seguita da un carattere di newline.
 Un altro esempio di comando Kitten \e \verb|int y := 0|, che \emph{dichiara}
@@ -485,8 +484,8 @@ una variabile di nome \texttt{y}, di tipo \texttt{int} e con valore iniziale
 pari a $0$.
 
 I comandi Kitten
-possono essere \emph{composti}. Per esempio, se abbiamo due comandi
-$c_1$ e $c_2$, possiamo comporli sequenzialmente
+possono essere \emph{composti}. Per esempio, a partire dai due comandi
+$c_1$ e $c_2$, si `puo costruire la loro composizione sequenziale
 scrivendo $c_1;c_2$. Quello che otteniamo
 \e ancora un comando, la cui esecuzione consiste nell'esecuzione di $c_1$
 seguita dall'esecuzione di $c_2$. Per esempio, scrivendo
@@ -504,11 +503,11 @@ maggiore o uguale a $18$ ed esegue $c_2$ altrimenti. Se quindi scriviamo
                else "kid".output()
 \end{verbatim}
 %
-otteniamo di stampare la stringa \texttt{man} se la variabile \texttt{y}
+otteniamo di stampare la stringa \texttt{man}, se la variabile \texttt{y}
 contiene un valore maggiore o uguale a $18$, e di stampare
 \texttt{kid} altrimenti.
 Si noti che, essendo in Kitten il punto e virgola un separatore di comandi,
-non dobbiamo inserirlo dopo il comando \verb|"man".output()|.
+non dobbiamo inserirlo dopo il secondo comando \verb|"man".output()|.
 
 Si faccia attenzione adesso al seguente codice:
 %
@@ -518,14 +517,14 @@ Si faccia attenzione adesso al seguente codice:
 \end{verbatim}
 %
 L'intenzione del programmatore era quella di stampare la stringa
-\texttt{old man} se la variabile \texttt{y} contiene un valore maggiore o
+\texttt{old man}, se la variabile \texttt{y} contiene un valore maggiore o
 uguale a $18$, e di stampare \texttt{kid} altrimenti. Purtroppo il compilatore
-Kitten non ama tale codice, e segnala un errore di sintassi in corrispondenza
+Kitten non apprezza tale codice, \poiche segnala un errore di sintassi in corrispondenza
 all'\texttt{else}. Il motivo \e che esso interpreta tale codice come
 un comando \verb|if (y >= 18) then "old ".output()| seguito da
 un secondo comando \verb|"man".output()| seguito a sua volta
 da uno stranissimo comando
-\verb|else "kid".output()| e non trova neppure il punto e virgola che
+\verb|else "kid".output()|. Il compilatore non trova neppure il punto e virgola che
 dovrebbe separare i comandi in Kitten. La giusta sintassi sarebbe stata
 invece la seguente:
 %
@@ -553,7 +552,7 @@ Il corpo del metodo \texttt{main} in Figura~\ref{fig:miao}
 \e il comando \verb|{ "miao\n".output() }|,
 che potrebbe essere semplificato in \verb|"miao\n".output()|. In pratica,
 useremo le parentesi graffe solo se il corpo di un metodo o costruttore
-\e \cosi esteso che abbiamo bisogno di dividerlo in \piu comandi in sequenza,
+\e \cosi esteso da avere bisogno di dividerlo in \piu comandi in sequenza,
 come accadr\`a in tantissimi casi.
 %
 \greycomment{Si noti che in C o Java le parentesi
@@ -596,20 +595,20 @@ Kitten gestisce i seguenti valori:
             varie sotto-zone chiamate \emph{campi} o \emph{variabili
             d'istanza}
             dell'oggetto. I campi contengono a loro volta dei valori.
-            La strutturazione in campi di un oggetto Kitten \`e descritta
+            La strutturazione in campi di un oggetto Kitten \e descritta
             dalla \emph{classe} dell'oggetto, che in Kitten viene specificata
             al momento della crezione dell'oggetto stesso e non \`e pi\`u
-            mutabile; diremo che un oggetto \`e un'\emph{istanza} della
+            mutabile; diremo che un oggetto \e un'\emph{istanza} della
             sua classe;
       \item gli \emph{array} o \emph{vettori}, \cioe delle zone di memoria
             divisibili in varie sotto-zone, chiamate \emph{elementi}
             dell'array e indirizzabili tramite un
             riferimento numerico intero non negativo.
             Gli elementi di un array contengono a loro
-            volta dei valori. La strutturazione in elementi di un array,
+            volta dei valori, tutti dello stesso tipo. La strutturazione in elementi di un array,
             cio\`e il numero e il tipo degli elementi,
-            viene specificata in Kitten al momento della sua creazione e dopo
-            non \`e pi\`u mutabile.
+            viene specificata in Kitten al momento della sua creazione e
+            non \`e poi pi\`u modificabile.
       \end{itemize}
 \end{itemize}
 %
@@ -626,11 +625,11 @@ un oggetto di classe \texttt{String.kit} \emph{a tempo di esecuzione}.
 In particolare, se la stessa espressione viene eseguita \piu volte,
 essa crea \piu oggetti diversi della classe \texttt{String.kit}.
 %
-\greycomment{In genere, in un linguaggio di programmazione si distinguono
+\greycomment{Pi\'u in generale, in un linguaggio di programmazione si distinguono
 concetti relativi al momento della compilazione, come la sintassi delle
 espressioni, e concetti relativi al momento dell'esecuzione del programma,
 come il valore delle espressioni. Ritroveremo spesso questa distinzione in
-futuro. Spesso indicheremo come \emph{statici} i primi e come \emph{dinamici}
+futuro. Spesso indicheremo come \emph{statici} i primi concetti e come \emph{dinamici}
 i secondi.}
 
 I valori possono essere \emph{legati} o \emph{copiati} dentro a una variabile
@@ -641,12 +640,11 @@ che \emph{contiene} o \emph{fa riferimento} a un oggetto stringa.
 Ci\`o nonostante, \`e convenzione comune
 dire che \texttt{s} \emph{\e} un oggetto quando
 si dovrebbe dire che \texttt{s} \emph{contiene} un oggetto. Ci adegueremo anche
-noi a questo uso, ma deve essere chiara la distinzione fra variabile e
-suo valore.
+noi a questo uso, ma deve essere chiara la distinzione fra una variabile e il suo valore.
 
 Il comando \texttt{s := new String()} in Figura~\ref{fig:fibonacci} \e
 chiamato \emph{assegnamento}. Si noti l'uso di \texttt{:=} al posto del
-solo \texttt{=} come si farebbe in C e Java. L'esecuzione di questo
+solo \texttt{=}, che si userebbe invece in C e Java. L'esecuzione di questo
 assegnamento consiste nell'assegnare alla variabile \texttt{s} un riferimento
 all'oggetto appena creato dall'espressione \texttt{new String()}.
 Si noti che non \e l'oggetto che viene copiato, ma un suo riferimento,
@@ -687,13 +685,13 @@ il valore di ritorno del metodo. Un esempio \e l'espressione
 \texttt{this.fib(n - 1)} in Figura~\ref{fig:fibonacci}. Dal momento che
 il corpo del metodo chiamato pu\`o contenere comandi arbitrari,
 dobbiamo ammettere che un'espressione Kitten possa modificare lo stato
-dell'esecutore. In particolare, diremo che un'espressione contiene
+dell'esecutore. In particolare, diremo che un'espressione comporta
 un \emph{side-effect} o \emph{effetto di bordo} se la sua valutazione
-modifica lo stato dell'esecutore. Altrimenti essa non contiene side-effect.
-In Kitten l'unica espressione che pu\`o contenere side-effect \e la chiamata
+modifica lo stato dell'esecutore. Altrimenti essa non comporta side-effect.
+In Kitten l'unica espressione che pu\`o comportare side-effect \e la chiamata
 di metodo. Altri linguaggi hanno altre espressioni con side-effect, come
 i preincrementi e postincrementi di variabili numeriche in
-linguaggi tipo C o Java: \texttt{i++}. Queste espressioni non esistono per\`o
+linguaggi tipo C o Java: ad esempio, \texttt{i++}. Queste espressioni non esistono per\`o
 in Kitten.
 
 Anche le espressioni, come i comandi della Sezione~\ref{sec:commands},
@@ -714,7 +712,7 @@ comando \emph{chiamata di metodo} si costruisce a partire da espressioni
 $e$, $e_1$, \ldots, $e_n$ con la sintassi
 $e\mathtt{.m(}e_1,\ldots,e_n\mathtt{)}$, dove \texttt{m} \e il nome del
 metodo che si intende chiamare \emph{sul} valore dell'espressione
-$e$ \emph{con parametri} pari al valore delle espressioni $e_1,\ldots,e_n$.
+$e$, \emph{con parametri} pari al valore delle espressioni $e_1,\ldots,e_n$.
 Questo mostra che un comando Kitten pu\`o costruirsi a partire da espressioni
 Kitten. Il viceversa non accade in Kitten, ma pu\`o accadere
 in altri linguaggi. Per esempio, in C esiste
@@ -749,7 +747,7 @@ tipo $t_1$ ogni volta che viene richiesto un valore di tipo $t_2$.
 Per esempio, \`e possibile assegnare un valore di tipo $t_1$ a una
 variabile dichiarata di tipo $t_2$, oppure passare tale valore come parametro
 a un metodo che si aspettava un valore di tipo $t_2$.
-La relazione $\le$ \`e formalmente definita come
+La relazione $\le$ \e formalmente definita come
 la chiusura transitiva e riflessiva della seguente relazione:
 %
 \begin{eqnarray*}
@@ -762,15 +760,15 @@ la chiusura transitiva e riflessiva della seguente relazione:
   &\mathtt{array\ of\ }t\le\mathtt{Object}\quad\text{per ogni tipo $t$.}
 \end{eqnarray*}
 %
-Si noti che tale definizione implica che ogni array \`e un sottotipo
+Si noti che tale definizione implica che ogni array \e un sottotipo
 della classe \texttt{Object} e che
 $\mathtt{array\ of\ int}\le\mathtt{array\ of\ int}$ (per riflessivit\`a).
 Invece tale definizione implica che non \e vero che
 $\mathtt{array\ of\ int}\le\mathtt{array\ of\ float}$, bench\'e
 $\mathtt{int}\le\mathtt{float}$. La motivazione di questa non monotonia
 nella relazione di sottotipaggio degli array sar\`a chiara in seguito.
-Se $t_1\le t_2$ diremo che $t_1$ \e un \emph{sottotipo} di $t_2$ e che
-$t_2$ \e un supertipo di $t_1$. Se $t_1\not=t_2$ scriveremo
+Se $t_1\le t_2$, diremo che $t_1$ \e un \emph{sottotipo} di $t_2$ e che
+$t_2$ \e un supertipo di $t_1$. In tal caso, se $t_1\not=t_2$ scriveremo
 $t_1<t_2$ e diremo che $t_1$ \`e un sottotipo \emph{stretto}
 di $t_2$ e che $t_2$ \`e un supertipo \emph{stretto} di $t_1$.
 
@@ -789,11 +787,11 @@ poich\'e il tipo di ritorno del metodo \texttt{fib} \`e \texttt{int}.
 Molti linguaggi di programmazione di uso corrente hanno un tipaggio statico.
 Per esempio C, C++ e Java. Diverso \`e il caso di un linguaggio tipo Prolog
 e di alcuni dialetti del Basic,
-in cui viene assegnato un tipo alle espressioni ma solo
+in cui viene assegnato un tipo alle espressioni, ma solo
 \emph{a tempo di esecuzione}. In tal caso, si parla di un linguaggio di
 programmazione a \emph{tipaggio dinamico}. Si noti che il tipaggio dinamico
-permette a un'espressione di avere tipi diversi in tempi diversi, mentre
-il tipaggio statico deve assegnare uno e un solo tipo a un'espressione.
+permette a un occorrenza di un'espressione di avere tipi diversi in tempi diversi, mentre
+il tipaggio statico deve assegnare uno e un solo tipo a ogni occorrenza di un'espressione.
 
 Cosa abbiamo guadagnato ad avere un linguaggio a tipaggio statico piuttosto
 che dina\-mico? Molto. In particolare, il tipaggio statico ci permette di
@@ -812,7 +810,8 @@ di tipo \texttt{int} e l'altra di tipo \texttt{float}.
 Quello che manca \e un'indicazione esplicita del tipo del valore.
 Ecco quindi che i linguaggi a tipaggio dinamico sono costretti
 ad associare ai valori un'etichetta che specifica il tipo del valore.
-Questa etichetta occupa spazio e rallenta l'esecuzione del programma.
+Questa etichetta occupa spazio e rallenta l'esecuzione del programma, \poiche
+va creata e copiata.
 La coppia valore pi\`u etichetta \e detta rappresentazione \emph{boxed} di
 un valore. Il solo valore \e detto rappresentazione \emph{unboxed} di
 se stesso. Potremmo quindi dire che in un linguaggio a tipaggio statico
@@ -824,34 +823,37 @@ a tipaggio dinamico offrono maggiore flessibilit\`a al programmatore e sono
 quindi spesso preferiti da chi lavora nell'ambito
 dell'intelligenza artificiale. Infine, va osservato che nei linguaggi a
 oggetti si \e comunque obbligati a usare una rappresentazione boxed per la
-maggior parte degli oggetti (normalmente, per tutti gli oggetti),
+maggior parte dei valori (normalmente, per tutti gli oggetti e per gli array),
 anche se il linguaggio ha un tipaggio statico,
 a causa della presenza di chiamate virtuali con late-binding
-e di cast controllati a tempo di esecuzione. La rappresentazione unboxed
-\e quindi limitata ai soli valori primitivi.
+e di cast controllati a tempo di esecuzione, che hanno bisogno di conoscere
+l'informazione sul tipo dinamico degli oggetti e degli array.
+La rappresentazione unboxed \e quindi limitata, in tali linguaggi, ai soli valori primitivi.
 
 Kitten \e un linguaggio di programmazione \emph{fortemente tipato}.
 Questo significa in primo luogo che esso \e tipato. Ma significa
-anche che il tipo assegnato (a tempo di compilazione, nel caso di Kitten)
-alle espressioni dall'analizzatore semantico
-\e un supertipo di quello del valore delle stesse espressioni a tempo
+anche che il tipo assegnato dall'analizzatore semantico
+(quindi a tempo di compilazione, nel caso di Kitten)
+a un'espressione del programma
+\e un supertipo di quello di tutti i possibili valori che assumer\'a
+tale espressione a tempo
 di esecuzione. In altre parole, l'analizzatore semantico ha etichettato
 \emph{bene}, senza \emph{sbagliare},
 le espressioni del programma, in modo tale che il tipo scelto
 \e corretto (un supertipo, appunto)
-rispetto a quello che poi avranno tali espressioni quando andremo ad eseguire
-il programma. Per esempio, il fatto che l'espressione \texttt{new String()} in
+rispetto a quello che poi avranno tali espressioni quando il programma verr\'a eseguito.
+Per esempio, il fatto che l'espressione \texttt{new String()} in
 Figura~\ref{fig:fibonacci} sia stata etichettata con il tipo \texttt{String}
 \e consistente con il fatto che, a tempo di esecuzione, tale espressione
 avr\`a un valore di tipo \texttt{String}. Come Kitten,
 anche il linguaggio Java \e
 fortemente tipato. Mentre non sono fortemente tipati C, C++ o C\#, \poiche
 \e possibile camuffare il tipo delle espressioni tramite cast non
-controllati, ed \e anche possibile spacciare per oggetti puntatori a memoria
+controllati ed \e anche possibile spacciare per oggetti puntatori a memoria
 forgiati a partire da valori interi, o infine accedere a zone di memoria
 oltre i limiti di un array senza garanzia che questo blocchi l'esecuzione
-del programma e forgiando quindi \emph{valori} del tipo dell'array
-a partire da configurazioni causali di bit.
+del programma, forgiando quindi \emph{valori} del tipo dell'array
+a partire da configurazioni casuali di bit.
 
 Cosa abbiamo guadagnato dalla scelta di avere un linguaggio
 \emph{fortemente} tipato piuttosto che semplicemente tipato? Anche in questo
@@ -860,11 +862,13 @@ possibilit\`a di garantire, a tempo di compilazione, che tutta una serie
 di propriet\`a relative ai tipi dei valori delle espressioni saranno
 sicuramente vere a tempo di esecuzione. Non servir\`a quindi verificarle
 a tempo di esecuzione. Per esempio, si consideri l'espressione
-\texttt{s} in Figura~\ref{fig:fibonacci}. Essa riceve dall'analizzatore
-semantico il tipo \texttt{String}. \Poiche Kitten \e fortemente tipato,
+\texttt{s} in Figura~\ref{fig:fibonacci}. Ad essa l'analizzatore
+semantico assegna il tipo \texttt{String} in fase di compilazione.
+\Poiche Kitten \e un linguaggio fortemente tipato,
 sappiamo che a tempo di esecuzione dentro la variabile \texttt{s} troveremo
 \emph{realmente}
-un valore di tipo \texttt{String}. Conseguentemente, non occorre verificare,
+un valore di tipo \texttt{String}, o al limite un suo sottotipo.
+Conseguentemente, non occorre verificare,
 a tempo di esecuzione, che l'oggetto contenuto dentro \texttt{s} abbia
 effettivamente un metodo chiamato \texttt{input}, \perche tale controllo
 \e superfluo, avendo \texttt{String} un metodo chiamato \texttt{input}.
@@ -897,7 +901,7 @@ considera come scorretto il comando
 \begin{center}
   \texttt{if (y >= y) then y := 2 else s := 3}
 \end{center}
-poich\'e ritiene illegale assegnare as \texttt{s}
+poich\'e ritiene illegale assegnare ad \texttt{s}
 il valore intero $3$. Un programmatore potrebbe
 forse osservare che questa scelta \`e troppo pessimistica, dal momento che
 la guardia del condizionale sar\`a sempre vera a tempo di esecuzione e quindi
@@ -910,7 +914,7 @@ quindi che l'analizzatore semantico decida un problema indecibile, \nec
 sembra una buona idea quella di considerare alcuni casi speciali (come
 qui \texttt{y >= y}), dal momento che corrispondono a usi rari
 e spesso errati delle guardie. \`E meglio continuare ad accettare il giudizio
-di un analizzatore semantico forse un po' severo, ma sicuramente corretto.}
+di un analizzatore semantico, forse un po' severo, ma sicuramente corretto.}
 %
 \section{Classi e campi Kitten}\label{sec:fields}
 %
@@ -950,7 +954,7 @@ Tutti gli oggetti di classe \texttt{Led} contengono al loro interno
 una zona di memoria etichettata come \texttt{state} e che contiene un
 valore di tipo booleano. Ogni oggetto avr\`a la sua zona di memoria
 \texttt{state} e la modifica del campo \texttt{state} di un oggetto non
-riguarda il campo \texttt{state} di un altro oggetto.
+ha effetto sul campo \texttt{state} di un altro oggetto.
 Si noti che la dichiarazione di questo campo
 richiede la parola chiave \texttt{field} che \e invece sottintesa in C++
 o Java. Si noti inoltre che in Kitten i campi sono tutti implicitamente
@@ -960,8 +964,8 @@ qualsiasi classe, senza alcuna restrizione di visibilit\`a.
 L'accesso a un campo avviene tramite la \emph{notazione punto}: $e$\texttt{.f}
 dove \texttt{f} \e il nome del campo ed $e$ \e l'espressione il cui valore
 deve essere un oggetto che ha un campo di nome \texttt{f}. Tale valore
-\`e detto \emph{ricevitore} dell'accesso al campo. Se il ricevitore
-\`e \textit{nil} si avr\`a un errore a tempo di esecuzione. Si noti
+\e detto \emph{ricevitore} dell'accesso al campo. Se il ricevitore
+\e \textit{nil}, si avr\`a un errore a tempo di esecuzione. Si noti
 che l'espressione $e$ non pu\`o essere lasciata sottintesa quando
 essa \e \texttt{this}, come invece si fa in C++ o Java. Per esempio,
 sarebbe stato un errore in Figura~\ref{fig:led} scrivere \texttt{state}
@@ -980,7 +984,7 @@ In realt\`a si pu\`o tranquillamente usare un identificatore numerico unico
 di $32$ bit
 al posto del nome della classe, risparmiando significativamente in occupazione
 di memoria rispetto all'uso di una stringa. Per questo
-motivo in Figura~\ref{fig:object}
+motivo, in Figura~\ref{fig:object}
 abbiamo assunto che l'etichetta della classe occupi solo $4$ byte.
 Si noti che il valore booleano del campo \texttt{state} occupa anch'esso
 $4$ byte, sebbene un singolo bit sarebbe stato sufficiente. Questa
@@ -1006,7 +1010,7 @@ La risposta \e semplice. Avendo gli oggetti di tipo \texttt{Led} un unico
 campo di nome \texttt{state}, il suo contenuto si trova subito dopo
 l'etichetta con il nome della classe. Nel nostro caso, subito dopo
 l'etichetta \texttt{Led}. L'etichetta \texttt{state} quindi non serve.
-Basta conoscere lo \emph{spostamento} o \emph{offset} a cui si trova
+Basta conoscere lo \emph{spostamento} od \emph{offset} a cui si trova
 il valore del campo \texttt{state} a partire dall'inizio o \emph{base}
 dell'oggetto. Nel caso del campo \texttt{state} di un oggetto di classe
 \texttt{Led}, l'offset \e $4$ byte. L'accesso tramite offset permette
@@ -1021,7 +1025,11 @@ esso pu\`o generare del codice che esegue
 un'addizione di $4$ byte dalla base del valore di $e$. Questo non sarebbe
 possibile se il tipaggio fosse dinamico, nel qual caso non sapremmo
 qual \e il tipo di $e$ se non al momento dell'esecuzione e non potremmo
-quindi calcolare alcun offset al momento della compilazione.
+quindi calcolare alcun offset al momento della compilazione. Il tal caso,
+occorrerebbe prevedere la memorizzazione eplicita dei nomi dei campi
+all'interno dello stato dell'oggetto, con conseguente aumento della sua
+occupazione in memoria e rallentamento nell'accesso al campo, che andrebbe
+ricercato ogni volta al suo interno.
 %
 \section{Metodi Kitten}\label{sec:methods}
 %
@@ -1037,20 +1045,20 @@ $e$\texttt{.m(}$e_1,\ldots,e_n$\texttt{)}. L'effetto \e di valutare le
 espressioni $e$, $e_1$, \ldots, $e_n$ (i parametri attuali)
 e di legarne i valori a \texttt{this} e ai parametri formali del metodo, che
 viene quindi eseguito. Se esso ritorna un valore tramite il comando
-\texttt{return}, quello \e il valore di ritorno del metodo.
+\texttt{return}, quello \e anche il valore di ritorno del metodo.
 
-Si noti che in Kitten i metodi si chiamano \emph{su} un valore contenuto
+Si noti che, in Kitten, i metodi si chiamano \emph{su} un valore contenuto
 in un'espressione $e$ che sta alla sinistra del punto. Tale valore dovr\`a
 essere un oggetto (quindi diverso da \textit{nil}) di una classe in cui
 \e dichiarato un metodo di nome \texttt{m} con parametri formali compatibili
 con quelli forniti dalla chiamata, o di una classe da cui tale
-metodo \`e rintracciabile risalendo la catena delle superclassi.
+metodo \e rintracciabile risalendo lungo la catena delle superclassi.
 Il valore dell'espressione $e$ \e detto
-\emph{ricevitore} della chiamata di metodo. Se ne evince che in Kitten
+\emph{ricevitore} della chiamata di metodo. Se ne evince che, in Kitten,
 il ricevitore \e sempre un oggetto, ad eccezione del metodo \texttt{main}
 che viene invocato implicitamente sulla classe dalla macchina virtuale
 Java (Sezione~\ref{sec:kitten_compiler}).
-In altri linguaggi, tipo Java, \e possibile
+In altri linguaggi, come a esempio Java, \e possibile
 invece usare una classe come ricevitore, nel caso in cui il metodo sia
 dichiarato come \texttt{static}, nonch\'e gli array, che in Java
 hanno tutti e soli i metodi ereditati da \texttt{java.lang.Object}.
@@ -1066,7 +1074,7 @@ e \texttt{B}, che sono invece sue \emph{sottoclassi}. Il metodo
 uno di tipo \texttt{A}, uno di tipo \texttt{B} e uno di tipo
 \texttt{S}, e li passa uno dopo l'altro a un metodo \texttt{print}
 che si aspetta un parametro di tipo \texttt{S}. Questo
-\`e possibile poich\'e \texttt{A}$\le$\texttt{S} e \texttt{B}$\le$\texttt{S}.
+\e possibile poich\'e \texttt{A}$\le$\texttt{S} e \texttt{B}$\le$\texttt{S}.
 Il metodo \texttt{print} chiama il metodo \texttt{toString()} su tali oggetti
 e ne stampa il valore di ritorno. Il risultato \e
 %
@@ -1191,7 +1199,7 @@ con un display di led.}\label{fig:digit}
             }
           }
 \end{verbatim}
-\caption{La classe \texttt{Increment.kit}, che crea due cifre, le incrementa e le stampa.}\label{fig:increment}
+\caption{La classe \texttt{Increment.kit} che crea due cifre, le incrementa e le stampa.}\label{fig:increment}
 \end{figure}
 %
 \begin{verbatim}
@@ -1201,7 +1209,7 @@ con un display di led.}\label{fig:digit}
 Questo significa che la chiamata \texttt{s.toString()} ha
 \emph{selezionato} di volta in volta
 un'implementazione diversa dello stesso metodo \texttt{toString} sulla base
-della classe dell'oggetto \texttt{s}, che \`e \texttt{A} la prima volta che
+della classe, a tempo di esecuzione, dell'oggetto \texttt{s}, che \`e \texttt{A} la prima volta che
 \texttt{print} viene chiamato, \e \texttt{B} la seconda ed \e \texttt{S} la
 terza. Questa selezione viene effettuata a tempo di esecuzione,
 guardando l'etichetta contenuta nell'oggetto ricevitore contenuto
@@ -1219,10 +1227,10 @@ che il late-binding \e inerentemente lento, \poiche richiede di accedere
 all'etichetta che identifica la classe del ricevitore e quindi di ricercare
 l'implementazione del metodo all'interno di tale classe. Una chiamata diretta,
 con \emph{legame anticipato} a tempo di compilazione, o \emph{early-binding},
-come in C, \e nettamente \piu veloce ma meno flessibile e non estendibile.
+come in C, \e nettamente \piu veloce ma meno flessibile e non estendibile
+senza ricompilare il codice sorgente.
 
-Si noti che in Kitten
-il late-binding avviene solo per i metodi e non per i campi,
+Si noti che in Kitten il late-binding avviene solo per i metodi e non per i campi,
 esattamente come in Java. La ridefinizione di un campo
 ha quindi l'effetto di dichiarare un \emph{altro} campo con lo stesso nome del
 campo ridefinito. I due campi vengono distinti sulla base del tipo
@@ -1236,10 +1244,10 @@ elementi con un ciclo \texttt{for} e quindi li stampa con un ciclo
 \texttt{while}. Si noti che questi due costrutti iterativi sono molto simili
 a quelli di C, C++ o Java. Non sono per\`o disponibili le istruzioni
 \texttt{break} e \texttt{continue} fornite da questi ultimi linguaggi.
-Si noti che \`e possibile ridefinire una variabile: la nuova
+Si noti che \e possibile ridefinire una variabile: la nuova
 dichiarazione nasconde la precedente e pu\`o avere un tipo diverso da
 quello della prima dichiarazione. Osserviamo inoltre che agli elementi
-di un array \`e possibile assegnare qualsiasi valore compatibile con il
+di un array \e possibile assegnare qualsiasi valore compatibile con il
 tipo di dichiarazione di tali elementi. L'esecuzione del programma
 in Figura~\ref{fig:array} stampa:
 %
@@ -1256,21 +1264,20 @@ I'm an S;
 I'm an A;
 \end{verbatim}
 %
-ancora una volta grazie al late-binding della chiamata al metodo
-\texttt{toString}.
+ancora una volta grazie al late-binding della chiamata al metodo \texttt{toString}.
 
 La Figura~\ref{fig:digit} mostra una classe Kitten che compone sette
 led al fine di formare un display capace di rappresentare le dieci cifre
 (la versione completa di questa classe \e disponibile nella directory
-\texttt{testcases} della distribuzione di Kitten).
+\texttt{testcases} della distribuzione del compilatore Kitten).
 Il costruttore crea i led. Il metodo \texttt{showDigit} accende e spegne
 i led in modo da visualizzare la cifra richiesta. Il metodo
 \texttt{increment} incrementa di uno la cifra rappresentata dal display;
 si noti l'uso di un \texttt{return} che restituisce un'uguaglianza fra
 due espressioni, il che \`e corretto dal momento che l'uguaglianza fra due
 espressioni ha tipo booleano e pu\`o quindi essere restituita da un metodo
-il cui tipo di ritorno \`e stato dichiarato come \texttt{boolean}.
-Infine, il metodo \texttt{toString} restituisce una rappresentazione del
+il cui tipo di ritorno \e stato dichiarato come \texttt{boolean}.
+Infine, il metodo \texttt{toString()} restituisce una rappresentazione del
 display sotto forma di stringa.
 La Figura~\ref{fig:increment}, infine, mostra una classe che crea
 due cifre, le incrementa e le stampa a video. Il risultato \`e il seguente
@@ -1313,13 +1320,13 @@ dei metodi e si provi ad aggiungerne di nuovi.
 %
 \begin{exercise}\label{ex:scramble}
 Si scriva una classe \texttt{Scramble.kit} con un costruttore che riceve
-una stringa e un metodo \texttt{scramble} che stampa tutte le permutazioni
+una stringa e con un metodo \texttt{scramble} che stampa tutte le permutazioni
 della stringa fornita al momento della costruzione dell'oggetto.
 \end{exercise}
 %
 \begin{exercise}\label{ex:sort}
 Si scriva una classe Kitten \texttt{Sort.kit} con un costruttore che
-riceve come parametro un array di interi, un metodo \texttt{toString} che
+riceve come parametro un array di interi, con un metodo \texttt{toString()} che
 restituisce una stringa e vari metodi void e senza parametri,
 che implementano ciascuno un differente algoritmo di ordinamento degli array.
 \end{exercise}
