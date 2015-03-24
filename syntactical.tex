@@ -1069,7 +1069,7 @@ possibilit\`a, mutuamente esclusive:
 \begin{enumerate}
 \item davanti a noi c'\`e il token $\mathtt{ID}$
 \item oppure davanti a noi c'\`e il token $\mathtt{INTEGER}$
-\item o infine davanti a noi c'\`e il token $\mathtt{MINUS}$ e siamo
+\item oppure davanti a noi c'\`e il token $\mathtt{MINUS}$ e siamo
       poi capaci di riconoscere, ricorsivamente, un altro $\mathit{exp}$.
 \end{enumerate}
 
@@ -1149,8 +1149,8 @@ Questo ragionamento ci dice che per costruire un programma come quello
 in Figura~\ref{fig:java_ll1} occorre conoscere, per ogni non terminale
 definito dalle produzioni
 $L\to r_1,\ldots,L\to r_n$ con $n\ge 2$, qual \`e l'insieme dei token con cui
-pu\`o cominciare ciascuno dei lati destri $r_1,\ldots,r_n$ e occorre che tali
-insiemi siano disgiunti. Per esempio,
+pu\`o cominciare ciascuno dei lati destri $r_1,\ldots,r_n$ e che inoltre
+occorre che tali insiemi siano disgiunti. Per esempio,
 il lato destro della produzione $\mathtt{MINUS}\ \mathit{exp}$ in
 Figura~\ref{fig:ll1_grammar} inizia con l'insieme di token
 $\{\mathtt{MINUS}\}$.
@@ -1160,7 +1160,7 @@ come pu\`o sembrare a prima vista, dal momento che i lati destri delle
 produzioni potrebbero cominciare con un non terminale, come
 in $\mathit{exp}\to\mathit{exp}\ \mathtt{PLUS}\ \mathit{exp}$,
 o potrebbero essere \emph{annullabili}, come in $\mathit{exp}\to\varepsilon$,
-nel qual caso non c'\`e alcun token con cui essi iniziano ed occorre
+nel qual caso non c'\`e alcun token con cui essi iniziano e occorre
 invece guardare quali token potrebbero \emph{seguire} il lato sinistro
 della produzione, in questo caso $\mathit{exp}$, per capire quando
 selezionare la produzione.
@@ -1242,7 +1242,8 @@ non significa che serve un numero infinito di iterazioni, poich\'e l'insieme
 dei non terminali di una data grammatica
 \`e finito e quindi tale limite verr\`a sicuramente raggiunto
 in un numero di iterazioni pari, \emph{al massimo}, al numero dei non terminali
-della grammatica.
+della grammatica. Dopo tale numero di iterazioni, il calcolo si sar\`a
+stabilizzato.
 
 Vediamo un primo esempio. Vogliamo calcolare i non terminali annullabili
 della grammatica in Figura~\ref{fig:ll1_grammar}.
@@ -1403,7 +1404,7 @@ normalmente omessa quando \`e chiara dal contesto.
 %
 \noindent
 Basta conoscere gli inizi dei non terminali
-per indurre quelli di una qualsiasi forma sentenziale.
+per dedurre quelli di una qualsiasi forma sentenziale.
 %
 \begin{proposition}\label{prop:extend_first}
 Sia $\langle T,N,I,P\rangle$ una grammatica e
@@ -1442,7 +1443,7 @@ agli inizi di ciascun non terminale l'insieme dei terminali con cui
 inizia il lato destro di una produzione per tale non terminale.
 Per calcolare come iniziano i lati destri delle produzioni
 si usa l'approssimazione precedente, quindi all'inizio si usa $\phi^0$.
-Si ottengono \cosi delle approssimazioni successive $\phi^1$, $\phi^2$,\ldots
+Si ottengono \cosi delle approssimazioni successive $\phi^1$, $\phi^2$, \ldots
 finch\'e non si raggiunge il punto fisso, cio\`e un $k$ tale che
 $\phi^k=\phi^{k+1}$.
 %
@@ -1902,7 +1903,7 @@ l'applicazione della giusta produzione sulla base del token che ci sta
 davanti, detto \emph{lookahead}.
 %
 \begin{definition}\label{def:ll_discriminant}
-Data una grammatica $G$ \`e una sua produzione $L\to r$, l'insieme dei
+Data una grammatica $G$ e una sua produzione $L\to r$, l'insieme dei
 \emph{terminali discriminanti} per $L\to r$ \`e dato da $\first(r)$ se
 $r$ non \`e annullabile e da $\first(r)\cup\follow(L)$ se $r$ \`e
 annullabile.
@@ -1932,7 +1933,7 @@ Questo metodo di parsing \`e detto $\mathit{LL}(1)$
 o \emph{parsing a discesa ricorsiva
 con lookahead unitario}. Il motivo del nome $\mathit{LL}(1)$ \`e che il parser
 risultante legge il file sorgente da sinistra a destra (da cui la prima
-$L$ da \emph{left-to-right}) e genera derivazioni leftmost (da cui la
+$L$, che sta per \emph{left-to-right}) e genera derivazioni leftmost (da cui la
 seconda $L$); inoltre esso usa un solo carattere di lookahead per decidere
 quale produzione applicare per i non terminali definiti da pi\`u di una
 produzione.
@@ -2104,7 +2105,7 @@ Ci\`o nonostante, il parsing $\mathit{LL}(1)$ \`e \cosi semplice che \`e stato
 lungamente utilizzato per scrivere i primi compilatori. Questo spiega
 perch\'e \emph{vecchi} linguaggi come il LISP abbiano una sintassi
 \emph{scomoda}, come per esempio una notazione prefissa per gli operatori
-aritmetici, finalizzata ad eliminare i conflitti del parsing $\mathit{LL}(1)$.}
+aritmetici, finalizzata proprio ad eliminare i conflitti del parsing $\mathit{LL}(1)$.}
 
 La teoria del parsing $\mathit{LL}(1)$ pu\`o essere generalizzata al parsing
 $\mathit{LL}(k)$, in cui si utilizzano fino a $k$ caratteri davanti al punto
