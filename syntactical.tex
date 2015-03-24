@@ -704,7 +704,7 @@ dell'analizzatore sintattico, il quale essenzialmente non sa quale delle
 due interpretazioni preferire. Sappiamo dall'esperienza con altri linguaggi
 di programmazione che la moltiplicazione ha \emph{precedenza} rispetto
 all'addizione, per cui l'interpretazione da preferire \`e
-\texttt{2 + (a * 4)}. Un problema simile sorge di fronte ad espressioni come
+\texttt{2 + (a * 4)}. Un problema simile sorge di fronte a espressioni come
 \texttt{2 - a - 4} che sono normalmente intese come
 \texttt{(2 - a) - 4} piuttosto che come \texttt{2 - (a - 4)}. Si noti che
 queste due interpretazioni sono diverse poich\'e, se \texttt{a} valesse
@@ -2105,7 +2105,7 @@ Ci\`o nonostante, il parsing $\mathit{LL}(1)$ \`e \cosi semplice che \`e stato
 lungamente utilizzato per scrivere i primi compilatori. Questo spiega
 perch\'e \emph{vecchi} linguaggi come il LISP abbiano una sintassi
 \emph{scomoda}, come per esempio una notazione prefissa per gli operatori
-aritmetici, finalizzata proprio ad eliminare i conflitti del parsing $\mathit{LL}(1)$.}
+aritmetici, finalizzata proprio a eliminare i conflitti del parsing $\mathit{LL}(1)$.}
 
 La teoria del parsing $\mathit{LL}(1)$ pu\`o essere generalizzata al parsing
 $\mathit{LL}(k)$, in cui si utilizzano fino a $k$ caratteri davanti al punto
@@ -2190,7 +2190,7 @@ noi, nel file sorgente, ci sia qualcosa a cui si pu\`o ridurre il non
 terminale $A$. Ci sono due item che si aspettano di trovarsi davanti una $A$:
 l'item $I\to\idot A\mathtt{\$}$ e l'item $I\to\idot A\mathtt{a}$, ovvero
 quegli item che hanno la $A$ subito dopo il punto. Se quindi riduciamo
-quello che sta davanti a noi ad una $A$, finiamo nello stato
+quello che sta davanti a noi a una $A$, finiamo nello stato
 \begin{equation}\label{eq:state1}
   \fbox{$
   \begin{array}{rl}
@@ -2204,14 +2204,14 @@ spostando avanti i punti che stanno immediatamente alla sinistra di una $A$
 e quindi chiudendo l'insieme di item
 risultante (che in effetti in questo esempio era gi\`a chiuso).
 Questo stato indica che se davanti a noi ci sar\`a un carattere $\mathtt{\$}$
-allora ridurremo tutto il file sorgente ad una $I$ con la produzione
+allora ridurremo tutto il file sorgente a una $I$ con la produzione
 $I\to A\mathtt{\$}$, ovvero dichiareremo che il file sorgente soddisfa
 le regole della grammatica in Figura~\ref{fig:no_ll1_grammar}.
 Questa sar\`a la condizione di \emph{accettazione} del file sorgente.
 Se invece ci sar\`a il carattere \texttt{a} allora
-ridurremo la $A$ e il carattere \texttt{a} ad una $A$ tramite la
+ridurremo la $A$ e il carattere \texttt{a} a una $A$ tramite la
 produzione $A\to A\mathtt{a}$. Indichiamo quest'ultima situazione dicendo
-che se nello stato~\eqref{eq:state1} ci troviamo davanti ad una \texttt{a},
+che se nello stato~\eqref{eq:state1} ci troviamo davanti a una \texttt{a},
 allora finiamo nello stato
 \begin{equation}\label{eq:state3}
   \fbox{$
@@ -2295,7 +2295,7 @@ dal file sorgente \`e \texttt{a}, si passa nello stato $s_1$;
 se la transizione fosse invece etichettata con un non terminale $A$, essa
 indicherebbe
 che da $s_0$ si passa ad $s_1$ se gli ultimi caratteri \emph{gi\`a letti} dal
-file sorgente formano uno stringa derivabile da $A$.
+file sorgente formano una stringa derivabile da $A$.
 
 Lo schema in Figura~\ref{fig:lr0_automaton} pu\`o essere usato come
 un \emph{programma} per un \emph{automa a pila} (deterministico),
@@ -2330,7 +2330,7 @@ della produzione. Dal momento che la produzione $A\to\mathtt{a}$ ha un
 lato destro di lunghezza unitaria (un terminale), dobbiamo eliminare uno
 stato dallo stack, esponendo lo stato $0$ in cima allo stack.
 Poich\'e abbiamo appena ridotto qualcosa
-ad una $A$, la Figura~\ref{fig:lr0_automaton}
+a una $A$, la Figura~\ref{fig:lr0_automaton}
 ci dice che l'automa dallo stato $0$ va nello stato $1$:
 \begin{align*}
   0,1 & & \mathtt{a\$}
@@ -2344,7 +2344,7 @@ $3$ leggendo tale \texttt{a}:
 Lo stato $3$ contiene un item col punto alla fine. Questo significa che
 abbiamo gi\`a visto qualcosa che ha la struttura del lato destro della
 produzione da cui l'item \`e derivato, cio\`e di $A\mathtt{a}$, e che possiamo
-ridurlo ad una $A$. Dal momento che $A\mathtt{a}$ ha lunghezza due
+ridurlo a una $A$. Dal momento che $A\mathtt{a}$ ha lunghezza due
 (un non terminale seguito da un terminale), dobbiamo estrarre due stati
 dallo stack, esponendo lo stato $0$ in cima allo stack.
 Poich\'e abbiamo appena ridotto qualcosa a una
@@ -2379,7 +2379,7 @@ Questa \`e proprio la derivazione della stringa $\mathtt{aa\$}$ a partire
 dal non terminale iniziale $I$. Si pu\`o dimostrare che questa derivazione
 costruita dall'automa \`e sempre una derivazione rightmost.
 
-Vediamo cosa accade se invece proviamo ad eseguire l'automa su un file
+Vediamo cosa accade se invece proviamo a eseguire l'automa su un file
 sorgente che contiene la stringa $\mathtt{ab\$}$, che non appartiene al
 linguaggio della grammatica in Figura~\ref{fig:no_ll1_grammar}. Le prime
 transizioni sono simili a quelle viste prima:
@@ -2407,11 +2407,11 @@ Ricapitoliamo quindi le operazioni che un automa a pila \`e capace di compiere:
 \item[riduzione secondo una produzione:] se siamo in uno stato $i$ che
   contiene un item $L\to\alpha\idot$, l'automa elimina dalla cima dello stack
   tanti stati quanta \`e la lunghezza $l$ (numero di terminali e non terminali)
-  di $\alpha$. Se lo stack fosse pi\`u corto di $l+1$ si d\`a errore. Quindi
+  di $\alpha$. Se lo stack fosse pi\`u corto di $l+1$, si d\`a errore. Quindi
   si prende lo stato $k$ che \`e stato esposto in cima allo stack e si cerca
   una transizione uscente da $k$ etichettata con $L$. Se tale transizione
   porta nello stato $j$ si aggiunge $j$ in cima allo stack. Se essa non
-  esiste si d\`a errore;
+  esiste, si d\`a errore;
 \item[accettazione:] se siamo in uno stato $i$ che contiene una produzione
   $L\to\alpha\idot\mathtt{\$}$ accettiamo il file sorgente;
 \item[errore:] in tutti gli altri casi si d\`a errore, rifiutando quindi il
@@ -2429,7 +2429,7 @@ chiamato \emph{automa $\mathit{LR}(0)$}.
 tale automa tramite una \emph{tabella $\mathit{LR}(0)$},
 che indica cosa fare in ogni
 stato sulla base del carattere che sta sotto la testina di lettura dell'automa.
-Sar\`a questa tabella e non lo schema che verr\`a effettivamente inserita
+Sar\`a questa tabella e non lo schema che verr\`a effettivamente inserito
 nell'automa per programmarlo a riconoscere una data grammatica.
 %
 \begin{definition}\label{def:lr0_table}
@@ -2440,7 +2440,7 @@ stati dell'automa, sulle ascisse i terminali e i non terminali di $G$ e tale
 che
 \begin{itemize}
 \item per ogni freccia da uno stato $i$ a uno stato $j$ etichettata con
-      un terminale $t$ la casella $(i,t)$ della tabella contiene $sj$
+      un terminale $t$, la casella $(i,t)$ della tabella contiene $sj$
       (\emph{sposta e vai in $j$});
 \item per ogni stato $i$ che contiene un item $L\to\alpha\idot$, dove
       $L\to\alpha$ \`e la $k$-esima produzione della grammatica,
@@ -2448,7 +2448,7 @@ che
       riga $i$-esima della tabella contiene $rk$ (\emph{riduci secondo
       la produzione $k$});
 \item per ogni freccia da uno stato $i$ a uno stato $j$ etichettato con
-      un non terminale $N$ la casella $(i,N)$ della tabella contiene $gj$
+      un non terminale $N$, la casella $(i,N)$ della tabella contiene $gj$
       (\emph{vai in $j$});
 \item per ogni stato $i$ che contiene un item del tipo $L\to\alpha\idot
       \mathtt{\$}$, la casella $(i,\mathtt{\$})$ contiene $a$ (\emph{accetta}).
@@ -2487,7 +2487,7 @@ Ricordiamo che essa invece non \`e una grammatica $\mathit{LL}(1)$.
 
 Questo metodo di parsing \`e detto $\mathit{LR}(0)$ poich\'e il parser
 legge il file sorgente da sinistra a destra (da cui la
-$L$ da \emph{left-to-right}) e genera derivazioni rightmost (da cui la
+$L$ che sta per \emph{left-to-right}) e genera derivazioni rightmost (da cui la
 $R$); inoltre esso non usa alcun carattere di lookahead per decidere
 secondo quale produzione ridurre in uno stato che ha un item
 con un punto alla fine. Questo \`e evidente dalla
@@ -2595,7 +2595,7 @@ $I\to\idot L\mathtt{\$}$, abbiamo aggiunto, per chiusura, l'item
 $L\to\idot AB$ per la produzione per $L$ e quindi, poich\'e il punto
 \`e adesso davanti al non terminale $A$, anche gli item per $A$.
 L'item $A\to\idot$ \`e derivato dalla produzione $A\to\varepsilon$.
-Si noti inoltre che se nello stato $2$ ci troviamo davanti a una \texttt{a},
+Si noti inoltre che, se nello stato $2$ ci troviamo davanti a una \texttt{a},
 l'item $A\to\idot\mathtt{a}A$ sposta il punto ottenendo l'item
 $A\to\mathtt{a}\idot A$ che, per chiusura, genera gli item
 $A\to\idot$ e $A\to\idot\mathtt{a}A$. Conseguentemente c'\`e una freccia
@@ -2631,7 +2631,7 @@ contiene dei conflitti, causati dall'aver messo le
 riduzioni su \emph{tutti} i terminali della grammatica.
 Questa scelta \`e estremamente
 grossolana, dal momento che ci sono alcuni terminali che non si troveranno
-mai a seguire il lato sinistro delle produzioni per cui si riduce.
+mai dopo il lato sinistro delle produzioni per cui si riduce.
 Pi\`u in dettaglio, se riduciamo secondo una produzione
 $L\to\alpha$ allora \`e inutile indicare una riduzione per quei terminali che
 non sono fra i $\follow(L)$ poich\'e tali terminali non possono mai seguire
@@ -2943,7 +2943,7 @@ che normalmente viene scritto, in maniera un po' pi\`u compatta, come
 %
 \greycomment{Il fatto che gli item $\mathit{LR}(1)$
 si differenzino anche sulla base
-del lookahead induce spesso in errori di chiusura, in cui si considerano come
+del lookahead induce spesso a errori di chiusura, in cui si considerano come
 stati degli insiemi di item che in effetti non sono chiusi. Occorre
 prestare particolare attenzione ogni volta che a un insieme di item se ne
 aggiunge un altro, controllando che questa aggiunta non provochi a sua
@@ -3087,7 +3087,7 @@ ha una grammatica $\mathit{LR}(1)$.
 \end{definition}
 %
 \noindent
-Si noti che per costruzione i lookahead $f$ in un item
+Si noti che, per costruzione, i lookahead $f$ in un item
 $L\to\alpha\idot\quad f$ sono fra i seguiti di $L$. Ne consegue che
 questo tipo di parsing non genera mai pi\`u conflitti del parsing
 $\mathit{SLR}$. Esso \`e in effetti strettamente pi\`u potente del
@@ -3143,8 +3143,8 @@ $2$ e $13$. Tali stati portano a loro volta in stati che sono uguali a meno
 di lookahead. Cosa accade se fondiamo tali stati in un unico stato,
 unendo l'insieme dei lookahead? Per esempio, fondendo lo stato $2$ e lo
 stato $13$ otteniamo lo stato $2$ e redirezioniamo ogni freccia entrante in
-$13$ in una freccia entrante in $2$. Si pu\`o dimostrare che se l'automa
-risultante non ha conflitti allora esso riconosce esattamente lo stesso
+$13$ in una freccia entrante in $2$. Si pu\`o dimostrare che, se l'automa
+risultante non ha conflitti, allora esso riconosce esattamente lo stesso
 linguaggio dell'automa $\mathit{LR}(1)$ non semplificato. Inoltre \`e facile
 convincersi che questa fusione di stati non pu\`o mai introdurre un
 conflitto sposta/riduci che non c'era gi\`a nell'automa $\mathit{LR}(0)$,
@@ -3348,11 +3348,11 @@ JavaCup risolve i conflitti sposta/riduci in favore dello spostamento e i
 conflitti riduci/riduci in favore della riduzione per la produzione che
 appare prima nella grammatica.
 
-Le scelte di risoluzione dei conflitti incontrati durante la generazione
-di un parser vengono enumerate da JavaCup
-nel file di log \texttt{syntactical/Kitten.err}, insieme agli stati dell'automa
-$\mathit{LALR}(1)$ e alle relative transizioni. Tale file andrebbe quindi
-sempre controllato dopo la generazione di un parser. \`E possibile specificare
+JavaCup visualizza le scelte di risoluzione dei conflitti incontrati durante la generazione
+di un parser, nella console di Eclipse oppure
+nel file di log \texttt{resources/Kitten.err}, insieme agli stati dell'automa
+$\mathit{LALR}(1)$ e alle relative transizioni. Tale informazione andrebbe quindi
+sempre controllata dopo la generazione di un parser. \`E possibile specificare
 un numero massimo di risoluzioni accettabili da JavaCup, superato il quale
 la creazione del parser non \`e effettuata.
 %
@@ -3491,7 +3491,7 @@ significa dare priorit\`a alla moltiplicazione, mentre spostare
 $\mathtt{PLUS}$ significa dare priorit\`a all'addizione. La scelta ragionevole
 \`e quindi quella di risolvere l'ambiguit\`a riducendo secondo la produzione
 $\mathit{exp}\to\mathit{exp}\ \mathtt{TIMES}\ \mathit{exp}$. In termini della
-tabella $\mathit{LR}(1)$, questo significa che nello sttao $1$, di fronte
+tabella $\mathit{LR}(1)$, questo significa che nello stato $1$, di fronte
 a $\mathtt{PLUS}$, risolviamo il conflitto
 lasciando l'azione di riduzione ed eliminado l'azione di spostamento del token.
 Un ragionamento simile ci fa concludere che nello stato $2$,
@@ -3541,13 +3541,13 @@ aritmetici viene fatta in JavaCup con le direttive che abbiamo visto nella
 Sezione~\ref{subsec:priorities}, le quali modificano il comportamento
 di JavaCup nella risoluzione dei conflitti (Sezione~\ref{subsec:lalr1}).
 Una direttiva \texttt{precedence xxx $t$} d\`a infatti al token $t$ una
-priorit\`a maggiore di quella di tutti gli altri token enumerati dalle
-direttive precedenti. Inoltre essa d\`a alle produzioni il cui ultimo
-token a destra \`e $t$ una priorit\`a pari a quella di $t$. Un conflitto
+priorit\`a maggiore di quella di tutti gli altri token enumerati da
+direttive precedenti dello stesso genere. Inoltre essa d\`a alle produzioni, il cui ultimo
+token a destra \`e $t$, una priorit\`a pari a quella di $t$. Un conflitto
 sposta/riduci viene a questo punto risolto preferendo lo spostamento se il
 token spostato ha priorit\`a maggiore della produzione per cui si dovrebbe
-ridurre; la riduzione nel caso opposto. Conseguentemente, con le direttive
-della Sezione~\ref{subsec:priorities} fra una riduzione per
+ridurre; preferendo la riduzione nel caso opposto. Conseguentemente, con le direttive
+della Sezione~\ref{subsec:priorities}, fra una riduzione per
 $\mathit{exp}\to\mathit{exp}\ \mathtt{TIMES}\ \mathit{exp}$ e lo spostamento
 di un $\mathtt{PLUS}$ si preferisce la riduzione. A parit\`a di
 priorit\`a si seguono le direttive di associativit\`a preferendo la
@@ -3579,8 +3579,8 @@ deve spostare tale token piuttosto che ridurre secondo la produzione
 della Sezione~\ref{subsec:commands_specification}.
 Abbiamo detto nella Sezione~\ref{subsec:lalr1} che
 JavaCup risolve un conflitto sposta/riduci in favore dello spostamento,
-che \`e quello che volevamo, e annotando nel
-file \texttt{syntactical/Kitten.err} che il conflitto \`e stato risolto in
+che \`e quello che volevamo, e segnalando su console o annotando nel
+file \texttt{resources/Kitten.err} che il conflitto \`e stato risolto in
 tal senso. Per evitare tale annotazione (essenzialmente un \emph{warning})
 e non contare questa risoluzione nel novero di quelle ammesse al massimo
 da JavaCup, basta dichiarare esplicitamente che l'\texttt{ELSE} ha priorit\`a
