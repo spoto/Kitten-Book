@@ -488,8 +488,8 @@ della grammatica:
   non terminal class_members;
   non terminal formals;
   non terminal formals_aux;
-  non terminal statements;
-  non terminal command;
+  non terminal com;
+  non terminal comseq;
   non terminal exp;
   non terminal expseq;
   non terminal expseq_aux;
@@ -852,7 +852,7 @@ formata dalle produzioni:
    | WHILE LPAREN exp RPAREN command    // un ciclo while
    | FOR LPAREN command SEMICOLON exp
        SEMICOLON command RPAREN command // un ciclo for
-   | LBRACE statements RBRACE           // uno scope locale
+   | LBRACE comseq RBRACE           // uno scope locale
    | LBRACE RBRACE                      // un comando vuoto
    | exp DOT ID LPAREN expseq RPAREN ;  // una chiamata di metodo
 \end{verbatim}
@@ -873,19 +873,19 @@ dichiarati per i metodi. Preferiamo invece lasciare questi
 La produzione
 %
 \begin{verbatim}
-  exp ::= LBRACE statements RBRACE
+  exp ::= LBRACE comseq RBRACE
 \end{verbatim}
 %
 definisce uno \emph{scope locale}, \cioe una sequenza non vuota di comandi,
 separati da punti e virgola, le cui dichiarazioni restano locali
 a tale sequenza stessa (ovvero non sono \piu visibili dopo la
-parentesi graffa di chiusura). Il non terminale \texttt{statements}
+parentesi graffa di chiusura). Il non terminale \texttt{comseq}
 definisce proprio tale sequenza di comandi:
 %
 \begin{verbatim}
-  statements ::=
-     command
-   | command SEMICOLON statements ;
+  comseq ::=
+     com
+   | com SEMICOLON comseq ;
 \end{verbatim}
 %
 \subsection{La specifica di una classe Kitten}
@@ -3706,7 +3706,7 @@ che contiene il loro valore semantico. \`E possibile decorare anche i terminali
 che stanno alla destra di una produzione. Il valore semantico dei terminali
 \`e per definizione il loro valore lessicale (Capitolo~\ref{chap:lexical})
 che normalmente \`e \texttt{null} tranne se l'analizzatore lessicale
-ha sintettizato per essi un apposito valore lessicale, come avviene in Kitten
+ha sintetizzato per essi un apposito valore lessicale, come avviene in Kitten
 per gli identificatori, le stringhe e le costanti numeriche.
 
 Continuando il nostro esempio, il numero di \texttt{a} e il numero di
@@ -3717,8 +3717,8 @@ di tipo \texttt{int}:
 %
 \begin{verbatim}
   public class Pair {
-    private int a;
-    private int b;
+    private final int a;
+    private final int b;
 
     public Pair(int a, int b) {
       this.a = a;
@@ -3737,7 +3737,7 @@ quindi specifichiamo come si costruisce tale valore lessicale:
 %
 \begin{verbatim}
   L ::= A:a B:b
-      {: RESULT = new Pair(a,b); :} ;
+      {: RESULT = new Pair(a, b); :} ;
 \end{verbatim}
 %
 La grammatica decorata \`e in Figura~\ref{fig:grammar_lists_decoration}.
@@ -3755,7 +3755,7 @@ come valore di ritorno del metodo \texttt{parse()} della classe
                        start with L;
 
                        L ::= A:a B:b
-                            {: RESULT = new Pair(a,b); :} ;
+                            {: RESULT = new Pair(a, b); :} ;
 
                        A ::=
                             {: RESULT = 0; :}
@@ -3831,7 +3831,7 @@ la produzione $A\to\mathtt{a}A$ per cui dobbiamo levare due stati dallo
 stack e sostituirli con lo stato $5$. Gli ultimi due elementi dello stack
 dei valori semantici sono $/$ e $0$ per cui nella
 Figura~\ref{fig:grammar_lists_decoration} il valore di $l$ \`e $0$.
-Conseguentemente il valore semantico $1+l$ \`e pari ad $1$ e otteniamo la
+Conseguentemente il valore semantico $1+l$ \`e pari a $1$ e otteniamo la
 configurazione:
 %
 \begin{align*}
@@ -3897,8 +3897,8 @@ su interi. Supponiamo che l'analizzatore lessicale associ al token
 \texttt{INTEGER} il valore numerico concreto presente nel file
 sorgente (Capitolo~\ref{chap:lexical}). Le azioni semantiche in
 Figura~\ref{fig:expressions_decoration} calcolano il valore dell'espressione
-contenuta nel file sorgente. Si noti che se l'espressione \`e formata
-semplicemente da un numero intero allora la produzione decorata
+contenuta nel file sorgente. Si noti che, se l'espressione \`e formata
+semplicemente da un numero intero, allora la produzione decorata
 %
 \begin{verbatim}
   exp ::= INTEGER:i
@@ -3971,7 +3971,7 @@ astratta della parte di codice da esso derivata.
                        start with L;
 
                        L ::= A:a B:b
-                            {: RESULT = new AB(a,b); :} ;
+                            {: RESULT = new AB(a, b); :} ;
 
                        A ::=
                             {: RESULT = new EmptyA(); :}
@@ -4006,7 +4006,7 @@ sia lasciata astratta, nel senso di Java:
   public class EmptyB extends AbstractB {}
 
   public class OneB extends AbstractB {
-    private AbstractB l;
+    private final AbstractB l;
     public OneB(AbstractB l) { this.l = l; }
   }
 \end{verbatim}
@@ -4017,8 +4017,8 @@ come:
 %
 \begin{verbatim}
   public class AB {
-    private AbstractA a;
-    private AbstractB b;
+    private final AbstractA a;
+    private final AbstractB b;
     public AB(AbstractA a, AbstractB b) { this.a = a; this.b = b; }
   }
 \end{verbatim}
@@ -4033,18 +4033,18 @@ Questa volta le classi di sintassi astratta sono implementate come
 %
 \begin{verbatim}
   public class ListA {
-    private ListA tail;
+    private final ListA tail;
     public ListA(ListA tail) { this.tail = tail; }
   }
 
   public class ListB {
-    private ListB tail;
+    private final ListB tail;
     public ListB(ListB tail) { this.tail = tail; }
   }
 
   public class AB {
-    private ListA a;
-    private ListB b;
+    private final ListA a;
+    private final ListB b;
     public AB(ListA a, ListB b) { this.a = a; this.b = b; }
   }
 \end{verbatim}
@@ -4071,7 +4071,7 @@ Figura~\ref{fig:grammar_lists_abstract_syntax2}.
                        start with L;
 
                        L ::= A:a B:b
-                            {: RESULT = new AB(a,b); :} ;
+                            {: RESULT = new AB(a, b); :} ;
 
                        A ::=
                             {: RESULT = null; :}
@@ -4121,7 +4121,7 @@ della Sezione~\ref{subsec:expressions_specification}:
 %
 \begin{verbatim}
   exp ::= exp:left PLUS:p exp:right
-     {: RESULT = new Addition(pleft,left,right); :}
+     {: RESULT = new Addition(pleft, left, right); :}
 \end{verbatim}
 %
 Per induzione, \texttt{left} e \texttt{right} contengono l'albero
@@ -4182,8 +4182,8 @@ rappresentazione grafica dell'albero di sintassi astratta
 \begin{figure}[t]
 \begin{verbatim}
                      public abstract class Absyn {
-                       private int pos;
-                       private int identifier;
+                       private final int pos;
+                       private final int identifier;
                        private static int counter = 0;
 
                        protected Absyn(int pos) {
@@ -4231,8 +4231,8 @@ caso particolare delle espressioni:
 %
 \begin{verbatim}
   public abstract class BinOp extends Expression {
-    private Expression left;
-    private Expression right;
+    private final Expression left;
+    private final Expression right;
 
     protected BinOp(int pos, Expression left, Expression right) {
       super(pos);
@@ -4253,7 +4253,7 @@ cio\`e un'operazione binaria aritmetica:
 \begin{verbatim}
   public abstract class ArithmeticBinOp extends BinOp {
     protected ArithmeticBinOp(int pos, Expression left, Expression right) {
-      super(pos,left,right);
+      super(pos, left, right);
     }
   }
 \end{verbatim}
@@ -4264,7 +4264,7 @@ come un caso particolare di operazione binaria aritmetica:
 \begin{verbatim}
   public class Addition extends ArithmeticBinOp {
     public Addition(int pos, Expression left, Expression right) {
-      super(pos,left,right);
+      super(pos, left, right);
     }
   }
 \end{verbatim}
@@ -4292,44 +4292,12 @@ sintassi astratta di Kitten.
 %
 \begin{figure}[t]
 \begin{center}
-\epsfig{file = types_hierarchy.pdf, width = 14cm}
+\includegraphics[width=14cm]{types_hierarchy.pdf}
 \end{center}
 \caption{La struttura gerarchica delle classi di sintassi astratta per
          i tipi. Le classi astratte sono indicate con un
          ovale, quelle concrete con un rettangolo.}
   \label{fig:types_hierarchy}
-\end{figure}
-
-\begin{figure}[t]
-\begin{verbatim}
-  public class Symbol implements Comparable {
-    // alcuni simboli usati di frequente
-    public static final Symbol THIS = mk("this");
-    public static final Symbol OBJECT = mk("Object");
-    public static final Symbol STRING = mk("String");
-    private String name;   // il nome del simbolo
-
-    private Symbol(String name) { // si noti: e' private!
-      this.name = name;
-    }
-
-    // possiamo creare simboli solo con questo metodo
-    public static Symbol mk(String name) {
-      // usa una tabella statica per determinare se il simbolo e' gia'
-      // stato creato e in tal caso lo ritorna. Altrimenti lo crea,
-      // lo aggiunge alla tabella e lo ritorna
-    }
-
-    public String toString() { return name; }
-
-    public int compareTo(Object other) {
-      if (!(other instanceof Symbol)) return 0;
-      return name.compareTo(((Symbol)other).name);
-    }
-  }
-\end{verbatim}
-\caption{La classe \texttt{symbol/Symbol.java} che rappresenta gli identificatori Kitten.}
-  \label{fig:symbol.Symbol}
 \end{figure}
 
 La Figura~\ref{fig:types_hierarchy} mostra la gerarchia delle classi di
@@ -4342,7 +4310,7 @@ dalle produzioni che definiscono i tipi Kitten
 \begin{verbatim}
   type ::=
      ID:id
-     {: RESULT = new ClassTypeExpression(idleft,Symbol.mk(id)); :}
+     {: RESULT = new ClassTypeExpression(idleft, id); :}
    | BOOLEAN:b
      {: RESULT = new BooleanTypeExpression(bleft); :}
    | INT:i
@@ -4350,7 +4318,7 @@ dalle produzioni che definiscono i tipi Kitten
    | FLOAT:f
      {: RESULT = new FloatTypeExpression(fleft); :}
    | ARRAY:a OF type:t
-     {: RESULT = new ArrayTypeExpression(aleft,t); :} ;
+     {: RESULT = new ArrayTypeExpression(aleft, t); :} ;
 
   typeplus ::=
      type:t
@@ -4358,25 +4326,6 @@ dalle produzioni che definiscono i tipi Kitten
    | VOID:v
      {: RESULT = new VoidTypeExpression(vleft); :} ;
 \end{verbatim}
-%
-Il metodo statico \texttt{Symbol.mk()} trasforma il valore lessicale
-\texttt{id} di un identificatore \texttt{ID} (\cioe il suo
-nome, visto come stringa) in un oggetto della classe
-\texttt{symbol/Symbol.java} mostrata in
-Figura~\ref{fig:symbol.Symbol}. Tale classe \`e molto simile a
-\texttt{java.lang.String}, con l'unica differenza che non
-possono esistere due \texttt{symbol.Symbol} che rappresentano lo
-stesso identificatore. Questo \`e ottenuto costringendo il programmatore
-a creare oggetti tramite un metodo statico \texttt{mk} che tiene traccia
-degli identificatori gi\`a creati ed evita di creare doppioni.
-Avevamo gi\`a osservato infatti che l'albero di sintassi astratta
-usa gli stessi nodi per diverse occorrenze dello stesso identificatore
-(Figura~\ref{fig:led_albero}).
-Il vantaggio di non avere due oggetti diversi per lo stesso identificatore
-sar\`a evidente in fase di analisi semantica, quando dovremo associare
-l'uso di un identificare con la sua dichiarazione. Avere lo stesso oggetto
-in entrambi i punti di programma semplificher\`a il nostro lavoro
-(Capitoli~\ref{chap:recursive_descent} e~\ref{chap:semantical}).
 
 Avendo aggiunto delle azioni semantiche alla grammatica della
 Sezione~\ref{sec:java_cup}, dobbiamo anche definire il tipo del valore
@@ -4402,8 +4351,7 @@ il tipo del valore semantico delle espressioni di tipo \`e
 la superclasse \texttt{TypeExpression} di tutte le classi astratte per
 le espressioni di tipo (Figura~\ref{fig:types_hierarchy}).
 %
-\subsection{Le classi di sintassi astratta per le espressioni e per
-            i leftvalue}
+\subsection{Le classi di sintassi astratta per le espressioni e per i leftvalue}
   \label{subsec:expressions_abstract}
 %
 La Figura~\ref{fig:expressions_hierarchy} mostra la gerarchia delle classi
@@ -4422,11 +4370,11 @@ valore. Le classi astratte per i letterali sono create con le produzioni:
 \begin{verbatim}
   exp ::=
      INTEGER:i
-     {: RESULT = new IntLiteral(ileft,i.intValue()); :}
+     {: RESULT = new IntLiteral(ileft, i.intValue()); :}
    | FLOATING:f
-     {: RESULT = new FloatLiteral(fleft,f.floatValue()) ; :}
+     {: RESULT = new FloatLiteral(fleft, f.floatValue()) ; :}
    | STRING:s
-     {: RESULT = new StringLiteral(sleft,s); :}
+     {: RESULT = new StringLiteral(sleft, s); :}
 \end{verbatim}
 %
 Ricordiamo che questi sono i soli tre token che abbiano un valore
@@ -4450,11 +4398,11 @@ sono create dalle produzioni:
 \begin{verbatim}
   lvalue ::=
      ID:id
-     {: RESULT = new Variable(idleft,Symbol.mk(id)); :}
+     {: RESULT = new Variable(idleft, id); :}
    | exp:receiver DOT:d ID:field
-     {: RESULT = new FieldAccess(dleft,receiver,Symbol.mk(field)); :}
+     {: RESULT = new FieldAccess(dleft, receiver, field); :}
    | exp:array LBRACK:b exp:index RBRACK
-     {: RESULT = new ArrayAccess(bleft,array,index); :} ;
+     {: RESULT = new ArrayAccess(bleft, array, index); :} ;
 \end{verbatim}
 
 La Figura~\ref{fig:expressions_hierarchy} mostra la complessit\`a della
@@ -4475,7 +4423,7 @@ incluse nella classe \texttt{NumericalComparisonBinOp}.
 %
 \begin{figure}[t]
 \begin{center}
-\epsfig{file = commands_hierarchy.pdf, width = 10cm}
+\epsfig{file = commands_hierarchy.pdf, width = 12cm}
 \end{center}
 \caption{La struttura gerarchica delle classi di sintassi astratta per
          i comandi. Le classi astratte sono indicate con un
@@ -4497,41 +4445,37 @@ Questo \`e evidente osservando le azioni semantiche per tale comando:
 \begin{verbatim}
   command ::=
      IF:i LPAREN exp:condition RPAREN THEN command:then
-      {: RESULT = new IfThenElse(ileft,condition,then); :}
+      {: RESULT = new IfThenElse(ileft, condition, then); :}
    | IF:i LPAREN exp:condition RPAREN THEN command:then ELSE command:else
-      {: RESULT = new IfThenElse(ileft,condition,then,else); :}
+      {: RESULT = new IfThenElse(ileft, condition, then, else); :}
 \end{verbatim}
 %
 Il costruttore a soli tre argomenti della classe
 \texttt{absyn/IfThenElse.java} \`e definito in modo da chiamare
 quello a quattro argomenti passando come quarto argomento un ramo
-\texttt{else} vuoto, \cioe un'oggetto creato come
+\texttt{else} vuoto, \cioe un oggetto creato come
 \texttt{new Skip(pos)}. In questo modo d'ora in poi possiamo sempre
 assumere che i condizionali abbiano sempre un ramo \texttt{else}.
 
-Le classi astratte per i comandi hanno un campo
-\texttt{next} che lega in sequenza comandi contigui.
-Il costruttore di \texttt{absyn/Command.java} annulla tale campo,
-che deve essere settato in seguito quando si riconoscono due comandi
-contigui. Questo \`e effettuato tramite il metodo \texttt{link()} della
-classe \texttt{absyn/Command.java}, utilizzato nelle produzioni per gli
-statements:
+Fra le classi di sintassi astratta per i comandi ci sta anche la sequenza
+di comandi \texttt{CommandSeq}. Essa \e utilizzata nelle produzioni per le
+sequenze di comandi:
 %
 \begin{verbatim}
-  statements ::=
-     command:cmd
-     {: RESULT = cmd; :}
-   | command:cmd SEMICOLON statements:next
-     {: cmd.link(next); RESULT = cmd; :} ;
+  comseq ::=
+     com:c
+     {: RESULT = c; :}
+   | com:f SEMICOLON comseq:s
+     {: RESULT = new CommandSeq(cleft, f, s); :} ;
 \end{verbatim}
 
-Anche per i comandi e gli statement
-dobbiamo dichiarare il tipo del loro valore semantico, che \`e la
+Anche per i comandi e le sequenze di comandi
+dobbiamo dichiarare il tipo del loro valore semantico, che \e la
 superclasse di tutte le classi di sintassi astratta per i comandi:
 %
 \begin{verbatim}
-  non terminal Command statements;
-  non terminal Command command;
+  non terminal Command comseq;
+  non terminal Command com;
 \end{verbatim}
 %
 \subsection{Le classi di sintassi astratta per le classi Kitten}
@@ -4555,7 +4499,6 @@ di classe \texttt{ClassDefinition} al cui interno si trova una
 lista di \texttt{ClassMemberDeclaration}. Ciascuna di tali dichiarazioni
 dichiara un membro della classe, che pu\`o essere la dichiarazione di
 un campo, di un costruttore o di un metodo.
-
 Le produzioni che istanziano queste classi di sintassi astratta sono le
 seguenti (si confronti con la Sezione~\ref{subsec:classes_specification}):
 %
@@ -4563,27 +4506,27 @@ seguenti (si confronti con la Sezione~\ref{subsec:classes_specification}):
   class ::=
      CLASS:c ID:name LBRACE class_members:declarations RBRACE
       {: RESULT = new ClassDefinition
-        (cleft,Symbol.mk(name),Symbol.OBJECT,declarations); :}
+        (cleft, name, "Object", declarations); :}
    | CLASS:c ID:name EXTENDS ID:superclass
        LBRACE class_members:declarations RBRACE
       {: RESULT = new ClassDefinition
-        (cleft,Symbol.mk(name),Symbol.mk(superclass),declarations); :} ;
+        (cleft, name, superclass, declarations); :} ;
 
   class_members ::=
       {: RESULT = null; :}
    | FIELD:f type:t ID:name class_members:next
-      {: RESULT = new FieldDeclaration(fleft,t,sym(name),next); :}
+      {: RESULT = new FieldDeclaration(fleft, t, name, next); :}
    | CONSTRUCTOR:c LPAREN formals:formals RPAREN command:body
        class_members:next
-      {: RESULT = new ConstructorDeclaration(cleft,formals,body,next); :}
+      {: RESULT = new ConstructorDeclaration(cleft, formals, body, next); :}
    | METHOD:m typeplus:returnType ID:name LPAREN formals:formals RPAREN
        command:body class_members:next
       {: RESULT = new MethodDeclaration
-        (mleft,returnType,sym(name),formals,body,next); :} ;
+        (mleft, returnType, name, formals, body, next); :} ;
 \end{verbatim}
 %
-Si noti che nel caso in cui la superclasse di una classe Kitten non \`e
-specificata si assume che essa sia \texttt{Object}, in modo che possiamo
+Si noti che, nel caso in cui la superclasse di una classe Kitten non sia
+specificata, si assume che essa sia \texttt{Object}, in modo che possiamo
 sempre assumere che una classe Kitten abbia specificata la sua superclasse.
 
 I tipi dei non terminali sono dichiarati come:
@@ -4608,11 +4551,12 @@ I tipi dei non terminali sono dichiarati come:
 \textit{BooleanBinOp(Expression left, Expression right)} \\
 \texttt{BooleanTypeExpression()} \\
 \texttt{Cast(TypeExpression type, Expression expression)} \\
-\texttt{ClassDefinition(Symbol name, Symbol superclassName, ClassMemberDeclaration declaration)} \\
+\texttt{ClassDefinition(String name, String superclassName, ClassMemberDeclaration declaration)} \\
 \textit{ClassMemberDeclaration(ClassMemberDeclaration next)} \\
-\texttt{ClassTypeExpression(Symbol name)} \\
+\texttt{ClassTypeExpression(String name)} \\
 \textit{CodeDeclaration(FormalParameters formals, Command body, ClassMemberDeclaration next)} \\
 \textit{Command()} \\
+\texttt{CommandSeq(Command first, Command second)} \\
 \textit{ComparisonBinOp(Expression left, Expression right)} \\
 \texttt{ConstructorDeclaration(FormalParameters formals, Command body, ClassMemberDeclaration next)} \\
 \texttt{Division(Expression left, Expression right)} \\
@@ -4620,12 +4564,12 @@ I tipi dei non terminali sono dichiarati come:
 \textit{Expression()} \\
 \texttt{ExpressionSeq(Expression head, ExpressionSeq tail)} \\
 \texttt{False()} \\
-\texttt{FieldAccess(Expression receiver, Symbol name)} \\
-\texttt{FieldDeclaration(TypeExpression type, Symbol name, ClassMemberDeclaration next)} \\
+\texttt{FieldAccess(Expression receiver, String name)} \\
+\texttt{FieldDeclaration(TypeExpression type, String name, ClassMemberDeclaration next)} \\
 \texttt{FloatLiteral(float value)} \\
 \texttt{FloatTypeExpression()} \\
 \texttt{For(Command initialisation, Expression condition, Command update, Command body)} \\
-\texttt{FormalParameters(TypeExpression type, Symbol name, FormalParameters next)} \\
+\texttt{FormalParameters(TypeExpression type, String name, FormalParameters next)} \\
 \texttt{GreaterThan(Expression left, Expression right)} \\
 \texttt{GreaterThanOrEqual(Expression left, Expression right)} \\
 \texttt{IfThenElse(Expression condition, Command then, Command else)} \\
@@ -4634,17 +4578,17 @@ I tipi dei non terminali sono dichiarati come:
 \texttt{LessThan(Expression left, Expression right)} \\
 \texttt{LessThanOrEqual(Expression left, Expression right)} \\
 \textit{Literal()} \\
-\texttt{LocalDeclaration(TypeExpression type, Symbol name, Expression initialiser)} \\
+\texttt{LocalDeclaration(TypeExpression type, String name, Expression initialiser)} \\
 \texttt{LocalScope(Command body)} \\
 \textit{Lvalue()} \\
-\texttt{MethodCallCommand(Expression receiver, Symbol name, ExpressionSeq actuals)} \\
-\texttt{MethodCallExpression(Expression receiver, Symbol name, ExpressionSeq actuals)} \\
-\texttt{MethodDeclaration(TypeExpression returnType, Symbol name, FormalParameters formals,}\\
+\texttt{MethodCallCommand(Expression receiver, String name, ExpressionSeq actuals)} \\
+\texttt{MethodCallExpression(Expression receiver, String name, ExpressionSeq actuals)} \\
+\texttt{MethodDeclaration(TypeExpression returnType, String name, FormalParameters formals,}\\
 \hspace*{21ex}\texttt{Command body, ClassMemberDeclaration next)} \\
 \texttt{Minus(Expression expression)} \\
 \texttt{Multiplication(Expression left, Expression right)} \\
 \texttt{NewArray(TypeExpression elementsType, Expression size)} \\
-\texttt{NewObject(Symbol className, ExpressionSeq actuals)} \\
+\texttt{NewObject(String className, ExpressionSeq actuals)} \\
 \texttt{Nil()} \\
 \texttt{Not(Expression expression)} \\
 \texttt{NotEqual(Expression left, Expression right)} \\
@@ -4656,7 +4600,7 @@ I tipi dei non terminali sono dichiarati come:
 \texttt{Subtraction(Expression left, Expression right)} \\
 \texttt{True()} \\
 \textit{TypeExpression()} \\
-\texttt{Variable(Symbol name)} \\
+\texttt{Variable(String name)} \\
 \texttt{VoidTypeExpression()} \\
 \texttt{While(Expression condition, Command body)}
 \end{tabular}
@@ -4701,10 +4645,10 @@ legata in Figura~\ref{fig:led_albero} tramite un arco etichettato con
 Tale nodo di tipo \texttt{FieldAccess} \`e poi legato, in
 Figura~\ref{fig:led_albero}, tramite due archi etichettati con
 \texttt{receiver} e \texttt{name}, a due nodi di tipo, rispettivamente,
-\texttt{Variable} e \texttt{Symbol} (rettangolare). Questo
+\texttt{Variable} e \texttt{String} (rettangolare). Questo
 rispetta il costruttore di \texttt{FieldAccess} in
 Figura~\ref{fig:abstract_classes}, che \`e
-\texttt{FieldAccess(Expression receiver, Symbol name)}.
+\texttt{FieldAccess(Expression receiver, String name)}.
 Si noti che \texttt{Variable} \`e una sottoclasse di \texttt{Expression}
 (Figura~\ref{fig:expressions_hierarchy}).
 
