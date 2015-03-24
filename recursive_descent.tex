@@ -2,20 +2,20 @@
   \label{chap:recursive_descent}
 %
 \begin{center}
-\epsfig{file = paw.pdf, width = 2.5cm}
+\includegraphics[width=6cm]{paw.jpg}
 \end{center}
 %
 In questo capitolo discutiamo l'implentazione di algoritmi che
-scendono ricorsivamente sull'albero di sintassi astratta generato
-dall'analizzatore sintattico a partire da un file sorgente. Tali algortmi
+scendono ricorsivamente sull'albero di sintassi astratta che l'analizzatore
+sintattico ha generato a partire da un file sorgente. Tali algoritmi
 hanno le funzioni pi\`u svariate, da una semplice raccolta di dati statistici
 sul codice alla verifica dell'uso corretto degli identificatori,
 dalla determinazione del \emph{codice morto}, \cioe di porzioni di codice
 che sicuramente non vengono raggiunte dal flusso di controllo e possono
 quindi essere eliminate,
 alla rappresentazione grafica della sintassi astratta, fino
-al type-checking del codice, a cui dedicheremo,
-per la sua complessit\`a, l'intero Capitolo~\ref{chap:semantical}
+al type-checking del codice (a cui dedicheremo,
+per la sua complessit\`a, l'intero Capitolo~\ref{chap:semantical})
 o addirittura alla generazione del codice intermedio,
 descritta nel Capitolo~\ref{chap:translate}.
 L'implementazione di questi algoritmi tramite discesa ricorsiva
@@ -29,7 +29,7 @@ astratta.
 Si consideri per esempio la grammatica in Figura~\ref{fig:grammar_lists}.
 Supponiamo di voler contare
 il numero di \texttt{a} e il numero di \texttt{b} di ciascun file sorgente
-che rispetta le regole della grammatica. Abbiamo gi\`a risolto questo
+che rispetta le regole espresse dalla grammatica. Abbiamo gi\`a risolto questo
 problema in Figura~\ref{fig:grammar_lists_decoration} tramite azioni
 semantiche. Ma possiamo fare la stessa cosa generando la sintassi astratta
 tramite le regole in Figura~\ref{fig:grammar_lists_abstract_syntax} e
@@ -53,17 +53,17 @@ stessa usata nella Sezione~\ref{sec:abstract_syntax} (una coppia di interi).
      }
 
      public class OneB extends AbstractB {
-       private AbstractB l;
+       private final AbstractB l;
        public OneB(AbstractB l) { this.l = l; }
        public int count() { return 1 + l.count(); }
      }
 
      public class AB {
-       private AbstractA a;
-       private AbstractB b;
+       private final AbstractA a;
+       private final AbstractB b;
        public AB(AbstractA a, AbstractB b) { this.a = a; this.b = b; }
        public Pair count() {
-         return new Pair(a.count(),b.count());
+         return new Pair(a.count(), b.count());
        }
      }
 \end{verbatim}
@@ -83,7 +83,7 @@ ricorsivo delle classi \texttt{EmptyB} e \texttt{OneB}; il secondo \`e quello
 Il metodo \texttt{count()} di \texttt{EmptyB} e \texttt{OneB} \`e
 \emph{a discesa ricorsiva sulla sintassi astratta} poich\'e la sua
 chiamata scende ricorsivamente sui componenti della sintassi astratta fino
-ad arrivare alle foglie, per cui \`e definito un valore costante.
+ad arrivare alle foglie, per le quali \`e definito un valore costante.
 Si faccia attenzione al fatto che
 il metodo virtuale \texttt{count()} \`e dichiarato
 \texttt{abstract} nella superclasse astratta \texttt{AbstractB} e quindi
@@ -92,8 +92,9 @@ il metodo virtuale \texttt{count()} \`e dichiarato
 Cosa abbiamo guadagnato rispetto all'uso di azioni semantiche come
 in Figura~\ref{fig:grammar_lists_decoration}? In primo luogo abbiamo lasciato
 l'analizzatore sintattico alla sua occupazione pi\`u specifica, \cioe
-all'analisi sintattica, piuttosto che usarlo per funzioni \emph{improprie}
-tramite azioni semantiche. In secondo luogo abbiamo \emph{concentrato}
+all'analisi sintattica, piuttosto che usarlo per funzioni a lui \emph{improprie}
+tramite azioni semantiche, rispettando quindi il principio della separation
+of concerns. In secondo luogo abbiamo \emph{concentrato}
 delle funzioni della sintassi astratta nelle classi di sintassi astratta
 stesse, sotto forma di codice Java ricorsivo, che pu\`o essere complesso
 quanto vogliamo. In terzo luogo possiamo utilizzare la gerarchizzazione delle
@@ -101,12 +102,13 @@ classi di sintassi astratta (come quella discussa per Kitten nella
 Sezione~\ref{sec:abstract_syntax_classes}) per definire i metodi virtuali
 solo su alcune superclassi, lasciandoli ereditare a tutte le loro sottoclassi,
 nei casi in cui essi non differissero da una sottoclasse all'altra.
-Questo non \`e possibile tramite azioni semantiche, che anche se fossero uguali
-devono essere comunque duplicate per ogni produzione della grammatica.
+Questo non \`e possibile tramite azioni semantiche che, anche quando sono
+identiche per \piu produzioni della grammatica,
+devono essere comunque duplicate per ognuna di esse.
 Quest'ultimo aspetto sar\`a chiaro adesso considerando un esempio di
 discesa ricorsiva sulla sintassi astratta di Kitten.
 %
-\section{Determinazione delle variabili di un'espressione o comando}
+\section{Determinazione delle variabili che occorrono in un'espressione o comando}
   \label{sec:free_variables}
 %
 Espressioni e comandi Kitten possono contenere variabili.
@@ -121,10 +123,10 @@ occorrono in un comando.
 Cominciamo con le espressioni (Figura~\ref{fig:expressions_hierarchy}).
 Definiamo una funzione
 \[
-  \vars{\_}:\mathtt{Expression}\mapsto\wp(\mathtt{Symbol})
+  \vars{\_}:\mathtt{Expression}\mapsto\wp(\mathtt{String})
 \]
-che mappa ciascuna espressione nell'insieme delle sue variabili
-(\emph{simboli}, Figura~\ref{fig:symbol.Symbol}). Alcuni casi della
+che mappa ciascuna espressione nell'insieme dei nomi delle variabili
+che occorrono nell'espressioni. Alcuni casi della
 definizione di questa funzione sono particolarmente semplici. Per esempio,
 una variabile occorre in se stessa:
 \begin{equation}\label{eq:vars_variable}
@@ -139,8 +141,8 @@ occorrono in ogni sottoclasse di \texttt{Literal} in
 Figura~\ref{fig:expressions_hierarchy}, senza bisogno di ripetere l'equazione
 per ogni sottoclasse.
 
-Un po' \piu complesso \`e il caso del meno unario e della negazione logica,
-che contenendo ricorsivamente un'altra espressione danno origine a una
+Un po' \piu complesso \`e il caso del meno unario e della negazione logica che,
+che contenendo ricorsivamente un'altra espressione, danno origine a una
 definizione ricorsiva per $\vars{}$ (ma ben fondata perch\'e andiamo verso
 strutture sintattiche sempre \piu piccole):
 \[
@@ -188,7 +190,7 @@ l'unione delle variabili che occorrono in ciascuna espressione:
   \vars{\mathtt{NewObject(className,actuals)}}&=\vars{\mathtt{actuals}}
 \end{align*}
 %
-dove $\vars{\_}:\mathtt{ExpressionSeq}\mapsto\wp(\mathtt{Symbol})$ \`e
+dove $\vars{\_}:\mathtt{ExpressionSeq}\mapsto\wp(\mathtt{String})$ \`e
 definito come
 %
 \begin{align*}
@@ -201,7 +203,7 @@ Consideriamo adesso i comandi (Figura~\ref{fig:commands_hierarchy}).
 Estendiamo la funzione $\vars{\_}$ in modo da potere essere applicata anche
 ai comandi:
 \[
-  \vars{\_}:\mathtt{Command}\mapsto\wp(\mathtt{Symbol})~.
+  \vars{\_}:\mathtt{Command}\mapsto\wp(\mathtt{String})~.
 \]
 %
 L'idea \`e semplicissima: le variabili che occorrono in un comando sono
@@ -235,8 +237,7 @@ comando:
   \vars{\mathtt{While(condition,body)}}&=\vars{\mathtt{condition}}\cup
     \vars{\mathtt{body}}\\
   \label{eq:vars_sequence}
-  \vars{\mathit{com}_1;\cdots;\mathit{com}_n}
-    &=\cup_{i=1}^n\vars{\mathit{com}_i}~.
+  \vars{\mathtt{CommandSeq(first,second)}}&=\vars{\mathtt{first}}\cup\vars{\mathtt{second}}~.
 \end{align}
 
 Consideriamo adesso l'implementazione in Java della funzione
@@ -249,12 +250,12 @@ tutti i comandi:
 \begin{verbatim}
   public class Expression extends Absyn {
     ....
-    public abstract HashSet<Symbol> vars();
+    public abstract Set<String> vars();
   }
 
   public class Command extends Absyn {
     ...
-    public abstract HashSet<Symbol> vars();
+    public abstract Set<String> vars();
   }
 \end{verbatim}
 %
@@ -269,8 +270,8 @@ classe \texttt{absyn/Variable.java}:
 \begin{verbatim}
   public class Variable extends Lvalue {
     ...
-    public HashSet<Symbol> vars() {
-      HashSet<Symbol> result = new HashSet<Symbol>();
+    public Set<String> vars() {
+      Set<String> result = new HashSet<String>();
       result.add(name);
       return result;
     }
@@ -284,8 +285,8 @@ la loro superclasse \texttt{absyn/Literal.java}:
 \begin{verbatim}
   public class Literal extends Expression {
     ...
-    public final HashSet<Symbol> vars() {
-      return new HashSet<Symbol>();  // insieme vuoto
+    public final Set<String> vars() {
+      return new HashSet<String>();  // insieme vuoto
     }
   }
 \end{verbatim}
@@ -302,7 +303,7 @@ la classe \texttt{absyn/FieldAccess.java}:
 \begin{verbatim}
   public class FieldAccess extends Lvalue {
     ...
-    public HashSet<Symbol> vars() {
+    public Set<String> vars() {
       return receiver.vars();
     }
   }
@@ -315,8 +316,8 @@ con l'Equazione~\eqref{eq:vars_binop}, la classe \texttt{absyn/BinOp.java}:
 \begin{verbatim}
   public class BinOp extends Expression {
     ...
-    public final HashSet<Symbol> vars() {
-      HashSet<Symbol> result = new HashSet<Symbol>();
+    public final Set<String> vars() {
+      Set<String> result = new HashSet<String>();
       result.addAll(left.vars());
       result.addAll(right.vars());
       return result;
@@ -329,7 +330,7 @@ nell'esempio precedente, in cui \cioe il risultato delle chiamate ricorsive
 non \`e modificato per costruire il risultato complessivo. Questo
 approccio, che chiamiamo \emph{funzionale}, \`e preferibile a un approccio
 \emph{distruttivo} del tipo
-\texttt{HashSet<Symbol> result = left.vars(); result.addAll(right.vars());}
+\texttt{Set<String> result = left.vars(); result.addAll(right.vars());}
 in cui l'insieme proveniente dalla sotto-espressione \texttt{left}
 \`e modificato aggiungendovi i simboli provenienti dalla sotto-espressione
 \texttt{right}. Il motivo per cui preferiamo un approccio funzionale
@@ -337,78 +338,19 @@ in cui l'insieme proveniente dalla sotto-espressione \texttt{left}
 i risultati intermedi delle chiamate ricorsive. Questi risultati potrebbero
 essere salvati e poi riutilizzati in futuro. In alcuni casi un approccio
 distruttivo pu\`o introdurre veri e propri errori di programmazione a causa
-di una complessa condivisione di strutture dati che lo studente non
+di una complessa condivisione di strutture dati che il programmatore non
 riesce a dominare.}
 
 Consideriamo adesso i comandi. Il metodo \texttt{vars()} per il comando
-condizionale andrebbe scritto modificando, in accordo con
+condizionale va scritto modificando, in accordo con
 l'Equazione~\eqref{eq:vars_ifthenelse}, la classe
-\texttt{absyn/IfThenElse.java}. Va per\`o osservato che i comandi sono
-legati a lista, per cui dopo aver calcolato le variabili che occorrono nel
-comando condizionale bisogna aggiungere quelle che occorrono nei comandi
-ad esso legati tramite il campo \texttt{next}
-(in accordo con l'Equazione~\eqref{eq:vars_sequence}).
-Conseguentemente otteniamo:
+\texttt{absyn/IfThenElse.java}:
 %
 \begin{verbatim}
   public class IfThenElse extends Command {
     ...
-    public HashSet<Symbol> vars() {
-      HashSet<Symbol> result = new HashSet<Symbol>();
-      result.addAll(condition.vars());
-      result.addAll(then.vars());
-      result.addAll(else.vars());
-      if (next != null) result.addAll(next.vars());
-      return result;
-    }
-  }
-\end{verbatim}
-%
-Si osservi che delle quattro chiamate a \texttt{vars()}, la prima avviene
-sulle espressioni mentre le tre successive sui comandi.
-
-L'aggiunta delle variabili usate nel comando \texttt{next} (se esso non \`e
-\texttt{null}) non
-\`e specifica al comando condizionale ma va fatta per tutti i comandi.
-Conseguentemente \`e un po' \piu semplice effettuare tale aggiunta per
-default e non considerarla ogni volta per ciascun comando. Questo ha inoltre
-l'effetto di far coincidere l'implementazione con la specifica
-formale data come nell'Equazione~\eqref{eq:vars_ifthenelse}.
-Infine un ragionamento di default evita di dimenticare la linea
-\begin{verbatim}
-  if (next != null) result.addAll(next.vars());
-\end{verbatim}
-in eventuali altri comandi che verranno aggiunti in futuro a Kitten.
-Per ottenere questo meccanismo di default basta
-rimodificare la classe \texttt{absyn/Command.java} come segue:
-%
-\begin{verbatim}
-  public class Command extends Absyn {
-    ...
-    public final HashSet<Symbol> vars() {
-      HashSet<Symbol> result = vars$0();
-      if (next != null) result.addAll(next.vars());
-      return result;
-    }
-
-    protected abstract HashSet<Symbol> vars$0();
-  }
-\end{verbatim}
-%
-Abbiamo \cioe reso \texttt{final} il metodo \texttt{vars()}, il quale adesso
-per default chiama un nuovo metodo \texttt{vars\$0()} dei comandi e poi
-aggiunge le variabili usate da \texttt{next}, se esso non \`e \texttt{null}.
-Si noti che
-il metodo ausiliario \texttt{vars\$0()} \`e \texttt{protected} in modo
-da nasconderne la visibilit\`a all'interno del package \texttt{absyn} e delle
-sottoclassi di \texttt{absyn/Command.java}. A questo punto la classe
-\texttt{absyn/IfThenElse.java} viene modificata come segue:
-%
-\begin{verbatim}
-  public class IfThenElse extends Command {
-    ...
-    public HashSet<Symbol> vars$0() {
-      HashSet<Symbol> result = new HashSet<Symbol>();
+    public Set<String> vars() {
+      Set<String> result = new HashSet<String>();
       result.addAll(condition.vars());
       result.addAll(then.vars());
       result.addAll(else.vars());
@@ -416,10 +358,24 @@ sottoclassi di \texttt{absyn/Command.java}. A questo punto la classe
     }
   }
 \end{verbatim}
-%$
-Si noti che essa non contiene \piu il metodo \texttt{vars()} (e non potrebbe
-mai contenerlo perch\'e l'abbiamo dichiarato \texttt{final} in
-\texttt{absyn/Command.java} al fine di evitarne ridefinizioni).
+%
+Si osservi che, delle tre chiamate a \texttt{vars()}, la prima avviene
+sulle espressioni mentre le due successive sui comandi.
+
+Il metodo \texttt{vars()} per la sequenza di comandi va scritto modificando
+la classe \texttt{absyn/CommandSeq.java}, in accordo con l'Equazione~\eqref{eq:vars_sequence}:
+%
+\begin{verbatim}
+  public class CommandSeq extends Command {
+    ...
+    public Set<String> vars() {
+      Set<String> result = new HashSet<String>();
+      result.addAll(left.vars());
+      result.addAll(right.vars());
+      return result;
+    }
+  }
+\end{verbatim}
 %
 \section{Determinazione delle variabili dichiarate ma non usate}
   \label{sec:no_use}
@@ -493,8 +449,8 @@ separati da punto e virgola \`e l'unione degli insiemi delle variabili
 dichiarate in ciascun comando della sequenza:
 %
 \[
-  \declared{\mathit{com}_1;\cdots;\mathit{com}_n}
-    =\cup_{i=1}^n\declared{\mathit{com}_i}~.
+  \declared{\mathtt{CommandSeq(first,second)}}=\declared{\mathtt{first}}
+    \cup\declared{\mathtt{second}}~.
 \]
 
 L'implementazione in Java della funzione $\used{}$ \`e quasi identica
@@ -509,9 +465,8 @@ ai comandi:
 \begin{verbatim}
   public class Command extends Absyn {
     ...
-    public HashSet<Symbol> declared() {
-      if (next != null) return next.declared();
-      else return new HashSet<Symbol>();    // un insieme vuoto
+    public Set<String> declared() {
+      return new HashSet<String>();    // un insieme vuoto
     }
   }
 \end{verbatim}
@@ -522,18 +477,13 @@ ridefinendovi il metodo \texttt{declared()}:
 \begin{verbatim}
   public class LocalDeclaration extends Command {
     ...
-    public HashSet<Symbol> declared() {
-      HashSet<Symbol> result = new HashSet<Symbol>();
+    public Set<String> declared() {
+      Set<String> result = new HashSet<String>();
       result.add(name);
-      if (getNext() != null) result.addAll(getNext().declared());
       return result;
     }
   }
 \end{verbatim}
-%
-In \texttt{absyn/LocalDeclaration.java} dobbiamo usare il metodo
-\texttt{getNext()} per accedere al campo \texttt{next} poich\'e quest'ultimo
-\`e locale ad \texttt{absyn/Command.java}.
 %
 \greycomment{La tecnica descritta per determinare l'insieme delle variabili
 dichiarate ma non usate \`e abbastanza rudimentale. Abbiamo gi\`a detto che
@@ -608,9 +558,10 @@ un bug in un programma.
 %\end{verbatim}
 %
 %il sotto-comando \texttt{y := x * 3} \`e codice morto.
-Si noti che se ci fosse un ulteriore comando nel corpo del metodo precedente,
+Si noti che, se ci fosse un ulteriore comando nel corpo del metodo precedente,
 subito dopo il comando \verb!"ciao".output()!, allora preferiremmo
-non segnalare che esso \`e codice morto, bench\'e effettivamente lo sia.
+non segnalare che anche esso \`e codice morto, bench\'e effettivamente lo sia,
+ma lasciare solo la prima segnalazione sulla riga precedente.
 Questo al fine di non confondere il programmatore con errori a cascata che
 finiscono per essere poco focalizzati sul punto problematico del codice.
 
@@ -651,20 +602,11 @@ in cui siamo. Se quindi avessimo un
 \emph{Check for Dead-Code} e in cui il booleano $b$ \`e vero quando il singolo
 comando $c$ termina sempre e comunque eseguendo un comando \texttt{return} che
 fa uscire dal metodo in cui siamo,
-allora potremmo estendere $\cdc$ a coppie di comandi con la regola:
-%
-\[
-  \frac{\text{se }\mathit{com}_1\cdc\mathit{true}\text{ segnala un warning}
-    \qquad\mathit{com}_2\cdc b}{\mathit{com}_1;\mathit{com}_2\cdc b}
-\]
-%
-facilmente estendibile poi ulteriormente
-a sequenze di comandi arbitrariamente lunghe:
+allora potremmo definire $\cdc$ su coppie di comandi con la regola:
 %
 \begin{equation}\label{eq:cdc_sequence}
-  \frac{\text{se }\mathit{com}_1\cdc\mathit{true}\text{ segnala un warning}
-    \qquad\mathit{com}_2;\cdots;\mathit{com}_n\cdc b}
-    {\mathit{com}_1;\mathit{com}_2;\cdots;\mathit{com}_n\cdc b}
+  \frac{\text{se }\mathtt{first}\cdc\mathit{true}\text{ segnala un warning}
+    \qquad\mathtt{second}\cdc b}{\mathtt{CommandSeq(first,second)}\cdc b}
 \end{equation}
 %
 Il predicato $\cdc$ \`e utile anche per garantire che il corpo
@@ -682,12 +624,12 @@ Va detto che questa propriet\`a \emph{operazionale} \`e sicuramente un
 vantaggio delle regole di inferenza rispetto a una specifica denotazionale.
 
 Si noti che l'Equazione~\eqref{eq:cdc_sequence} determina se
-l'\emph{ultimo} comando della sequenza termina sempre e comunque con un
+il \emph{secondo} comando della sequenza termina sempre e comunque con un
 \texttt{return} che fa uscire dal metodo in cui siamo,
 al fine di evitare warning a cascata e di focalizzare
 l'attenzione del programmatore sul punto in cui l'errore \`e originato.
 
-Vediamo adesso come definiamo il predicato $\cdc$ sui singoli comandi
+Vediamo adesso come definiamo il predicato $\cdc$ sugli altri comandi
 della Figura~\ref{fig:commands_hierarchy}. Un comando \texttt{return}
 termina sempre e comunque con se stesso e fa uscire dal metodo in cui
 occorre, per cui:
@@ -704,7 +646,7 @@ termini sempre e comunque con un comando \texttt{return} che fa uscire
 dal metodo in cui siamo, questo deve essere
 vero per \emph{entrambi} i suoi rami \texttt{then} ed \texttt{else}. Infatti
 non siamo abbastanza \emph{raffinati} da scoprire che uno dei due
-rami magari non \`e mai eseguito. Conseguentemente definiamo:
+rami non \e magari mai eseguito. Conseguentemente definiamo:
 %
 \begin{equation}\label{eq:cdc_ifthenelse}
   \frac{\mathtt{then}\cdc b_1\quad\mathtt{else}\cdc b_2}
@@ -721,7 +663,7 @@ perch\'e altrimenti l'esecuzione continuerebbe
 con l'istruzione successiva, senza
 incontrare alcun \texttt{return}. Dal momento che non siamo abbastanza
 raffinati da sapere se un ciclo viene eseguito almeno una volta, siamo
-costretti, per sicurezza, a dire che i cicli non terminano mai con un
+costretti, per sicurezza, a dire che i cicli potrebbero non terminare con un
 \texttt{return} che fa uscire dal metodo in cui siamo:
 %
 \begin{equation}\label{eq:cdc_while}
@@ -745,10 +687,10 @@ esempio il ciclo
 in cui il comando \texttt{y := y + 1} \`e codice morto e viene identificato
 dalla regola~\eqref{eq:cdc_while} proprio grazie alla sua premessa.
 
-Il caso del ciclo \texttt{for} \`e simile a quello del ciclo \texttt{while}
+Il caso del ciclo \texttt{for} \`e simile a quello del ciclo \texttt{while},
 ma va tenuto conto che almeno l'inizializzazione del ciclo viene \emph{sempre}
 effettuata una volta. Conseguentemente, se essa eseguisse sempre e comunque
-un comando \texttt{return} che fa uscire dal metodo in cui siamo lo stesso
+un comando \texttt{return} che fa uscire dal metodo in cui siamo, lo stesso
 accadrebbe per l'intero \texttt{for}. Definiamo quindi:
 %
 \begin{equation}\label{eq:cdc_for}
@@ -792,54 +734,30 @@ che fa uscire dal metodo in cui occorrono:
 \]
 
 L'implementazione del giudizio $\cdc$ \`e fatta tramite un metodo
-\texttt{checkForDeadcode\$0()} dei comandi,
-che implementa $\cdc$ per comandi singoli,
-e un metodo \texttt{checkForDeadcode()}, sempre dei comandi,
-che lo estende a sequenze di comandi legati dal campo \texttt{next}, secondo
-l'Equazione~\eqref{eq:cdc_sequence}. A tal fine modifichiamo
-\texttt{absyn/Command.java} come segue:
+\texttt{checkForDeadcode()} dei comandi.
+A tal fine modifichiamo \texttt{absyn/Command.java} come segue:
 %
 \begin{verbatim}
   public class Command extends Absyn {
     ...
-    public final boolean checkForDeadcode() {
-      boolean stopping = checkForDeadcode$0(checker);
-      if (next != null) {
-        if (stopping) error("unreachable code after this statement");
-        return next.checkForDeadcode(checker);
-      }
-      else return stopping;
-    }
-
-    protected abstract boolean checkForDeadcode$0();
+    public abstract boolean checkForDeadcode();
   }
 \end{verbatim}
-%$
-Il metodo \texttt{checkForDeadcode()} applicato a un comando singolo
-non fa altro che chiamare \texttt{checkForDeadcode\$0()}; applicato a un
-comando composto controlla che il primo non termini sempre e comunque con
-un \texttt{return} che fa uscire dal metodo in cui occorre
-(variabile \texttt{stopping}) segnalando un warning in tal caso, quindi
-prosegue con la chiamata ricorsiva sui comandi che seguono.
-Il metodo \texttt{abstract} \texttt{checkForDeadcode\$0()}, come abbiamo gi\`a
-detto, \`e l'implementazione di $\cdc$ per un singolo comando. Per
+%
+Tale metodo verr\`a implementato nelle sottoclassi. Per
 esempio, nel caso del condizionale modifichiamo la classe
 \texttt{absyn/IfThenElse.java} definendo:
 %
 \begin{verbatim}
   public class IfThenElse extends Command {
     ...
-    protected boolean checkForDeadcode$0() {
+    public boolean checkForDeadcode() {
       return then.checkForDeadcode() && else.checkForDeadcode();
     }
   }
 \end{verbatim}
-%$
-in accordo con l'Equazione~\eqref{eq:cdc_ifthenelse}. Si noti che la
-chiamata ricorsiva \`e stata fatta tramite il metodo
-\texttt{checkForDeadcode()} e non
-\texttt{checkForDeadcode\$0()} poich\'e i rami \texttt{then} ed \texttt{else}
-potrebbero essere comandi composti e non soltanto singoli comandi.
+%
+in accordo con l'Equazione~\eqref{eq:cdc_ifthenelse}.
 
 Un ultimo esempio \`e quello del ciclo \texttt{for}.
 Modifichiamo la classe \texttt{absyn/For.java} in accordo
@@ -848,7 +766,7 @@ con l'Equazione~\eqref{eq:cdc_for}:
 \begin{verbatim}
   public class For extends Command {
     ...
-    protected boolean checkForDeadcode$0() {
+    public boolean checkForDeadcode() {
       update.checkForDeadcode();
       body.checkForDeadcode();
       if (initialisation.checkForDeadcode())
@@ -858,7 +776,7 @@ con l'Equazione~\eqref{eq:cdc_for}:
     }
   }
 \end{verbatim}
-%$
+%
 
 Quello descritto in questa sezione \`e il controllo di codice morto
 implementato attualmente dal compilatore Kitten, usato anche per garantire che
