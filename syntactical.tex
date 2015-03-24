@@ -2,21 +2,24 @@
 %
 \vspace*{-2ex}
 \begin{center}
-\epsfig{file = cat2.pdf, width = 3.5cm}
+\includegraphics[width=6cm]{cat2.jpeg}
 \end{center}
 \vspace*{-2ex}
 %
-Abbiamo visto nel Capitolo~\ref{chap:lexical} come la sequenza di
-caratteri di un sorgente Kitten viene trasformata in una lista
+Nel Capitolo~\ref{chap:lexical} abbiamo visto come la sequenza di
+caratteri di un sorgente Kitten possa venire trasformata in una lista
 di \emph{token}. Programmi \emph{lessicalmente errati}, \cioe
 contenenti sequenze di caratteri che non compongono alcun
 token, vengono rifiutati dall'analizzatore lessicale con una segnalazione
 di errore.
 
-Non bisogna per\`o pensare che l'analizzatore lessicale impedisca
+Questo non significa per\`o che l'analizzatore lessicale impedisca
 al programmatore di scrivere programmi \emph{sintatticamente errati}.
-Per esempio, il comando \texttt{while (a != b a := a + 1} viene
-tradotto nella sequenza di token \texttt{WHILE}, \texttt{LPAREN},
+Per esempio, il comando
+\[
+  \verb|while (a != b a := a + 1|
+\]
+viene tradotto nella sequenza di token \texttt{WHILE}, \texttt{LPAREN},
 \texttt{ID}, \texttt{NEQ}, \texttt{ID}, \texttt{ID}, \texttt{ASSIGN},
 \texttt{ID}, \texttt{PLUS}, \texttt{INTEGER} senza che alcun messaggio
 di errore venga segnalato dall'analizzatore lessicale. Ci\`o nonostante,
@@ -38,9 +41,9 @@ L'analisi sintattica ha due scopi:
   ottimizzazione del codice.
 \end{itemize}
 %
-\begin{figure}[t]
+\begin{figure}
 \begin{center}
-\epsfig{file = led_logica.pdf, height = 12.5cm}
+\includegraphics[width=16cm]{led_logica.jpg}
 \end{center}
 \caption{La sintassi astratta del programma in Figura~\ref{fig:led}.}
   \label{fig:led_albero}
@@ -100,7 +103,8 @@ Visto il primo carattere \texttt{b}, occorre ricordarsi quanti caratteri
 ci si deve ancora aspettare. Il \emph{linguaggio di parentesi} $P$ non \`e
 un puro gioco teorico: esso astrae un tipico linguaggio di programmazione
 la cui struttura \`e data da delimitatori come le parentesi graffe
-o le parole chiave \texttt{begin} ed \texttt{end}.
+o le parole chiave \texttt{begin} ed \texttt{end}, che devono essere
+accoppiati: ad ogni apertura deve corrispondere una chiusura.
 
 Abbiamo visto nella Sezione~\ref{sec:modes} che le espressioni regolari
 posso essere \emph{potenziate} utilizzando delle \emph{azioni con memoria}
@@ -125,7 +129,7 @@ Una \emph{grammatica libera dal contesto} (in seguito semplicemente
 \item $I\in N$ \`e il \emph{non terminale iniziale}
 \item $P$ \`e un insieme di \emph{produzioni}, \cioe di frecce del tipo
       $L\to\gamma$ dove $L\in N$ \`e il \emph{lato sinistro} della produzione
-      ed $\gamma\in (T\cup N)^*$ \`e una sequenza anche vuota di terminali e
+      e $\gamma\in (T\cup N)^*$ \`e una sequenza anche vuota di terminali e
       non terminali, detta \emph{lato destro} della produzione.
 \end{itemize}
 %
@@ -280,8 +284,7 @@ di partenza, con qualsiasi criterio di sostituzione.
 Un \emph{albero di parsing} o \emph{di derivazione}
 per una grammatica $G=\langle T,N,I,P\rangle$ \`e un albero tale che:
 \begin{enumerate}
-\item i suoi nodi sono etichettati con un elemento di $N$ o di $T$ o con
-      $\varepsilon$;
+\item i suoi nodi sono etichettati con un elemento di $N$ o di $T$ o con $\varepsilon$
 \item la radice \`e etichettata con $I$
 \item le foglie sono etichettate con elementi di $T$ o con $\varepsilon$
 \item dato un nodo etichettato come $L$ e prese, da sinistra a destra,
@@ -393,43 +396,48 @@ aspetti sintattici del linguaggio che non sono specificabili tramite
 grammatiche libere dal contesto. Per esempio, non saremo capaci di specificare
 il fatto che un identificare deve essere dichiarato prima di poter
 essere usato, \nec l'uso corretto dei tipi nelle espressioni. Questi aspetti
-verranno quindi considerati \emph{semantici} e gestiti in seguito, in fase,
+vengono di solito considerati come \emph{semantici} e verranno
+gestiti in seguito, in fase,
 appunto, di analisi semantica (Capitolo~\ref{chap:semantical}).
 
 La creazione di un parser a partire dalla grammatica di
 Kitten verr\`a ottenuta in maniera automatica, tramite uno strumento Java
-di nome JavaCup. Esso \`e una versione Java di un vecchio programma C
-di nome \texttt{yacc}~\cite{Johnson75}.
+di nome JavaCup\footnote{\texttt{http://www2.cs.tum.edu/projects/cup/}.}.
+Esso \`e una versione Java di un vecchio programma C
+di nome \texttt{yacc}.
 Dal momento che vogliamo riconoscere il linguaggio Kitten, useremo
 in JavaCup la grammatica per tale linguaggio.
 La Figura~\ref{fig:java_cup} mostra l'utilizzo di JavaCup.
 L'applicazione di JavaCup alla grammatica del linguaggio
-Kitten, specificata dentro un file \texttt{syntactical/Kitten.cup},
+Kitten, specificata dentro un file \texttt{resources/Kitten.cup},
 produce tre file:
 %
 \begin{enumerate}
 \item l'analizzatore sintattico vero e proprio
-      \texttt{syntactical/Parser.java}. Esso pu\`o quindi
-      essere compilato con \texttt{javac} ed eseguito per effettuare il parsing
+      \texttt{syntactical/Parser.java}. Esso pu\`o successivamente
+      venire compilato con \texttt{javac} ed eseguito per effettuare il parsing
       di un programma Kitten;
 \item il file \texttt{syntactical/sym.java}, che enumera i terminali
       (token) usati dalla grammatica, associando loro un identificatore
       intero unico; si tratta dello stesso file usato dall'analizzatore
       lessicale per identificare i token (Sezione~\ref{sec:jlex});
-\item il file di log \texttt{syntactical/Kitten.err}. Tale file contiene
+\item (eventualmente) il file di log \texttt{resources/Kitten.err}. Tale file contiene
       eventuali errori nella specifica della grammatica o eventuali
       problemi riscontrati da JavaCup, quando per esempio non riesce a
       creare il parser a causa di una grammatica non adeguata.
-      Questo file contiene anche gli stati di un automa di cui parleremo
-      in Sezione~\ref{sec:lr}.
+      Questo file potr\`a contenere anche gli stati di un automa di cui parleremo
+      in Sezione~\ref{sec:lr}. La generazione di questo file richiede di
+      specificare delle opportune opzioni al lancio di JavaCup. Noi preferiremo
+      invece riportare sulla console di Eclipse il risultato della generazione
+      del parser, piuttosto che salvarlo in \texttt{resources/Kitten.err}.
 \end{enumerate}
 %
 \javatip{Se qualcosa non funziona nella generazione del parser dalla
-grammatica, il programma JavaCup non comunica messaggi di errore da linea
-di comando ma scrive tutto nel file \texttt{syntactical/Kitten.err}.
+grammatica, il programma JavaCup comunica messaggi di errore sulla console
+di Eclipse o li scrive nel file \texttt{resources/Kitten.err}.
 Se quindi, dopo aver modificato o sostituito la grammatica Kitten, JavaCup
-non genera l'analizzatore \texttt{syntactical/Parser.java}, si vada a guardare
-il contenuto di \texttt{syntactical/Kitten.err}.}
+non genera l'analizzatore \texttt{syntactical/Parser.java}, si guardi tale
+output per capire cosa sia accaduto.}
 
 Vedremo nelle Sezioni~\ref{sec:ll} e~\ref{sec:lr} due modi per
 generare l'analizzatore sintattico a partire dalla specifica di una grammatica;
@@ -438,7 +446,7 @@ utilizzato da JavaCup. Nella Sezione~\ref{sec:abstract_syntax} vedremo
 come usare JavaCup per generare anche l'albero che descrive la struttura
 del file sorgente, come quello mostrato in Figura~\ref{fig:led}.
 Per adesso descriviamo la specifica della grammatica
-Kitten contenuta nel file \texttt{syntactical/Kitten.cup}.
+Kitten contenuta nel file \texttt{resources/Kitten.cup}.
 %
 \begin{figure}[t]
 \begin{center}
@@ -451,7 +459,7 @@ Kitten contenuta nel file \texttt{syntactical/Kitten.cup}.
 \subsection{La specifica dei terminali e dei non terminali}
   \label{subsec:terminals}
 %
-Il file \texttt{syntactical/Kitten.cup}
+Il file \texttt{resources/Kitten.cup}
 inizia con l'enumerazione dei terminali della grammatica:
 %
 \begin{verbatim}
@@ -522,7 +530,7 @@ I tipi Kitten sono descritti dalle seguenti produzioni:
 \end{verbatim}
 %
 La barra verticale indica un'alternativa nella definizione di \texttt{type}.
-Si noti che oltre ai tre tipi primitivi \texttt{boolean}, \texttt{int}
+Si noti che, oltre ai tre tipi primitivi \texttt{boolean}, \texttt{int}
 e \texttt{float}, sono previsti dei tipi classe, espressi come il token
 \texttt{ID}, nonch\'e il tipo array, definito ricorsivamente.
 Il non terminale \texttt{type} \`e usato quando si vuole specificare
@@ -611,7 +619,7 @@ che tutte le costanti del linguaggio sono espressioni:
 \cioe \texttt{true}, \texttt{false}, le costanti intere, le costanti in virgola
 mobile, le stringhe fra doppi apici e il riferimento \texttt{nil}.
 \`E un'espressione anche la creazione di un oggetto come in
-\texttt{new Rettangolo(10,20)}. Questo \`e ottenuto tramite la
+\texttt{new Rettangolo(10, 20)}. Questo \e ottenuto tramite la
 produzione per \texttt{exp}:
 %
 \begin{verbatim}
@@ -619,7 +627,7 @@ produzione per \texttt{exp}:
 \end{verbatim}
 %
 dove \texttt{ID} \`e l'identificatore della classe che si sta istanziando
-e \texttt{expseq} \`e una sequenza, possibilmente vuota, di espressioni
+ed \texttt{expseq} \`e una sequenza, possibilmente vuota, di espressioni
 separate da virgole:
 %
 \begin{verbatim}
@@ -660,7 +668,7 @@ Si noti che \texttt{type} non \`e vincolato in alcun modo (tranne a non essere
 \`E quindi del tutto lecito scrivere \texttt{12 as float} oppure
 \texttt{arr as array of int}. In particolare, la stessa notazione viene
 usata sia per le conversioni di tipo (\texttt{12 as float}) che per
-i cast veri e propri (\texttt{persona as Studente} e
+i cast veri e propri (\texttt{persona as Studente} oppure
 \texttt{arr as array of int}).
 
 Le precedenti produzioni per le espressioni includono le operazioni
@@ -759,7 +767,7 @@ Con queste produzioni, l'unico albero di derivazione possibile
 per \texttt{2 + a * 4} a partire da \texttt{exp} \`e quello mostrato
 in Figura~\ref{fig:no_ambiguity}, dove le foglie etichettate come
 \texttt{2}, \texttt{a} e \texttt{4} vanno intese come \texttt{INTEGER},
-\texttt{ID} ed \texttt{INTEGER}, rispettivamente, ma abbiamo preferito
+\texttt{ID} e \texttt{INTEGER}, rispettivamente, ma abbiamo preferito
 indicare il loro valore lessicale per maggiore chiarezza.
 
 L'uso di una grammatica non ambigua, sebbene possibile, risulta per\`o
@@ -769,7 +777,7 @@ in Kitten. Risulta pi\`u semplice infatti lasciare ambigua la grammatica
 ma specificare come risolvere l'ambiguit\`a tramite delle regole
 di priorit\`a e associativit\`a per gli operatori binari.
 In particolare, basta aggiungere le seguenti dichiarazioni all'interno del
-file \texttt{syntactical/Kitten.cup}:
+file \texttt{resources/Kitten.cup}:
 %
 \begin{verbatim}
   precedence left AND, OR;
@@ -935,7 +943,7 @@ $\varepsilon$-produzione.
   \label{subsec:jlex_and_java_cup}
 %
 Specificata la grammatica, occorre ancora indicare, in
-\texttt{syntatical/Kitten.cup}, come interfacciarsi con
+\texttt{resources/Kitten.cup}, come interfacciarsi con
 l'analizzatore lessicale che abbiamo ottenuto nel Capitolo~\ref{chap:lexical}.
 A tal fine, inseriamo fra i delimitatori
 \verb!parser code {:! e \verb!:};! del codice che verr\`a
@@ -960,13 +968,13 @@ associata all'analizzatore lessicale appena creato:
     }
 
     public void syntax_error(java_cup.runtime.Symbol token) {
-      getErrorMsg().error(token.left,"syntax error");
+      getErrorMsg().error(token.left, "syntax error");
     }
   :};
 \end{verbatim}
 %
 Il metodo \texttt{syntax\_error()} viene chiamato
-dall'analizzatore sintattico quando non riesce ad effettuare il parsing
+dall'analizzatore sintattico quando non riesce a effettuare il parsing
 di un programma. Il metodo \texttt{getErrorMsg()} lo usiamo invece per
 ottenere la struttura di errore con cui comunicare messaggi di errore
 relativi al file sorgente che stiamo processando con un dato analizzatore
@@ -990,7 +998,7 @@ Si noti che avremmo potuto utilizzare un qualsiasi altro nome al posto di
 \texttt{nextToken()}, purch\'e sia lo stesso utilizzato
 dall'analizzatore lessicale.
 
-Il risultato della trasformazione di \texttt{syntactical/Kitten.cup} in un
+Il risultato della trasformazione di \texttt{resources/Kitten.cup} in un
 parser \`e una classe Java \texttt{syntactical/Parser.java} che
 contiene un metodo \texttt{parse()}. Chiamando tale metodo si effettua
 il parsing del file sorgente, segnalando eventuali errori di sintassi.
@@ -1015,9 +1023,7 @@ di quest'ultimo genera per\`o un \emph{nuovo} file
 \texttt{syntactical/sym.java}, che enumera i token in modo
 possibilmente diverso dall'enumerazione manuale che avevamo appena dato.
 Occorre ricompilare l'analizzatore lessicale per far s\`{\i} che i due
-analizzatori siano finalmente sincronizzati sulla stessa enumerazione.
-In termini di \texttt{make}, queste due compilazioni si possono ottenere con
-\texttt{make clean; make syntactical; make clean; make syntactical}.}
+analizzatori siano finalmente sincronizzati sulla stessa enumerazione.}
 %
 \section{Il parsing $\mathit{LL}$}\label{sec:ll}
 %
@@ -1038,12 +1044,13 @@ da una grammatica. Si consideri la grammatica in Figura~\ref{fig:ll1_grammar}.
 %
 La prima produzione indica che un file sorgente che rispetta le regole
 di questa grammatica deve contenere un $\mathit{com}$ seguito da
-un carattere \texttt{\$} che indica la fine del file sorgente.
+un carattere \texttt{\$}, che tradizionalmente
+indica la fine del file sorgente (il token di end of file).
 Quando una grammatica contiene solo una produzione per il non terminale
 iniziale $I$, la quale inoltre termina con il token \texttt{\$},
 si dice che essa \`e
 \emph{aumentata}\footnote{L'aumento di una grammatica \`e ottenuto
-in JavaCup tramite la direttiva \texttt{start with}. In questo esempio
+automaticamente in JavaCup tramite la direttiva \texttt{start with}. In questo esempio
 con \texttt{start with com}.}.
 Il senso \`e che questa produzione impone che non ci siano
 caratteri in pi\`u dopo il $\mathit{com}$.
@@ -3577,7 +3584,7 @@ tal senso. Per evitare tale annotazione (essenzialmente un \emph{warning})
 e non contare questa risoluzione nel novero di quelle ammesse al massimo
 da JavaCup, basta dichiarare esplicitamente che l'\texttt{ELSE} ha priorit\`a
 rispetto al \texttt{THEN}. Otteniamo questo effetto aggiungendo al file
-\texttt{syntactical/Kitten.cup} le dichiarazioni:
+\texttt{resources/Kitten.cup} le dichiarazioni:
 %
 \begin{verbatim}
   precedence nonassoc THEN;
@@ -4091,7 +4098,7 @@ di effettuare il type-checking e la generazione del codice intermedio
 comunque utilizzare le stesse azioni semantiche per svolgere
 tali compiti. Questo approccio \e sicuramente pi\`u
 tradizionale~\cite{AhoSU86} ma finisce per sovraccaricare il file
-\texttt{syntactical/Kitten.cup} con informazione non relativa all'aspetto
+\texttt{resources/Kitten.cup} con informazione non relativa all'aspetto
 sintattico
 del linguaggio. Inoltre l'uso di un linguaggio a oggetti per l'implementazione
 del compilatore ben si accompagna alla definizione del type-checking e della
