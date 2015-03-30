@@ -793,7 +793,7 @@ La formalizzazione e implementazione di tali controlli \emph{evoluti}
 %
 \begin{figure}
 \begin{center}
-\epsfig{file = example.pdf, width = 4.5cm}
+\includegraphics[width=6cm]{example.pdf}
 \end{center}
 \caption{Un grafo generato con dot.}\label{fig:dot_example}
 \end{figure}
@@ -824,11 +824,11 @@ seguente file sorgente \texttt{example.dot}, scritto nel linguaggio dot:
 In tale sorgente si specificano, in un qualsiasi ordine, i nodi e
 gli archi del grafo. Nodi e archi possono avere propriet\`a espresse fra
 parentesi quadre per specificarne la forma, lo spessore o il colore.
-La trasformazione di tale file sorgente nel file postscript in
+La trasformazione di tale file sorgente nel file PDF in
 Figura~\ref{fig:dot_example} avviene tramite il comando:
 %
 \begin{verbatim}
-  dot -Tps example.dot >example.ps
+  dot -Tpdf example.dot -o example.pdf
 \end{verbatim}
 %
 Ulteriori esempi sono presenti nella pagina web di dot.
@@ -856,19 +856,18 @@ Tale sottoalbero \`e specificato da un file sorgente dot del tipo:
 \end{verbatim}
 %
 Si noti che l'esatta numerazione dei nodi non \`e importante, a differenza
-della loro etichetta che apparir\`a nel file postscript finale.
+della loro etichetta che apparir\`a nel file PDF finale.
 Quello che importa per\`o \`e che tale numerazione generi stringhe diverse
 per nodi di sintassi astratta diversi, anche se poi la loro etichetta esterna,
-quella visualizzata nel file postscript,
+quella visualizzata nel file PDF,
 pu\`o coincidere. A tal fine, basta che ogni nodo di sintassi
 astratta contribuisca al file dot con un nodo chiamato \texttt{node}$n$,
 dove $n$ \`e l'identificatore unico di tale nodo (si veda il campo
 \texttt{identifier} in Figura~\ref{fig:absyn.Absyn}). I simboli sono
-invece condivisi e mai ripetuti (Figura~\ref{fig:symbol.Symbol}).
-Essi saranno quindi rappresentati da un nodo chiamato \texttt{symbol\_}$x$,
-dove $x$ \`e l'identificatore del simbolo.
+invece stringhe, rappresentate da un nodo chiamato \texttt{symbol\_}$x$,
+dove $x$ \e il nome del simbolo.
 
-La generazione del file sorgente dot \`e fatta con un algoritmo
+La generazione del file sorgente dot \e fatta con un algoritmo
 a discesa ricorsiva:
 un nodo di sintassi astratta genera una parte del file
 che descrive se stesso e gli archi verso i suoi figli; quindi chiama
@@ -890,21 +889,21 @@ genera le righe
   node18 -> symbol_state [label = "name" fontsize = 8]
 \end{verbatim}
 %
-I due nodi figli di \texttt{FieldAccess} sono una \texttt{Variable}, che
-genera
+I due nodi figli di \texttt{FieldAccess} sono una \texttt{Variable}, che genera
 %
 \begin{verbatim}
   node17 [label = "Variable"];
   node17 -> symbol_this [label = "name" fontsize = 8]
 \end{verbatim}
 %
-e un \texttt{Symbol}, che genera
+e una stringa (il nome del campo), che genera
 %
 \begin{verbatim}
   symbol_state [label = "state" fontname = "Times-Italic" shape = box]
 \end{verbatim}
 %
-Infine, il figlio di \texttt{Variable} \`e un \texttt{Symbol} che genera
+Infine, il figlio di \texttt{Variable} \e una stringa (il nome della variabile), per la quale
+si genera
 %
 \begin{verbatim}
   symbol_this [label = "this" fontname = "Times-Italic" shape = box]
@@ -935,15 +934,21 @@ nodo di sintassi astratta il cui nome usato nel file dot \`e \texttt{to}.
 Occorre anche specificare l'etichetta \texttt{name} dell'arco.
 \item Il metodo \texttt{boldLinkToNode()} si comporta come
 \texttt{linkToNode()} ma crea un arco di maggiore spessore. Questo
-metodo \`e usato solo per legare un comando o un membro di una classe
-al suo successore (campi \texttt{next}). Si veda per esempio la
-Figura~\ref{fig:led_albero}.
+metodo \`e usato solo per legare un membro di una classe
+al suo successore, o un'espressione alla sua seguente all'interno di
+una sequenza di espressioni, o un parametro formale al suo successivo
+(campi \texttt{next}). Si veda per esempio la Figura~\ref{fig:led_albero}.
+\item Il metodo \texttt{toDot()} genera il nodo di nome \texttt{symbol\_}$x$
+per l'identificatore $x$ del linguaggio e ne restituisce il nome.
+I simboli non hanno mai archi uscenti, per
+cui costituiscono un caso base della discesa ricorsiva (le foglie
+dell'albero in Figura~\ref{fig:led_albero}).
 \end{itemize}
 %
 \begin{figure}[t]
-\begin{verbatim}
+{\small\begin{verbatim}
 protected String label() {
-  return this.getClass().getSimpleName();
+  return getClass().getSimpleName();
 }
 
 protected final String dotNodeName() {
@@ -953,16 +958,24 @@ protected final String dotNodeName() {
 protected final void linkToNode(String name, String to, FileWriter where)
 {
   where.write(dotNodeName() + " -> " + to +
-              " [label = \"" + name + "\" fontsize = 8]\n");
+    " [label = \"" + name + "\" fontsize = 8]\n");
 }
 
 protected final void boldLinkToNode
   (String name, String to, FileWriter where)
 {
   where.write(dotNodeName() + " -> " + to +
-              " [label = \"" + name + "\" fontsize = 8 style = bold]\n");
+    " [label = \"" + name + "\" fontsize = 8 style = bold]\n");
 }
-\end{verbatim}
+
+protected String toDot(String symbol, FileWriter where) {
+  String id = "symbol_" + symbol;
+  where.write(id + " [label = \"" + symbol +
+    "\" fontname = \"Times-Italic\" shape = box]\n");
+
+  return id;
+}
+\end{verbatim}}
 \caption{Metodi aggiunti alla classe \texttt{absyn/Absyn.java} in Figura~\ref{fig:absyn.Absyn} per la generazione della rappresentazione dot della sintassi astratta.}
   \label{fig:absyn.Absyn_dot}
 \end{figure}
@@ -978,7 +991,7 @@ file dot a partire da un nodo di sintassi astratta. Lo chiameremo
 Questo significa che il metodo scrive dentro il file indicato il codice
 dot che rappresenta la classe di sintassi astratta e i suoi figli (e
 ricorsivamente i figli dei figli\ldots). Il valore
-di ritorno \`e il nome usato nel file dot per rappresentare il nodo
+di ritorno \e il nome usato nel file dot per rappresentare il nodo
 di sintassi astratta su cui il metodo \`e invocato.
 
 Cominciamo dai tipi. Il metodo \texttt{toDot()} \`e \cosi definito in
@@ -987,97 +1000,78 @@ Cominciamo dai tipi. Il metodo \texttt{toDot()} \`e \cosi definito in
 \begin{verbatim}
   public final String toDot(FileWriter where) {
     where.write(dotNodeName() + " [ label = \"" + label() + "\"];\n");
-    toDot$0(where);
+    toDotAux(where);
     return dotNodeName();
   }
 
-  protected void toDot$0(FileWriter where) {}
+  protected void toDotAux(FileWriter where) {}
 \end{verbatim}
 %
 Si noti che \texttt{toDot()}
 \`e definito come \texttt{final}. Esso si limita a generare
 un nodo dot per il nodo di sintassi astratta e a chiamare un metodo ausiliario
 \texttt{protected} che di default non fa nulla. Le ridefinizioni del
-metodo \texttt{toDot\$0()} creano degli archi
+metodo ausiliario \texttt{toDotAux()} creano degli archi
 verso i nodi figli e richiamano ricorsivamente \texttt{toDot()}.
 Per esempio, eccone la ridefinizione dentro
 \texttt{absyn/ArrayTypeExpression.java}:
 %
 \begin{verbatim}
-  protected void toDot$0(FileWriter where) {
-    linkToNode("elementsType",elementsType.toDot(where),where);
+  protected void toDotAux(FileWriter where) {
+    linkToNode("elementsType", elementsType.toDot(where), where);
   }
 \end{verbatim}
-%$
 
 Lo stesso procedimento si usa per le espressioni.
 La definizione di \texttt{toDot()} dentro alla classe
-\texttt{absyn/Expression.java} \`e
-identica al caso dei tipi. La ridefinizione di \texttt{toDot\$()} dentro
-\texttt{absyn/Variable.java} \`e per esempio
+\texttt{absyn/Expression.java} \e
+identica al caso dei tipi. La ridefinizione di \texttt{toDotAux()} dentro
+\texttt{absyn/Variable.java} \e per esempio
 %
 \begin{verbatim}
-  protected void toDot$0(FileWriter where) {
-    linkToNode("name",name.toDot(where),where);
+  protected void toDotAux(FileWriter where) {
+    linkToNode("name", toDot(name, where), where);
   }
 \end{verbatim}
 %$
-e quella dentro \texttt{absyn/FieldAccess.java} \`e:
+e quella dentro \texttt{absyn/FieldAccess.java} \e:
 %
 \begin{verbatim}
-  protected void toDot$0(FileWriter where) {
-    linkToNode("receiver",receiver.toDot(where),where);
-    linkToNode("name",name.toDot(where),where);
+  protected void toDotAux(FileWriter where) {
+    linkToNode("receiver", receiver.toDot(where), where);
+    linkToNode("name", toDot(name, where), where);
   }
 \end{verbatim}
-%$
-Come altro esempio, la ridefinizione di \texttt{toDot\$0()} dentro
-\texttt{absyn/BinOp.java} \`e
+%
+Come altro esempio, la ridefinizione di \texttt{toDotAux()} dentro
+\texttt{absyn/BinOp.java} \e
 %
 \begin{verbatim}
-  protected void toDot$0(FileWriter where) {
-    linkToNode("left",left.toDot(where),where);
-    linkToNode("right",right.toDot(where),where);
+  protected void toDotAux(FileWriter where) {
+    linkToNode("left", left.toDot(where), where);
+    linkToNode("right", right.toDot(where), where);
   }
 \end{verbatim}
-%$
 
-Vediamo infine la definizione di \texttt{toDot()} dentro
-\texttt{symbol/Symbol.java} (Figura~\ref{fig:symbol.Symbol}):
-%
-\begin{verbatim}
-  public String toDot(FileWriter where) {
-    where.write("symbol_" + name +
-                " [label = \"" + name + "\"" +
-                " fontname = \"Times-Italic\" shape = box]\n");
-    return "symbol_" + name;
-  }
-\end{verbatim}
-%
-Questa volta il metodo genera un nodo dot di nome \texttt{symbol\_}$x$,
-dove $x$ \`e il nome del simbolo. I simboli non hanno mai archi uscenti, per
-cui costituiscono un caso base della discesa ricorsiva (le foglie
-dell'albero in Figura~\ref{fig:led_albero}).
-
-La definizione di \texttt{toDot()} \`e simile per i comandi. Per la
+La definizione di \texttt{toDot()} \e simile per i comandi. Per la
 struttura complessiva di una classe, il metodo \texttt{toDot()}
 si richiama ricorsivamente sui componenti della classe e aggiunge al file
 dot un prologo che specifica la dimensione della pagina e un epilogo, \cioe
-la parentesi graffa di chiusura!
+la parentesi graffa di chiusura.
 %
 \javatip{
 L'aggiunta di una nuova classe di sintassi astratta al compilatore
 Kitten comporta
-la definizione del suo metodo \texttt{toDot\$0()}. Come visto in questi
+la definizione del suo metodo \texttt{toDotAux()}. Come visto in questi
 esempi, si tratta semplicemente di una sequenza di
 chiamate a \texttt{linkToNode()} per ciascuno dei figli della classe
 di sintassi astratta che \`e stata aggiunta. In assenza della specifica
 del metodo
-\texttt{toDot\$0()}, il comportamento di default sar\`a quello dell'omonimo
+\texttt{toDotAux()}, il comportamento di default sar\`a quello dell'omonimo
 metodo, vuoto, definito in \texttt{absyn/TypeExpression.java} per i tipi,
 \texttt{absyn/Expression.java} per le espressioni e
 \texttt{absyn/Command.java} per i comandi. Conseguentemente non sar\`a
-visibile, nel file postscript generato da dot, il sottoalbero
+visibile, nel file PDF generato da dot, il sottoalbero
 radicato nei nodi di sintassi astratta per la nuova classe che \`e
 stata aggiunta. Un comportamento indesiderato che non finisce
 di meravigliare gli studenti\ldots}
