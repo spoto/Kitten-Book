@@ -2,7 +2,7 @@
 %
 \vspace*{-2ex}
 \begin{center}
-\includegraphics[width=5.5cm]{ThinkingCat.png}
+\includegraphics[width=6.5cm]{ThinkingCat.png}
 \end{center}
 %\vspace*{-2ex}
 %
@@ -14,7 +14,7 @@ ha inoltre costruito un albero di sintassi astratta che fornisce una visione
 strutturata del file sorgente (Figura~\ref{fig:led_albero}).
 Questo non significa che tutti i programmi che hanno superato con successo
 l'analisi sintattica, \cioe senza generare alcun errore di sintassi,
-siano automaticamente dei programmi \emph{corretti}, pronti ad essere tradotti
+siano automaticamente dei programmi \emph{corretti}, pronti a essere tradotti
 in codice oggetto ed eseguiti. Per esempio, basta prendere il programma
 della Figura~\ref{fig:led} e modificare la linea \texttt{this.state := true}
 in \texttt{this.state := 3} per ottenere un programma che supera senza alcun
@@ -49,14 +49,15 @@ Pi\`u in dettaglio, i compiti di un'analisi semantica sono quelli di
       in un programma (\emph{inferenza dei tipi});
 \item identificare, per ogni accesso a un campo, la classe in cui il campo
       \`e definito;
-\item identificare per ogni istruzione \texttt{new} \textit{Classe},
-      sulla base del tipo statico dei parametri attuali,
+\item identificare, per ogni istruzione \texttt{new} \textit{Classe},
       il costruttore di \textit{Classe}
-      che deve essere chiamato in tale punto a tempo di esecuzione;
-\item identificare per ogni invocazione di metodo, sulla base del tipo statico
-      dei parametri attuali, la dichiarazione del metodo
+      che deve essere chiamato in tale punto a tempo di esecuzione,
+      sulla base del tipo statico dei parametri attuali;
+\item identificare, per ogni invocazione di metodo,
+      la dichiarazione del metodo
       che deve essere chiamato (o una cui ridefinizione deve essere chiamata)
-      in tal punto a tempo di esecuzione.
+      in tal punto a tempo di esecuzione,
+      sulla base del tipo statico dei parametri attuali.
 \end{enumerate}
 %
 Potremmo quindi dire che l'analisi semantica si occupa di
@@ -104,7 +105,7 @@ la \emph{struttura semantica} dei tipi delle espressioni Kitten,
 che permettono, per esempio, di determinare se un tipo \`e un sottotipo
 di un altro o qual \`e il minimo supertipo
 comune fra due o \piu tipi, se esso esiste (Sezione~\ref{sec:types}), o quali
-sono i campi o i costruttori o metodi di un tipo classe.
+siano i campi o i costruttori o metodi di un tipo classe.
 Per apprezzare la differenza, basta osservare che
 due occorrenze dell'espressione \texttt{int} in due punti diversi
 di un file sorgente danno origine a due oggetti \texttt{IntTypeExpression}
@@ -116,7 +117,7 @@ del linguaggio Kitten.
 %
 \begin{figure}
 \begin{center}
-\epsfig{file = semantical_types.pdf, width = 12cm}
+\includegraphics[width=12cm]{semantical_types.pdf}
 \end{center}
 \caption{Le classi del package \texttt{types} che rappresentano i tipi semantici di Kitten.}\label{fig:semantical_types}
 \end{figure}
@@ -133,8 +134,7 @@ Si noti che non esiste un tipo specifico per le stringhe, che sono invece
 considerate come un caso di \texttt{ClassType}.
 
 La Figura~\ref{fig:types.Type} mostra l'implementazione della superclasse
-\texttt{types/Type.java}. Essa definisce in primo luogo delle costanti
-per dei tipi di uso comune. Le sue sottoclassi dovranno istanziare
+\texttt{types/Type.java}. Le sue sottoclassi dovranno istanziare
 il metodo \texttt{canBeAssignedTo()} che determina
 se un tipo pu\`o essere assegnato a un
 altro, seguendo le regole che nella Sezione~\ref{sec:types}
@@ -157,7 +157,7 @@ non \`e monotona sugli array di tipi primitivi (Sezione~\ref{sec:types}).
 Esso \e usato anche per determinare se il tipo di ritorno di una ridefinizione
 di un metodo \`e compatibile con quello del metodo ridefinito.
 Il metodo \texttt{leastCommonSupertype()} determina il minimo supertipo comune
-fra due tipi. Tale supertipo potrebbe non esistere: fra
+fra due tipi. Tale supertipo potrebbe non esistere: per esempio, fra
 \texttt{int} e \texttt{boolean} non c'\e alcun supertipo comune.
 La definizione fornita dentro
 \texttt{types/Type.java} funziona per tutti i tipi primitivi, ma come
@@ -167,36 +167,36 @@ Anche i costruttori delle altre classi che implementano i tipi semantici sono
 \texttt{protected} o \texttt{private}. Quindi
 l'unico modo per ottenere degli oggetti della
 gerarchia in Figura~\ref{fig:semantical_types} sar\`a tramite le costanti
-definite in Figura~\ref{fig:types.Type} o tramite
-dei costruttori con memoria che
+presenti dentro ciascuna classe (per esempio, \texttt{types/IntType.INSTANCE})
+o tramite dei metodi statici con memoria che
 definiremo dentro le classi per i tipi riferimento. Questo implica
 che \emph{esiste al pi\`u un oggetto per un dato tipo semantico}
 e l'uguaglianza fra tipi pu\`o essere controllata con
-semplici confronti Java \texttt{==}. Il metodo \texttt{getObjectType()}
-ritorna il tipo della superclasse \texttt{Object} di tutte le classi ed array.
+semplici confronti Java \texttt{==}. Si tratta di un esempio di applicazione
+del design pattern del \emph{singleton}, esteso a tutte le possibili istanze
+di una classe. Il metodo \texttt{getObjectType()}
+ritorna il tipo della superclasse \texttt{Object} di tutte le classi e array.
 
 \begin{figure}[t]
 {\small
 \begin{verbatim}
 public abstract class Type {
-  // delle costanti di uso frequente
-  public final static BooleanType BOOLEAN = new BooleanType();
-  public final static FloatType FLOAT = new FloatType();
-  public final static IntType INT = new IntType();
-  public final static NilType NIL = new NilType();
-  public final static VoidType VOID = new VoidType();
 
   protected Type() {}
+
   public abstract boolean canBeAssignedTo(Type other);
+
   public boolean canBeAssignedToSpecial(Type other) {
-    return canBeAssignedTo(other); // i tipi primitivi lo ridefiniscono
+    return canBeAssignedTo(other); // i tipi primitivi e void lo ridefiniscono
   }
+
   public Type leastCommonSupertype(Type other) {
     // questo e' ok per i tipi primitivi. Classi e array lo ridefiniscono
     if (this.canBeAssignedTo(other)) return other;
     else if (other.canBeAssignedTo(this)) return this;
     else return null; // non esiste
   }
+
   public static final ClassType getObjectType() { ... ritorna il tipo per Object }
 }
 \end{verbatim}
@@ -248,7 +248,7 @@ potesse essere ridefinito, in una sottoclasse, in \texttt{int m()}
 allora una chiamata virtuale del tipo \texttt{float f = o.m()} richiederebbe,
 o meno, una conversione di tipo da \texttt{int} a \texttt{float} sulla base
 della classe, a tempo di esecuzione, dell'oggetto contenuto in \texttt{o}, il
-che complica la generazione del codice. Quindi impediamo al programmatore di
+che complica la generazione del codice. Per questo motivo impediamo al programmatore di
 fare una simile ridefinizione del tipo di ritorno del metodo \texttt{m()}.
 Questo stesso vincolo \e imposto nel linguaggio Java.}
 
@@ -256,14 +256,14 @@ Questo stesso vincolo \e imposto nel linguaggio Java.}
 {\small
 \begin{verbatim}
 public class ArrayType extends ReferenceType {
-  private Type elementsType;
+  private final Type elementsType;
   private ArrayType(Type elementsType) { this.elementsType = elementsType; }
   public static ArrayType mk(Type elementsType) {
     ... usa una memoria per non ricreare tipi array gia' creati in passato
   }
   public boolean canBeAssignedTo(Type other) {
     if (other instanceof ArrayType)
-      return elementsType.canBeAssignedToSpecial(((ArrayType)other).elementsType);
+      return elementsType.canBeAssignedToSpecial(((ArrayType) other).elementsType);
     else return other == getObjectType();
   }
   public Type leastCommonSupertype(Type other) {
@@ -276,11 +276,10 @@ public class ArrayType extends ReferenceType {
         // fra due array di tipi primitivi diversi, l'lcs e' Object
         else return getObjectType();
       else {
-        Type lcs = elementsType.leastCommonSupertype(((ArrayType)other).elementsType);
-        if (lcs == null) return getObjectType();
-        else return mk(lcs);
+        Type lcs = elementsType.leastCommonSupertype(((ArrayType) other).elementsType);
+        return lcs == null ? getObjectType() : mk(lcs);
       }
-    else if (other == Type.NIL) return this; // fra un array e nil e' l'array
+    else if (other == NilType.ISTANCE) return this; // fra un array e nil e' l'array
     else return null; // non esiste alcun lcs
   }
 }
@@ -298,7 +297,7 @@ usa una memoria per evitare di creare duplicati.
 L'assegnamento di un tipo array \texttt{this}
 a un altro tipo \texttt{other} \`e considerata
 legale solo se \texttt{other} \`e \texttt{Object} oppure se anche
-\texttt{other} \`e un tipo array e gli elementi di \texttt{this}
+\texttt{other} \e un tipo array e gli elementi di \texttt{this}
 possono a loro volta essere assegnati a quelli di \texttt{other}.
 Ma si noti l'uso di \texttt{canBeAssignedToSpecial()} per questa chiamata
 ricorsiva! Questo al fine di imporre il vincolo
@@ -307,7 +306,7 @@ di \texttt{this} sono un tipo primitivo allora quelli di \texttt{other} devono
 essere \emph{lo stesso} tipo primitivo.
 %
 \greycomment{Questo vincolo, apparentemente strano, \`e giustificato dal fatto
-che se \texttt{arr} \`e un array di interi allora
+che, se \texttt{arr} \`e un array di interi, allora
 il comando \texttt{int[] copy := arr}
 rende \texttt{arr} e \texttt{copy} \emph{alias}, \cioe riferimenti diversi
 allo stesso oggetto array. Mentre il comando \texttt{float[] copy := arr}
@@ -339,11 +338,11 @@ Le regole che portano alla definizione di \emph{lcs} sono le seguenti:
       \item se entrambi sono array dello stesso tipo primitivo
             allora \emph{lcs} \`e uguale
             a \texttt{this} (o equivalentemente a \texttt{other});
-      \item se entrambi sono array di tipi primitivi diversi
-            allora \emph{lcs} \`e \texttt{Object}; si noti che sarebbe
+      \item se entrambi sono array di tipi primitivi, ma diversi,
+            allora \emph{lcs} \`e \texttt{Object}\footnote{Si noti che sarebbe
             errato definire in questo caso \emph{lcs} come
             \texttt{array of Object}, poich\'e i tipi primitivi non sono
-            sottotipi di \texttt{Object};
+            sottotipi di \texttt{Object}};
       \item se entrambi sono array di tipi non primitivi
             allora \emph{lcs} \`e il tipo array del minimo supertipo comune
             fra i tipi degli elementi di \texttt{this} e \texttt{other};
@@ -358,32 +357,32 @@ Le regole che portano alla definizione di \emph{lcs} sono le seguenti:
 {\scriptsize
 \begin{verbatim}
 public class ClassType extends ReferenceType {
-  private Symbol name;                    // il nome di questa classe
+  private String name;                    // il nome di questa classe
   private ClassType superclass;           // la sua superclasse (se esiste)
-  private ClassTypeList subclasses;       // le sue sottoclassi (se esistono)
-  private Parser parser;                  // il parser usato per questa classe
+  private List<ClassType> subclasses;     // le sue sottoclassi (se esistono)
   private ClassDefinition abstractSyntax; // la sintassi astratta della classe
 
-  private ClassType(Symbol name) {
+  private ClassType(String name) {
     ... salva this nella memoria usata da mk()
-    this.name = name; parser = new Parser(new Lexer(name));
-    (abstractSyntax = (ClassDefinition)parser.parse().value).addMembers(this);
-    if (name != Symbol.OBJECT) {
+    this.name = name;
+    Parser parser = new Parser(new Lexer(name));
+    (abstractSyntax = (ClassDefinition) parser.parse().value).addMembersTo(this);
+    if (!name.equals("Object")) {
       superclass = mk(abstractSyntax.getSuperclassName());
-      superclass.subclasses = new ClassTypeList(this,superclass.subclasses);
+      superclass.subclasses.add(this);
     }
   }
-  public static ClassType mk(Symbol name) {
+  public static ClassType mk(String name) {
     ... restituisci l'eventuale classe di nome name contenuta nella memoria
     ... altrimenti restituisci new ClassType(name)
   }
-  public FieldSignature fieldLookup(Symbol name) { ... }
+  public FieldSignature fieldLookup(String name) { ... }
   public ConstructorSignature constructorLookup(TypeList formals) { ... }
-  public HashSet constructorsLookup(TypeList formals) { ... }
-  public MethodSignature methodLookup(Symbol name, TypeList formals) { ... }
-  public HashSet methodsLookup(Symbol name, TypeList formals) { ... }
+  public Set<ConstructorSignature> constructorsLookup(TypeList formals) { ... }
+  public MethodSignature methodLookup(String name, TypeList formals) { ... }
+  public Set methodsLookup(String name, TypeList formals) { ... }
   public boolean canBeAssignedTo(Type other) {
-    return other instanceof ClassType && this.subclass((ClassType)other);
+    return other instanceof ClassType && this.subclass((ClassType) other);
   }
   public boolean subclass(ClassType other) {
     return this == other || (superclass != null && superclass.subclass(other));
@@ -391,9 +390,9 @@ public class ClassType extends ReferenceType {
   public Type leastCommonSupertype(Type other) {
     if (other instanceof ArrayType) return getObjectType();
     else if (other instanceof ClassType)
-      for (ClassType cursor = this; cursor != null; cursor = cursor.superclass)
+      for (ClassType cursor = this; ; cursor = cursor.superclass)
         if (other.canBeAssignedTo(cursor)) return cursor;
-    else if (other == Type.NIL) return this; else return null;
+    return other == NilType.INSTANCE ? this : null;
   }
 }
 \end{verbatim}
@@ -428,13 +427,13 @@ finch\'e si pu\`o, segnalando quanti \piu errori possibile al programmatore.
 Un tipo classe ha informazione sulla \emph{segnatura}
 della classe, \cioe sui suoi campi, costruttori e metodi.
 Questa informazione \e estratta dalla sua sintassi astratta al momento
-della costruzione di un tipo classe tramite il metodo
-\texttt{addMembers()} a discesa ricorsiva
+della costruzione di un tipo classe tramite e aggiunta a quest'ultimo,
+tramite il metodo \texttt{addMembersTo()} a discesa ricorsiva
 (Figura~\ref{fig:types.ClassType}). Si noti che se
 i campi, costruttori o metodi fanno riferimento alla stessa classe che
 stiamo creando non entriamo in loop poich\'e abbiamo avuto cura di
 registrare il tipo classe che stiamo creando nella memoria di
-\texttt{mk()} prima di chiamare \texttt{addMembers()}.
+\texttt{mk()} prima di chiamare \texttt{addMembersTo()}.
 
 La segnatura della classe pu\`o essere
 consultata in seguito tramite dei metodi di ricerca (\emph{lookup}).
@@ -456,7 +455,8 @@ formali \piu specifici dei suoi. Per esempio, nella segnatura della classe:
   }
 \end{verbatim}
 %
-il risultato di \texttt{constructorsLookup()} con per parametro una lista di
+il risultato di una chiamata a
+\texttt{constructorsLookup()} avente come parametri una lista di
 due \texttt{IntType} \`e l'insieme dei
 due costruttori della classe non commentati.
 Entrambi sono infatti compatibili con
@@ -467,10 +467,10 @@ terzo costruttore, che \`e \piu specifico degli altri due.
 Si pu\`o adesso comprendere a cosa ci servir\`a il metodo
 \texttt{constructorsLookup()}:
 di fronte a una invocazione del costruttore di \texttt{Ambiguous},
-del tipo \texttt{new Ambiguous(3,4)}, il compilatore Kitten
-determina, tramite \texttt{constructorsLookup()}, l'insieme
+del tipo \texttt{new Ambiguous(3, 4)}, il compilatore Kitten
+determiner\`a, tramite \texttt{constructorsLookup()}, l'insieme
 dei possibili costruttori candidati a essere chiamati in tale punto di
-programma. Se ce ne fosse \piu d'uno, la chiamata verrebbe considerata
+programma. Se ce ne fosse \piu d'uno, la chiamata verrebbe considerato
 \emph{ambigua}. Se non ce ne fosse nessuno, la
 chiamata verrebbe considerata \emph{indefinita}.
 In entrambi i casi essa verrebbe rifiutata in fase di analisi semantica
@@ -511,7 +511,7 @@ secondo le regole seguenti:
 %
 \begin{figure}[t]
 \begin{center}
-\epsfig{file = signatures_hierarchy.pdf, width = 8cm}
+\includegraphics[width=9cm]{signatures_hierarchy.pdf}
 \end{center}
 \caption{Le classi del package \texttt{types} che rappresentano le segnature dei membri di una classe.}\label{fig:signatures}
 \end{figure}
@@ -520,9 +520,9 @@ secondo le regole seguenti:
 {\small
 \begin{verbatim}
   public class FieldSignature extends ClassMemberSignature {
-    private Type type;   // il tipo del campo
-    private Symbol name; // il nome del campo
-    public FieldSignature(ClassType clazz, Type type, Symbol name) {
+    private final Type type;   // il tipo del campo
+    private final String name; // il nome del campo
+    public FieldSignature(ClassType clazz, Type type, String name) {
       super(clazz); this.type = type; this.name = name;
     }
   }
@@ -536,16 +536,16 @@ secondo le regole seguenti:
 
   public class ConstructorSignature extends CodeSignature {
     public ConstructorSignature(ClassType clazz, TypeList parameters) {
-      super(clazz,parameters);
+      super(clazz, parameters);
     }
   }
 
   public class MethodSignature extends CodeSignature {
-    private Symbol name;     // il nome del metodo
-    private Type returnType; // il suo tipo di ritorno
+    private final String name;     // il nome del metodo
+    private final Type returnType; // il suo tipo di ritorno
     public MethodSignature
-     (ClassType clazz, Type returnType, TypeList parameters, Symbol name) {
-     super(clazz,parameters); this.name = name; this.returnType = returnType;
+      (ClassType clazz, Type returnType, TypeList parameters, String name) {
+     super(clazz, parameters); this.name = name; this.returnType = returnType;
     }
   }
 \end{verbatim}
