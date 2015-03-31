@@ -1013,7 +1013,7 @@ Figure~\ref{fig:analysis_expressions1} e~\ref{fig:analysis_expressions2}.
 \subsection{L'implementazione dell'analisi semantica delle espressioni}
   \label{subsec:analysis_expressions_implementation}
 %
-L'implementazione delle regole nelle Figure~\ref{fig:analysis_expressions1}
+L'implementazione delle regole delle Figure~\ref{fig:analysis_expressions1}
 e~\ref{fig:analysis_expressions2}
 richiede in primo luogo di implementare l'ambiente $\rho$. Si potrebbe
 pensare di utilizzare una semplice \texttt{java.util.HashMap} che lega
@@ -1022,86 +1022,89 @@ le variabili ai loro tipi di dichiarazione. Ma fra poco
 un'operazione di estensione \emph{non distruttiva} sugli ambienti, tale
 \cioe da lasciare il vecchio ambiente intatto dopo la sua estensione.
 Questo rende l'uso di \texttt{java.util.HashMap} sconveniente, \poiche
-tale struttura dati ha solo operazioni distruttive.
+tale struttura dati ha solo operazioni distruttive: saremmo
+costretti a clonare la mappa e modificare la copia.
 Decidiamo quindi di usare una nostra struttura dati
-per rappresentare gli ambienti, \cioe la classe \texttt{symbol/Table.java}
+per rappresentare gli ambienti, \cioe la classe \texttt{tables/Table.java}
 e le sue due sottoclassi in Figura~\ref{fig:symbol.Table}.
 %
 \begin{figure}
 {\small
 \begin{verbatim}
-public abstract class Table {
-  public final static EmptyTable EMPTY = new EmptyTable();
-  public abstract Object get(Symbol key);
-  public abstract Table put(Symbol key, Object value);
+public abstract class Table<E> {
+  public final static Table<?> EMPTY = new EmptyTable();
+  public abstract E get(String key);
+  public abstract Table<E> put(String key, E value);
 }
 
 class EmptyTable extends Table {
-  public Object get(Symbol key) { return null; }
-  public Table put(Symbol key, Object value) {
-    return new NonEmptyTable(key,value);
+  public E get(String key) { return null; }
+  public Table<E> put(String key, E value) {
+    return new NonEmptyTable(key, value);
   }
 }
 
 class NonEmptyTable extends Table {
-  private Symbol key;  private Object value;  private Table left, right;
+  private final String key;
+  private final E value;
+  private final Table<E> left, right;
 
-  private NonEmptyTable(Symbol key, Object value, Table left, Table right) {
+  private NonEmptyTable(String key, E value, Table<E> left, Table<E> right) {
     this.key = key; this.value = value;
     this.left = left; this.right = right;
   }
-  NonEmptyTable(Symbol key, Object value) { this(key,value,EMPTY,EMPTY); }
-  public Object get(Symbol key) {
+  NonEmptyTable(String key, E value) { this(key, value, EMPTY, EMPTY); }
+  public E get(String key) {
     int comp = this.key.compareTo(key);
     if (comp < 0) return left.get(key);
     else if (comp == 0) return value;
     else return right.get(key);
   }
-  public Table put(Symbol key, Object value) {
-    Table temp; int comp = this.key.compareTo(key);
+  public Table put(String key, E value) {
+    int comp = this.key.compareTo(key);
     if (comp < 0) {
-      temp = left.put(key,value);
+      Table<E> temp = left.put(key, value);
       if (temp == left) return this;
-      else return new NonEmptyTable(this.key,this.value,temp,right);
+      else return new NonEmptyTable(this.key, this.value, temp, right);
     } 
     else if (comp == 0)
       if (value == this.value) return this;
-      else return new NonEmptyTable(this.key,this.value,left,right);
+      else return new NonEmptyTable(this.key, this.value, left, right);
     else {
-      temp = right.put(key,value);
+      Table<E> temp = right.put(key, value);
       if (temp == right) return this;
-      else return new NonEmptyTable(this.key,this.value,left,temp);
+      else return new NonEmptyTable(this.key, this.value, left, temp);
     }
   }
 }
 \end{verbatim}
 }
-\caption{Le classi del package \texttt{symbol} che implementano gli ambienti.}
+\caption{Le classi del package \texttt{tables} che implementano gli ambienti.}
   \label{fig:symbol.Table}
 \end{figure}
 %
-L'interfaccia \texttt{symbol.Table} specifica semplicemente che un ambiente
+L'interfaccia \texttt{tables.Table<E>} specifica semplicemente che un ambiente
 ha un'operazione \texttt{get(key)}
-che permette di leggere il valore di una variabile \texttt{key} e un'operazione
-\texttt{put(key,value)} che costruisce un nuovo ambiente in cui
-la variabile \texttt{key} \`e legata a \texttt{value}.
+che permette di leggere il valore, di tipo \texttt{E}, legato
+a una variabile \texttt{key} e un'operazione
+\texttt{put(key, value)} che costruisce un nuovo ambiente in cui
+la variabile \texttt{key} \`e legata a \texttt{value}, di tipo \texttt{E}.
 Si noti che le variabili sono genericamente legate a degli
-\texttt{Object}, bench\'e a noi servirebbero degli ambienti che legano
+\texttt{E}, bench\'e a noi servirebbero degli ambienti che legano
 le variabili a dei \texttt{types.Type}. Questo d\`a maggiore generalit\`a
 a questi ambienti, che in futuro potrebbero essere usati per altri scopi,
-in cui alle variabili sono legate strutture dati diverse da
-\texttt{types.Type}.
+in cui alle variabili sono legate strutture dati diverse da \texttt{types.Type}.
 Si noti inoltre che il metodo \texttt{put()} restituisce un \emph{nuovo}
 ambiente con aggiunto
 un nuovo legame: il vecchio ambiente non \`e modificato
 ed \`e ancora utilizzabile. Questo al fine di implementare un'operazione
 \texttt{put()} non distruttiva, come volevamo.
 
-Le sottoclassi di \texttt{symbol.Table} sono
-\texttt{symbol.EmptyTable} e \texttt{symbol.NonEmptyTable}.
+Le sottoclassi di \texttt{tables.Table} sono
+\texttt{tables.EmptyTable} e \texttt{tables.NonEmptyTable}.
 La prima implementa un ambiente vuoto in cui non esiste alcun legame
-per le variabili. La seconda implementa un ambiente in cui c'\`e almeno
-un legame per una variabile. Questo ambiente \`e rappresentato come
+per le variabili. La seconda implementa un ambiente in cui c'\`e
+un legame per almeno una variabile. Questo ambiente \`e rappresentato come
 un albero binario di ricerca, in cui \cioe le variabili
 che precedono la radice, in ordine lessicografico,
 vanno cercate nel sottoalbero di sinistra e quelle che la seguono
@@ -1119,30 +1122,30 @@ ricostruendo solo il cammino dalla radice dell'albero al nodo che
 \begin{figure}[t]
 \vspace*{-33ex}
 \begin{center}
-\epsfig{file = insertion.pdf, width = 15cm}
+\includegraphics[width=15cm]{insertion.pdf}
 \end{center}
 \vspace*{-33ex}
-\caption{L'inserzione non distruttiva in un ambiente di un legame per una variabile.}\label{fig:non_destructive}
+\caption{L'inserzione non distruttiva di un legame per una variabile in un ambiente.}\label{fig:non_destructive}
 \end{figure}
 
 \begin{figure}[t]
 {\small
 \begin{verbatim}
        public class TypeChecker {
-         private Table env;
-         private ErrorMsg errorMsg;
+         private final Table<Type> env;
+         private final ErrorMsg errorMsg;
 
-         private TypeChecker(Table env, ErrorMsg errorMsg) {
+         private TypeChecker(Table<Type> env, ErrorMsg errorMsg) {
            this.env = env; this.errorMsg = errorMsg;
          }
          public TypeChecker(ErrorMsg errorMsg) {
-           this(Table.EMPTY,errorMsg);
+           this(Table.EMPTY, errorMsg);
          }
-         public TypeChecker putVar(Symbol var, Type type) {
-           return new TypeChecker(env.put(var,type),errorMsg));
+         public TypeChecker putVar(String var, Type type) {
+           return new TypeChecker(env.put(var, type), errorMsg));
          }
-         public Type getVar(Symbol var) { return (Type)env.get(var); }
-         public void error(int pos, String msg) { errorMsg.error(pos,msg); }
+         public Type getVar(String var) { return env.get(var); }
+         public void error(int pos, String msg) { errorMsg.error(pos, msg); }
        }
 \end{verbatim}
 }
@@ -1168,41 +1171,41 @@ tramite una discesa ricorsiva sulla sintassi astratta delle espressioni. In
   private TypeChecker checker;
 
   public final Type typeCheck(TypeChecker checker) {
-    return staticType = typeCheck$0(this.checker = checker);
+    return staticType = typeCheckAux(this.checker = checker);
   }
 
-  protected abstract Type typeCheck$0(TypeChecker checker);
+  protected abstract Type typeCheckAux(TypeChecker checker);
 \end{verbatim}
 %
 Il metodo \texttt{public} e \texttt{final}, di nome \texttt{typeCheck()},
 effettua le operazioni comuni a tutte le espressioni, \cioe
 l'annotazione del tipo statico inferito per l'espressione e del type-checker
 usato per inferirlo. Un metodo ausiliario e \texttt{protected}, di nome
-\texttt{typeCheck\$0()}, implementa le operazioni specifiche alla singola
+\texttt{typeCheckAux()}, implementa le operazioni specifiche alla singola
 espressione, come specificate nelle Figure~\ref{fig:analysis_expressions1}
 e~\ref{fig:analysis_expressions2}.
 
-Vediamo alcuni esempi di implementazione del metodo \texttt{typeCheck\$0()}.
+Vediamo alcuni esempi di implementazione del metodo \texttt{typeCheckAux()}.
 Dentro la classe \texttt{absyn/Variable.java} definiamo:
 %
 \begin{verbatim}
-  protected Type typeCheck$0(TypeChecker checker) {
+  protected Type typeCheckAux(TypeChecker checker) {
     Type result = checker.getVar(name);
     if (result == null) return error("undefined variable " + name);
     else return result;
   }
 \end{verbatim}
-% $
+%
 Questa implementazione riflette la specifica in
 Figura~\ref{fig:analysis_expressions1}: si cerca la variabile
-nell'ambiente; se non esiste si d\`a un errore
-altrimenti se ne restituisce il tipo.
+nell'ambiente e se ne restituisce il tipo; se la variabile non
+esiste nell'ambiente, si d\`a un errore.
 Il metodo \texttt{error()} \e definito dentro
 \texttt{absyn/Expression.java} come
 %
 \begin{verbatim}
   protected Type error(String msg) {
-    error(checker,msg);
+    error(checker, msg);
     return IntType.INSTANCE;
   }
 \end{verbatim}
@@ -1216,29 +1219,29 @@ Il metodo \texttt{error()} a due argomenti \e poi definito dentro
 %
 \begin{verbatim}
   protected void error(TypeChecker checker, String msg) {
-    checker.error(pos,msg);
+    checker.error(pos, msg);
   }
 \end{verbatim}
 %
 Esso usa il campo \texttt{pos} della sintassi astratta per indicare in che
 punto dare l'errore all'utente. Tale campo era il numero di caratteri
-passati dall'inizio del file a un punto significativo della parte di sintassi
+tra l'inizio del file e un punto significativo della parte di sintassi
 astratta in considerazione (Sezione~\ref{sec:abstract_syntax_classes}).
 
 Esaminiamo un altro esempio, quello di \texttt{absyn/FieldAccess.java}:
 %
 \begin{verbatim}
-  protected Type typeCheck$0(TypeChecker checker) {
+  protected Type typeCheckAux(TypeChecker checker) {
     Type receiverType = receiver.typeCheck(checker);
     if (!(receiverType instanceof ClassType))
       return error("class type required");
-    ClassType receiverClass = (ClassType)receiverType;
+    ClassType receiverClass = (ClassType) receiverType;
     if ((field = receiverClass.fieldLookup(name)) == null)
       return error("unknown field " + name);
     return field.getType();
   }
 \end{verbatim}
-% $
+%
 Consistentemente con la Figura~\ref{fig:analysis_expressions1},
 tale metodo effettua ricorsivamente l'analisi semantica di
 \texttt{receiver} e quindi impone che esso abbia un tipo classe.
@@ -1248,15 +1251,15 @@ e ne restituisce il tipo.
 Un altro esempio \e quello di \texttt{absyn/ArrayAccess.java}:
 %
 \begin{verbatim}
-  protected Type typeCheck$0(TypeChecker checker) {
+  protected Type typeCheckAux(TypeChecker checker) {
     Type arrayType = array.typeCheck(checker);
     index.mustBeInt(checker);
     if (!(arrayType instanceof ArrayType))
       return error("array type required");
-    return ((ArrayType)arrayType).getElementsType();
+    return ((ArrayType) arrayType).getElementsType();
   }
 \end{verbatim}
-% $
+%
 Consistentemente con la Figura~\ref{fig:analysis_expressions1},
 tale metodo effettua ricorsivamente l'analisi semantica di
 \texttt{array} e \texttt{index}. Per \texttt{index} usa il metodo ausiliario
@@ -1269,11 +1272,11 @@ come:
   }
 \end{verbatim}
 
-Consideriamo infine la definizione di \texttt{typeCheck\$0()}
+Consideriamo infine la definizione di \texttt{typeCheckAux()}
 in \texttt{absyn/ArithmeticBinOp.java}:
 %
 \begin{verbatim}
-  protected Type typeCheck$0(TypeChecker checker) {
+  protected Type typeCheckAux(TypeChecker checker) {
     Type leftType = getLeft().typeCheck(checker);
     Type rightType = getRight().typeCheck(checker);
     if (leftType.canBeAssignedTo(FloatType.INSTANCE) &&
@@ -1282,10 +1285,11 @@ in \texttt{absyn/ArithmeticBinOp.java}:
     else return error("numerical argument required");
   }
 \end{verbatim}
-% $
+%
 Consistentemente con la Figura~\ref{fig:analysis_expressions2},
 esso effettua ricorsivamente l'analisi semantica di
-\texttt{left} e \texttt{right} e impone che abbiano un tipo statico
+\texttt{left} e \texttt{right} e impone che tali sottoespressioni
+abbiano un tipo statico
 che sia \texttt{float} o un sottotipo di \texttt{float}. Il tipo statico
 dell'operazione binaria \e il minimo supertipo comune fra i tipi
 statici di \texttt{left} e \texttt{right}.
@@ -1385,14 +1389,15 @@ Esaminiamo adesso alcune regole della Figura~\ref{fig:analysis_commands}:
   La scelta di lasciare $\rho$ immutato come risultato
   dell'analisi semantica del condizionale implica che eventuali variabili
   locali dichiarate all'interno del ramo \textit{then} o del
-  ramo \textit{else} non sono \piu in scope alla fine del condizionale.
+  ramo \textit{else} (o di entrambe)
+  non sono \piu in scope alla fine del condizionale.
 \item[\underline{$\mathtt{Return(\mathit{expression})}$}.]
   Il comando di ritorno da metodo o costruttore richiede di effettuare
   ricorsivamente l'analisi semantica dell'espressione ritornata, se esiste.
   Nel caso in cui essa non sia \texttt{null}, allora questo comando deve
-  occorrere dentro un metodo che ritorna il tipo statico
+  trovarsi dentro un metodo che ritorna il tipo statico
   di $\mathit{expression}$ o un suo supertipo. Altrimenti questo comando
-  deve occorrere dentro un metodo che ritorna \texttt{void} o dentro
+  deve trovarsi dentro un metodo che ritorna \texttt{void} o dentro
   un costruttore.
 \item[\underline{$\mathtt{Assignment(\mathit{lvalue},\mathit{rvalue})}$}.]
   L'analisi semantica dell'assegnamento del valore di un'espressione
@@ -1421,7 +1426,7 @@ Esaminiamo adesso alcune regole della Figura~\ref{fig:analysis_commands}:
 \item[\underline{$\mathtt{LocalDeclaration(\mathit{type},\mathit{name},\mathit{initialiser})}$}.]
   L'analisi semantica della dichiarazione di una variabile locale estende
   l'ambiente legando la variabile \textit{name} al tipo semantico di
-  \textit{type}. Si effettua anche ricorsivamente
+  \textit{type}. Ricorsivamente si effettua anche
   l'analisi semantica di \textit{initialiser} e si impone che il suo tipo
   statico sia lo stesso o un sottotipo del tipo semantico di \textit{type}.
 \item[\underline{$\mathtt{LocalScope(\mathit{body})}$}.]
