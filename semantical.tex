@@ -1453,43 +1453,38 @@ Esaminiamo adesso alcune regole della Figura~\ref{fig:analysis_commands}:
 \subsection{L'implementazione dell'analisi semantica dei comandi}
   \label{subsec:analysis_commands_implementation}
 %
-Dal momento
-che l'analisi semantica di un comando restituisce un ambiente, implementiamo
+Dal momento che l'analisi semantica di un comando restituisce un ambiente, implementiamo
 il metodo di analisi semantica dentro \texttt{absyn/Command.java} come
 %
 \begin{verbatim}
   private TypeChecker checker;
 
   public final TypeChecker typeCheck(TypeChecker checker) {
-    checker = typeCheck$0(this.checker = checker);
-    if (next != null) return next.typeCheck(checker);
-    else return checker;
+    return checker = typeCheckAux(this.checker = checker);
   }
 
-  protected abstract TypeChecker typeCheck$0(TypeChecker checker);
+  protected abstract TypeChecker typeCheckAux(TypeChecker checker);
 \end{verbatim}
 %
 Il metodo \texttt{public} e \texttt{final} di nome \texttt{typeCheck()}
 effettua la parte di analisi semantica comune a tutti i comandi, che consiste
-nel chiamare il metodo ausiliario \texttt{typeCheck\$0()}, annotare il
-type-checker risultante dall'analisi e richiamarsi ricorsivamente sul
-comando seguente, se esiste. In questo modo si implementa l'analisi
-semantica della sequenza di comandi.
+nel chiamare il metodo ausiliario \texttt{typeCheckAux()} e prendere nota del
+type-checker risultante dall'analisi.
 
-Il metodo \texttt{typeCheck\$0()} effettua la parte di analisi semantica
+Il metodo \texttt{typeCheckAux()} effettua la parte di analisi semantica
 specifica a ciascun comando, secondo le regole della
 Figura~\ref{fig:analysis_commands}. Per esempio, dentro
 \texttt{absyn/IfThenElse.java} lo definiamo come
 %
 \begin{verbatim}
-  protected TypeChecker typeCheck$0(TypeChecker checker) {
+  protected TypeChecker typeCheckAux(TypeChecker checker) {
     condition.mustBeBoolean(checker);
     then.typeCheck(checker);
     else.typeCheck(checker);
     return checker;
   }
 \end{verbatim}
-% $
+%
 Invece dentro \texttt{absyn/For.java} lo definiamo come
 %
 \begin{verbatim}
@@ -1501,47 +1496,49 @@ Invece dentro \texttt{absyn/For.java} lo definiamo come
     return checker;
   }
 \end{verbatim}
-% $
+%
 \begin{figure}[t]
 {\small
 \begin{verbatim}
 public class TypeChecker {
-  private Type returnType;    private Table env;   
-  private int varNum;         private ErrorMsg errorMsg;
+  private final Type returnType;
+  private final Table<TypeAndNumber> env;   
+  private final int varNum;
+  private final ErrorMsg errorMsg;
 
-  private TypeChecker(Type returnType, Table env, int varNum, ErrorMsg errorMsg) {
+  private TypeChecker(Type returnType, Table<TypeAndNumber> env,
+      int varNum, ErrorMsg errorMsg) {
     this.returnType = returnType; this.env = env;
     this.varNum = varNum; this.errorMsg = errorMsg;
   }
   public TypeChecker(Type returnType, ErrorMsg errorMsg) {
-    this(returnType,Table.EMPTY,0,errorMsg);
-  }
-  public TypeChecker setReturnType(Type returnType) {
-    return new TypeChecker(returnType,env,varNum,errorMsg);
+    this(returnType, Table.EMPTY, 0, errorMsg);
   }
   public Type getReturnType() { return returnType; }
-  public TypeChecker putVar(Symbol var, Type type) {
+  public TypeChecker putVar(String var, Type type) {
     return new TypeChecker
-      (returnType,env.put(var,new TypeAndNumber(type,varNum)),varNum + 1,errorMsg);
+      (returnType, env.put(var, new TypeAndNumber(type, varNum)), varNum + 1, errorMsg);
   }
-  public Type getVar(Symbol var) {
-    TypeAndNumber tan = (TypeAndNumber)env.get(var);
+  public Type getVar(String var) {
+    TypeAndNumber tan = env.get(var);
     if (tan != null) return tan.getType(); else return null;
   }
-  public int getVarNum(Symbol var) {
-    TypeAndNumber tan = (TypeAndNumber)env.get(var);
+  public int getVarNum(String var) {
+    TypeAndNumber tan = env.get(var);
     if (tan != null) return tan.getNumber(); else return -1;
   }
 }
 \end{verbatim}
 }
-\caption{La classe \texttt{semantical/TypeChecker.java} che implementa un type-checker.}
+\caption{Una versione potenziata della classe \texttt{semantical/TypeChecker.java} che implementa un type-checker.}
   \label{fig:semantical.TypeChecker}
 \end{figure}
 %
 Si noti in quest'ultimo esempio come l'ambiente (in effetti, il type-checker)
 risultante dall'analisi di \texttt{initialisation} sia poi usato per effettuare
-l'analisi semantica di \texttt{condition}, \texttt{update} e \texttt{body},
+l'analisi semantica di \texttt{condition}, \texttt{update} e \texttt{body}, ma
+come poi venga ritornato il type-checker di partenza, senza l'eventuale
+legame per le variabili dichiarate nell'espressione di inizializzazione,
 conformemente alla Figura~\ref{fig:analysis_commands}.
 
 La Figura~\ref{fig:semantical.TypeChecker} mostra una revisione del
@@ -1554,7 +1551,7 @@ implementare l'analisi semantica dei comandi \texttt{return}: in
 \texttt{absyn/Return.java} definiamo infatti:
 %
 \begin{verbatim}
-  protected TypeChecker typeCheck$0(TypeChecker checker) {
+  protected TypeChecker typeCheckAux(TypeChecker checker) {
     Type expectedReturnType = checker.getReturnType();
     if (returned == null && expectedReturnType != VoidType.INSTANCE)
       error("missing return value");
@@ -1567,9 +1564,11 @@ implementare l'analisi semantica dei comandi \texttt{return}: in
 % $
 conformemente alla Figura~\ref{fig:analysis_commands}.
 
-Si noti che il type-checker in Figura~\ref{fig:semantical.TypeChecker} associa
+Si noti che il type-checker potenziato come
+in Figura~\ref{fig:semantical.TypeChecker} associa adesso
 alle variabile dell'ambiente non solo il loro tipo di dichiarazione,
-ma anche un numero progressivo, che sar\`a utile in fase di generazione del
+ma anche un numero progressivo che indica la quantit\`a di variabili
+viste finora in un metodo, informazione che ci sar\`a utile in fase di generazione del
 codice (Capitolo~\ref{chap:translate}).
 %
 \section{L'analisi semantica delle classi Kitten}
