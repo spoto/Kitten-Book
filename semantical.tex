@@ -221,7 +221,7 @@ stesso, come abbiamo gi\`a detto.
            public class IntType extends NumericalType {
              protected IntType() {}
              public boolean canBeAssignedTo(Type other) {
-               return other == Type.INT || other == Type.FLOAT;
+               return other == IntType.INSTANCE || other == FloatType.INSTANCE;
              }
            }
 
@@ -590,14 +590,14 @@ semantico $\st{t}$ rappresentato da ogni espressione sintattica di tipo $t$
 che occorre nel programma e annotare tale tipo dentro $t$ stessa. La
 costruzione di $\st{t}$ \e formalizzata nella Figura~\ref{fig:analysis_types}.
 %
-\begin{figure}
+\begin{figure}[th]
 \begin{align*}
   \st{\_}:\mathtt{absyn.TypeExpression}&\mapsto\mathtt{types.Type}\\
   \mbox{}\\
-  \st{\mathtt{IntTypeExpression()}}&=\mathtt{Type.INT}\\
-  \st{\mathtt{FloatTypeExpression()}}&=\mathtt{Type.FLOAT}\\
-  \st{\mathtt{BooleanTypeExpression()}}&=\mathtt{Type.BOOLEAN}\\
-  \st{\mathtt{VoidTypeExpression()}}&=\mathtt{Type.VOID}\\
+  \st{\mathtt{IntTypeExpression()}}&=\mathtt{IntType.INSTANCE}\\
+  \st{\mathtt{FloatTypeExpression()}}&=\mathtt{FloatType.INSTANCE}\\
+  \st{\mathtt{BooleanTypeExpression()}}&=\mathtt{BooleanType.INSTANCE}\\
+  \st{\mathtt{VoidTypeExpression()}}&=\mathtt{VoidType.INSTANCE}\\
   \st{\mathtt{ArrayTypeExpression(\mathit{elementsType})}}
     &=\mathtt{ArrayType.mk(\st{\mathit{elementsType}})}\\
   \st{\mathtt{ClassTypeExpression(\mathit{name})}}
@@ -623,28 +623,28 @@ classe di sintassi astratta \texttt{absyn/TypeExpression.java}:
 %
 \begin{verbatim}
   private Type staticType;
-  public final Type typeCheck() { return staticType = typeCheck$0(); }
-  protected abstract Type typeCheck$0();
+  public final Type typeCheck() { return staticType = typeCheckAux(); }
+  protected abstract Type typeCheckAux();
 \end{verbatim}
 %
 Il metodo \texttt{typeCheck()}, pubblico e \texttt{final}, annota nel campo
 \texttt{staticType} il tipo semantico inferito per l'espressione di tipo.
 Tale annotazione potr\`a essere utile
 in fase di generazione del codice. Lasciamo invece
-a un metodo \texttt{protected} ausiliario \texttt{typeCheck\$0()} il
+a un metodo \texttt{protected} ausiliario \texttt{typeCheckAux()} il
 compito di completare il lavoro con quanto \`e specifico a ciascuna
 sottoclasse. Per esempio, per implentare la definizione di $\st{}$ data
 in Figura~\ref{fig:analysis_types},
 dentro \texttt{absyn/IntTypeExpression.java} ridefiniamo:
 %
 \begin{verbatim}
-  protected Type typeCheck$0() { return Type.INT; }
+  protected Type typeCheckAux() { return IntType.INSTANCE; }
 \end{verbatim}
 %
 dentro \texttt{absyn/ArrayTypeExpression.java}:
 %
 \begin{verbatim}
-  protected Type typeCheck$0() {
+  protected Type typeCheckAux() {
     return ArrayType.mk(elementsType.typeCheck());
   }
 \end{verbatim}
@@ -652,7 +652,7 @@ dentro \texttt{absyn/ArrayTypeExpression.java}:
 e dentro \texttt{absyn/ClassTypeExpression.java}:
 %
 \begin{verbatim}
-  protected Type typeCheck$0() { return ClassType.mk(name); }
+  protected Type typeCheckAux() { return ClassType.mk(name); }
 \end{verbatim}
 % $
 \begin{figure}
@@ -685,7 +685,7 @@ funzione $\st{\_}$ della Figura~\ref{fig:analysis_types}:
 Possiamo adesso mostrare in Figura~\ref{fig:signatures_definition} una funzione
 $\sig{\kappa}{\_}$ che costruisce le segnature dei
 membri di una classe $\kappa$ a partire dalla loro sintassi astratta.
-Questa funzione \`e implementata dal metodo \texttt{addMembers()}
+Questa funzione \e implementata dal metodo \texttt{addMembersTo($\kappa$)}
 usato al momento della costruzione di un tipo classe per arricchirlo
 con le segnature dei suoi membri (Figura~\ref{fig:types.ClassType}).
 %
@@ -704,23 +704,25 @@ con le segnature dei suoi membri (Figura~\ref{fig:types.ClassType}).
   \]
   \[
     \frac{\rho\vdash\mathit{array}:t\quad t\in\mathtt{ArrayType}\quad
-          \rho\vdash\mathit{index}:\mathtt{Type.INT}}
+          \rho\vdash\mathit{index}:\mathtt{IntType.INSTANCE}}
          {\rho\vdash\mathtt{ArrayAccess(\mathit{array},\mathit{index})}:
           t\mathtt{.getElementsType()}}
   \]
   \[
     \frac{}
-         {\rho\vdash\mathtt{False()}:\mathtt{Type.BOOLEAN}}\qquad
+         {\rho\vdash\mathtt{False()}:\mathtt{BooleanType.INSTANCE}}\qquad
     \frac{}
-         {\rho\vdash\mathtt{True()}:\mathtt{Type.BOOLEAN}}\qquad
-    \frac{}
-         {\rho\vdash\mathtt{Nil()}:\mathtt{Type.NIL}}
+         {\rho\vdash\mathtt{True()}:\mathtt{BooleanType.INSTANCE}}\qquad
   \]
   \[
     \frac{}
-         {\rho\vdash\mathtt{IntLiteral()}:\mathtt{Type.INT}}\qquad
+         {\rho\vdash\mathtt{Nil()}:\mathtt{NilType.INSTANCE}}
+  \]
+  \[
     \frac{}
-         {\rho\vdash\mathtt{FloatLiteral()}:\mathtt{Type.FLOAT}}
+         {\rho\vdash\mathtt{IntLiteral()}:\mathtt{IntType.INSTANCE}}\qquad
+    \frac{}
+         {\rho\vdash\mathtt{FloatLiteral()}:\mathtt{FloatType.INSTANCE}}
   \]
   \[
     \frac{}
@@ -728,8 +730,7 @@ con le segnature dei suoi membri (Figura~\ref{fig:types.ClassType}).
          \mathtt{ClassType.mk(Symbol.STRING)}}
   \]
 }
-\caption{Le regole per l'analisi semantica dei leftvalue e dei letterali
-         Kitten.}
+\caption{Le regole per l'analisi semantica dei leftvalue e dei letterali Kitten.}
   \label{fig:analysis_expressions1}
 \end{figure}
 %
@@ -745,7 +746,7 @@ con le segnature dei suoi membri (Figura~\ref{fig:types.ClassType}).
   \]
   \[
     \frac{\rho\vdash\mathit{elementsType}:t\quad\rho\vdash\mathit{size}:
-          \mathtt{Type.INT}}
+          \mathtt{IntType.INSTANCE}}
          {\rho\vdash\mathtt{NewArray(\mathit{elementsType},\mathit{size})}:
           \mathtt{ArrayType.mk(\mathit{t})}}
   \]
@@ -756,16 +757,16 @@ con le segnature dei suoi membri (Figura~\ref{fig:types.ClassType}).
        \kappa\mathtt{.methodsLookup(\mathit{name},}\vec{\tau})=
            \{\mathit{method}\}\quad
          r=\mathit{method}\mathtt{.getReturnType()}
-           \quad r\not=\mathtt{Type.VOID}
+           \quad r\not=\mathtt{VoidType.INSTANCE}
        \end{array}}
           {\rho\vdash\mathtt{MethodCallExpression(\mathit{receiver},
            \mathit{name},\mathit{actuals})}:r}
   \]
   \[
-    \frac{\rho\vdash\mathit{expression}:\mathtt{Type.BOOLEAN}}
-         {\rho\vdash\mathtt{Not(\mathit{expression})}:\mathtt{Type.BOOLEAN}}
+    \frac{\rho\vdash\mathit{expression}:\mathtt{BooleanType.INSTANCE}}
+         {\rho\vdash\mathtt{Not(\mathit{expression})}:\mathtt{BooleanType.INSTANCE}}
     \qquad
-    \frac{\rho\vdash\mathit{expression}:t\quad t\le\mathtt{Type.FLOAT}}
+    \frac{\rho\vdash\mathit{expression}:t\quad t\le\mathtt{FloatType.INSTANCE}}
          {\rho\vdash\mathtt{Minus(\mathit{expression})}:t}
   \]
   \[
@@ -777,38 +778,38 @@ con le segnature dei suoi membri (Figura~\ref{fig:types.ClassType}).
           \mathit{intoType}}
   \]
   \[
-    \frac{\rho\vdash\mathit{left}:\mathtt{Type.BOOLEAN}\quad
-          \rho\vdash\mathit{right}:\mathtt{Type.BOOLEAN}}
+    \frac{\rho\vdash\mathit{left}:\mathtt{BooleanType.INSTANCE}\quad
+          \rho\vdash\mathit{right}:\mathtt{BooleanType.INSTANCE}}
          {\rho\vdash\mathtt{BooleanBinOp(\mathit{left},\mathit{right})}:
-          \mathtt{Type.BOOLEAN}}
+          \mathtt{BooleanType.INSTANCE}}
   \]
   \[
     \frac{\rho\vdash\mathit{left}:t_l\quad
-          \rho\vdash\mathit{right}:t_r\quad t_l\le\mathtt{Type.FLOAT}
-          \quad t_r\le\mathtt{Type.FLOAT}}
+          \rho\vdash\mathit{right}:t_r\quad t_l\le\mathtt{FloatType.INSTANCE}
+          \quad t_r\le\mathtt{FloatType.INSTANCE}}
          {\rho\vdash\mathtt{ArithmeticBinOp(\mathit{left},\mathit{right})}:
           t_l\mathtt{.leastCommonSupertype(\mathit{t_r})}}
   \]
   \[
     \frac{\rho\vdash\mathit{left}:t_l\quad
-          \rho\vdash\mathit{right}:t_r\quad t_l\le\mathtt{Type.FLOAT}
-          \quad t_r\le\mathtt{Type.FLOAT}}
+          \rho\vdash\mathit{right}:t_r\quad t_l\le\mathtt{FloatType.INSTANCE}
+          \quad t_r\le\mathtt{FloatType.INSTANCE}}
          {\rho\vdash\mathtt{NumericalComparisonBinOp
-           (\mathit{left},\mathit{right})}:\mathtt{Type.BOOLEAN}}
+           (\mathit{left},\mathit{right})}:\mathtt{BooleanType.INSTANCE}}
   \]
   \[
     \frac{\rho\vdash\mathit{left}:t_l\quad
           \rho\vdash\mathit{right}:t_r\quad (t_l\le t_r\text{ oppure }
           t_r\le t_l)}
          {\rho\vdash\mathtt{Equal(\mathit{left},\mathit{right})}:
-           \mathtt{Type.BOOLEAN}}
+           \mathtt{BooleanType.INSTANCE}}
   \]
   \[
     \frac{\rho\vdash\mathit{left}:t_l\quad
           \rho\vdash\mathit{right}:t_r\quad (t_l\le t_r\text{ oppure }
           t_r\le t_l)}
          {\rho\vdash\mathtt{NotEqual(\mathit{left},\mathit{right})}:
-           \mathtt{Type.BOOLEAN}}
+           \mathtt{BooleanType.INSTANCE}}
   \]
 }
 \caption{Le regole per l'analisi semantica delle restanti espressioni Kitten.}
@@ -866,8 +867,8 @@ Figura~\ref{fig:analysis_expressions1} per quanto riguarda i leftvalue e i
 letterali Kitten e in Figura~\ref{fig:analysis_expressions2} per le restanti
 espressioni.
 Si noti subito che il giudizio $\rho\vdash e:t_e$ non \e sempre definito.
-Si deve immaginare che, quando esso non \e definito, un messaggio di errore
-viene comunicato al programmatore.
+Si deve immaginare che, dove esso non \e definito, un messaggio di errore
+venga comunicato al programmatore.
 
 Consideriamo adesso le regole \piu significative delle
 Figure~\ref{fig:analysis_expressions1} e~\ref{fig:analysis_expressions2}.
@@ -978,7 +979,8 @@ Figure~\ref{fig:analysis_expressions1} e~\ref{fig:analysis_expressions2}.
   \texttt{int} o \texttt{float}. Il tipo statico del risultato dell'operazione
   \`e il minimo supertipo comune fra $t_l$ e $t_r$. Questo significa per
   esempio che \texttt{3 + 4} ha tipo statico \texttt{int} e
-  \texttt{3 + 4.5} ha tipo statico \texttt{float}.
+  \texttt{3 + 4.5} ha tipo statico \texttt{float} (tipaggio delle espressioni
+  aritmetiche ibride, come in Java).
   Si noti che dando una regola per la classe astratta
   delle operazioni binarie aritmetiche
   non abbiamo bisogno di specificare esplicitamente alcuna regola
@@ -1201,7 +1203,7 @@ Il metodo \texttt{error()} \e definito dentro
 \begin{verbatim}
   protected Type error(String msg) {
     error(checker,msg);
-    return Type.INT;
+    return IntType.INSTANCE;
   }
 \end{verbatim}
 %
@@ -1263,7 +1265,7 @@ come:
 %
 \begin{verbatim}
   protected void mustBeInt(TypeChecker checker) {
-    if (typeCheck(checker) != Type.INT) error("integer expected");
+    if (typeCheck(checker) != IntType.INSTANCE) error("integer expected");
   }
 \end{verbatim}
 
@@ -1274,8 +1276,8 @@ in \texttt{absyn/ArithmeticBinOp.java}:
   protected Type typeCheck$0(TypeChecker checker) {
     Type leftType = getLeft().typeCheck(checker);
     Type rightType = getRight().typeCheck(checker);
-    if (leftType.canBeAssignedTo(Type.FLOAT) &&
-        rightType.canBeAssignedTo(Type.FLOAT))
+    if (leftType.canBeAssignedTo(FloatType.INSTANCE) &&
+        rightType.canBeAssignedTo(FloatType.INSTANCE))
       return leftType.leastCommonSupertype(rightType);
     else return error("numerical argument required");
   }
@@ -1294,7 +1296,7 @@ statici di \texttt{left} e \texttt{right}.
   \[
     \frac{}
          {\rho\vdash\mathtt{Skip()}:\rho}\qquad
-    \frac{\rho\vdash\mathit{condition}:\mathtt{Type.BOOLEAN}\quad
+    \frac{\rho\vdash\mathit{condition}:\mathtt{BooleanType.INSTANCE}\quad
           \rho\vdash\mathit{then}:\rho'\quad
           \rho\vdash\mathit{else}:\rho''}
          {\rho\vdash\mathtt{IfThenElse(\mathit{condition},\mathit{then},
@@ -1319,14 +1321,14 @@ statici di \texttt{left} e \texttt{right}.
   \]
   \[
     \frac{\rho\vdash\mathit{initialisation}:\rho'\quad
-          \rho'\vdash\mathit{condition}:\mathtt{Type.BOOLEAN}\quad
+          \rho'\vdash\mathit{condition}:\mathtt{BooleanType.INSTANCE}\quad
           \rho'\vdash\mathit{update}:\rho''\quad
           \rho'\vdash\mathit{body}:\rho'''}
          {\rho\vdash\mathtt{For(\mathit{initialisation},\mathit{condition},
           \mathit{update},\mathit{body})}:\rho}
   \]
   \[
-    \frac{\rho\vdash\mathit{condition}:\mathtt{Type.BOOLEAN}\quad
+    \frac{\rho\vdash\mathit{condition}:\mathtt{BooleanType.INSTANCE}\quad
           \rho\vdash\mathit{body}:\rho'}
          {\rho\vdash\mathtt{While(\mathit{condition},\mathit{body})}:\rho}
   \]
@@ -1549,7 +1551,7 @@ implementare l'analisi semantica dei comandi \texttt{return}: in
 \begin{verbatim}
   protected TypeChecker typeCheck$0(TypeChecker checker) {
     Type expectedReturnType = checker.getReturnType();
-    if (returned == null && expectedReturnType != Type.VOID)
+    if (returned == null && expectedReturnType != VoidType.INSTANCE)
       error("missing return value");
     if (returned != null &&
         !returned.typeCheck(checker).canBeAssignedTo(expectedReturnType))
@@ -1625,7 +1627,7 @@ In \texttt{absyn/ConstructorDeclaration.java} definiamo invece:
 \begin{verbatim}
   protected void typeCheck$0(ClassType currentClass) {
     TypeChecker checker
-      = new TypeChecker(Type.VOID,currentClass.getErrorMsg());
+      = new TypeChecker(VoidType.INSTANCE, currentClass.getErrorMsg());
     checker = checker.putVar(Symbol.THIS,currentClass);
     if (getFormals() != null) checker = getFormals().typeCheck(checker);
     getBody().typeCheck(checker);
@@ -1634,14 +1636,14 @@ In \texttt{absyn/ConstructorDeclaration.java} definiamo invece:
 \end{verbatim}
 % $
 Questo metodo comincia col costruire un type-checker con ambiente vuoto e
-che si aspetta come tipo di ritorno \texttt{Type.VOID}. Quindi aggiunge
+che si aspetta come tipo di ritorno \texttt{VoidType.INSTANCE}. Quindi aggiunge
 la variabile \texttt{this} legata al tipo semantico
 della classe e i parametri formali legati al loro tipo di dichiarazione,
 rispecchiando la definizione precedente di $\overline{\rho}$.
 Infine effettua il type-checking del corpo del costruttore e controlla che al
 suo interno non ci sia del codice morto (Sezione~\ref{sec:dead_code}).
 Il ragionamento \e simile nel caso della dichiarazione di un metodo,
-ma si usa il tipo di ritorno del metodo al posto di \texttt{Type.VOID} e si
+ma si usa il tipo di ritorno del metodo al posto di \texttt{VoidType.INSTANCE} e si
 controlla che se il metodo ne ridefinisce un
 altro di una superclasse allora la ridefinizione del tipo di ritorno
 soddisfi il test \texttt{canBeAssignedToSpecial()}
