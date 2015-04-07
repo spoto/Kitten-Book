@@ -1488,7 +1488,7 @@ Figura~\ref{fig:analysis_commands}. Per esempio, dentro
 Invece dentro \texttt{absyn/For.java} lo definiamo come
 %
 \begin{verbatim}
-  protected TypeChecker typeCheck$0(TypeChecker checker) {
+  protected TypeChecker typeCheckAux(TypeChecker checker) {
     TypeChecker initChecker = initialisation.typeCheck(checker);
     condition.mustBeBoolean(initChecker);
     update.typeCheck(initChecker);
@@ -1580,9 +1580,9 @@ Nulla va controllato per quanto riguarda i campi. Per quanto riguarda
 costruttori e metodi, invece, occorre effettuare l'analisi semantica
 del loro corpo. Essendo il loro corpo un comando, possiamo usare a tal
 fine le regole della Figura~\ref{fig:analysis_commands}, cominciando
-l'analisi da un ambiente iniziale in cui i parametri del costruttore o del
-metodo sono legati al loro tipo di dichiarazione (incluso il parametro
-implicito \texttt{this}). A tal fine, definiamo una funzione che
+l'analisi da un ambiente iniziale in cui i parametri del costruttore
+o del metodo (incluso il parametro implicito \texttt{this})
+sono legati al loro tipo di dichiarazione. A tal fine, definiamo una funzione che
 aggiunge a un ambiente una lista di variabili dichiarate come parametri
 formali:
 %
@@ -1608,32 +1608,32 @@ chiama \texttt{typeCheck()}. Esso \`e definito dentro
 %
 \begin{verbatim}
   final void typeCheck(ClassType currentClass) {
-    typeCheck$0(currentClass);
+    typeCheckAux(currentClass);
     if (next != null) next.typeCheck(currentClass);
   }
 
-  protected abstract void typeCheck$0(ClassType currentClass);
+  protected abstract void typeCheckAux(ClassType currentClass);
 \end{verbatim}
 % $
 ovvero tramite il solito metodo \texttt{final} che richiama, su tutta la
 lista dei membri della classe, il metodo ausiliario
-\texttt{typeCheck\$0()} che effettua l'analisi specifica a ciascun membro.
+\texttt{typeCheckAux()} che effettua l'analisi specifica a ciascun membro.
 Abbiamo detto che l'analisi semantica dei campi non richiede nessun controllo:
 dentro la classe di sintassi astratta
 \texttt{absyn/FieldDeclaration.java} definiamo quindi:
 %
 \begin{verbatim}
-  protected void typeCheck$0(ClassType currentClass) {}
+  protected void typeCheckAux(ClassType currentClass) {}
 \end{verbatim}
 % $
 In \texttt{absyn/ConstructorDeclaration.java} definiamo invece:
 %
 \begin{verbatim}
-  protected void typeCheck$0(ClassType currentClass) {
+  protected void typeCheckAux(ClassType currentClass) {
     TypeChecker checker
       = new TypeChecker(VoidType.INSTANCE, currentClass.getErrorMsg());
-    checker = checker.putVar(Symbol.THIS,currentClass);
-    if (getFormals() != null) checker = getFormals().typeCheck(checker);
+    checker = checker.putVar("this", currentClass);
+    if (formals != null) checker = formals.typeCheck(checker);
     getBody().typeCheck(checker);
     getBody().checkForDeadcode();
   }
