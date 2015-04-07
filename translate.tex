@@ -1440,7 +1440,7 @@ comandi Kitten. Commentiamo tali regole di compilazione.
   il valore di ritorno di un metodo non \texttt{void} tramite un
   bytecode \texttt{pop}.
 \item[\underline{$\mathtt{Assignment(\mathit{lvalue},\mathit{rvalue})}$}.]
-  La compilazione di un assegnamento di $\mathit{rvalue}$ ad
+  La compilazione di un assegnamento di $\mathit{rvalue}$ a
   $\mathit{lvalue}$ \e ottenuta come in Figura~\ref{fig:passive_leftvalues}.
 \item[\underline{$\mathtt{While(\mathit{condition},\mathit{body})}$}.]
   Il codice generato per un ciclo \texttt{while} \`e la compilazione
@@ -1469,59 +1469,49 @@ comandi Kitten. Commentiamo tali regole di compilazione.
 \end{description}
 
 L'implementazione della generazione del codice per i comandi \`e ottenuta
-aggiungendo i seguenti metodi ad \texttt{absyn/Command.java}:
+aggiungendo il seguenti metodo ad \texttt{absyn/Command.java}:
 %
 \begin{verbatim}
-  public final CodeBlock translate(CodeBlock continuation) {
-    if (next != null) continuation = next.translate(continuation);
-    return translate$0(continuation);
-  }
-
-  protected abstract CodeBlock translate$0(CodeBlock continuation);
+  public abstract CodeBlock translate(CodeBlock continuation);
 \end{verbatim}
 %
-Il primo si occupa del lavoro comune a tutti i comandi, che consiste
-nel compilare il comando che potrebbe seguire ottenendo la continuazione
-da passare al metodo \texttt{translate\$0()}.
-Quest'ultimo si occupa del lavoro specifico a ogni comando.
-Esso implementa le regole in Figura~\ref{fig:commands_generation}.
-
-Vediamo alcuni esempi di definizione di \texttt{translate\$0()} in alcune
+che implementa le regole in Figura~\ref{fig:commands_generation}.
+Vediamo alcuni esempi della sua definizione in alcune
 delle sottoclassi della classe \texttt{absyn/Command.java}.
 Dentro \texttt{absyn/LocalScope.java} definiamo
 %
 \begin{verbatim}
-  protected CodeBlock translate$0(CodeBlock continuation) {
+  public CodeBlock translate(CodeBlock continuation) {
     return body.translate(continuation);
   }
 \end{verbatim}
-% $
+%
 consistentemente con la Figura~\ref{fig:commands_generation}.
 In \texttt{absyn/IfThenElse.java} definiamo
 %
 \begin{verbatim}
-  protected CodeBlock translate$0(CodeBlock continuation) {
+  public CodeBlock translate(CodeBlock continuation) {
     return condition.translateAsTest
-      (then.translate(continuation),else.translate(continuation));
+      (then.translate(continuation), else.translate(continuation));
   }
 \end{verbatim}
-% $
+%
 ancora una volta questo rispecchia la formalizzazione in
 Figura~\ref{fig:commands_generation}.
 
 L'implementazione delle regole
-per il \texttt{while} e il \texttt{for} richiedono di creare
-\emph{prima} il \textit{pivot} in modo da poterlo passare come continuazione,
+per il \texttt{while} e il \texttt{for} richiede di creare
+\emph{prima} il \textit{pivot}, in modo da poterlo passare come continuazione,
 rispettivamente, alla compilazione del \textit{body} o
 dell'\textit{update} del ciclo. Alla fine si lega il blocco \textit{pivot} con
 il suo successore, chiudendo il ciclo. Ecco per esempio il generatore di codice
 inserito dentro \texttt{absyn/For.java}:
 %
 \begin{verbatim}
-  protected CodeBlock translate$0(CodeBlock continuation) {
+  public CodeBlock translate(CodeBlock continuation) {
     CodeBlock pivot = new CodeBlock();
     CodeBlock test = condition.translateAsTest
-      (body.translate(update.translate(pivot)),continuation);
+      (body.translate(update.translate(pivot)), continuation);
     pivot.linkTo(test);
     return initialisation.translate(test);
   }
