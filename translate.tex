@@ -563,9 +563,11 @@ di blocchi all'interno dei quali si trova del codice,
 come mostrato in Figura~\ref{fig:cycle_bytecode}.
 Il bytecode che genereremo per le espressioni sar\`a in effetti molto
 semplice, al punto che una sequenza di blocchi sar\`a
-sempre sufficiente per tutte le espressioni. Si noti comunque che questo
-non sarebbe pi\`u vero se Kitten ammettesse espressioni pi\`u
-complesse, come per esempio un'espressione condizionale come
+sempre sufficiente per tutte le espressioni. Si noti comunque che questa
+propriet\`a
+\e dovuta alla semplicit\`a delle espressioni del linguaggio Kitten e
+che essa non sarebbe pi\`u vera se Kitten ammettesse ad esempio espressioni pi\`u
+complesse, come l'espressione condizionale
 $\mathit{exp}\ \mathtt{?}\ \mathit{exp}\ \mathtt{:}\ \mathit{exp}$
 (si veda l'Esercizio~\ref{ex:conditional_expression_compilation}).
 
@@ -576,9 +578,11 @@ Ci sono tre contesti in cui un'espressione Kitten pu\`o trovarsi:
       nel caso in cui essa occorre come lato destro di un assegnamento;
 \item un contesto in cui di un'espressione serve sapere se \e vera o falsa
       per decidere come istradare l'esecuzione del programma, come nel
-      caso in cui essa occorre come test di un condizionale;
+      caso in cui essa occorre come test di un condizionale. Ovviamente
+      questo caso ha senso solo per le espressioni booleane;
 \item un contesto in cui il valore di un'espressione deve essere modificato,
       come nel caso in cui essa occorre alla sinistra di un assegnamento.
+      Ovviamente questo caso ha senso solo per i leftvalue.
 \end{enumerate}
 %
 Compileremo un'espressione in tre modi diversi,
@@ -692,7 +696,7 @@ fra il codice generato per due parti sequenziali di un programma.
     \end{array}$}\to
    \gentwo{\vec{t}}{\mathit{actuals}}
    \left(\fbox{$\mathtt{constructorcall}\ \mathit{con}$}\to\beta\right)\\
-  \text{dove $\mathit{con}=\kappa.\kappa(\vec{t})\mathtt{:void}$ \e il}&
+  \text{dove $\mathit{con}=\kappa(\vec{t})\mathtt{:void}$ \e il}&
   \text{ costruttore identificato dall'analisi semantica
         (Figura~\ref{fig:analysis_expressions2})}\\
   \gen{\mathtt{NewArray(\mathit{elementsType},\mathit{size})}}(\beta)
@@ -827,8 +831,8 @@ Figura~\ref{fig:expressions_generation}.
   Per caricare sullo stack il valore di una variabile locale, usiamo
   il bytecode \texttt{load} della Figura~\ref{fig:bytecodes2}.
   Il numero della variabile locale \`e gi\`a stato determinato in
-  fase di analisi semantica e annotato dentro all'ambiente del
-  punto di programma in cui ci troviamo, insieme al tipo della variabile
+  fase di analisi semantica e accessibile tramite il type-checker usato
+  per l'analisi, insieme al tipo della variabile
   (Figura~\ref{fig:semantical.TypeChecker}).
 \item[\underline{$\mathtt{FieldAccess(\mathit{receiver},\mathit{name})}$}.]
   Per accedere a un campo dell'oggetto $o$
@@ -871,7 +875,7 @@ Figura~\ref{fig:expressions_generation}.
   Questo nodo di sintassi astratta per la creazione di un oggetto di classe
   $\mathit{className}$ \e stato annotato durante l'analisi semantica con
   il costruttore $\mathit{con}=
-  \kappa.\kappa(\vec{t})\mathtt{:void}$ della classe $\kappa$ che \`e
+  \kappa(\vec{t})\mathtt{:void}$ della classe $\kappa$ che \`e
   il corrispondente semantico di $\mathit{className}$. Tale costruttore
   \e il \piu
   specifico fra quelli che possono essere chiamati da questa espressione
@@ -952,7 +956,7 @@ Figura~\ref{fig:expressions_generation}.
   nel caso in cui il cast sia in effetti
   una richiesta di arrotondamento di un valore a virgola mobile
   ($\mathtt{3.14\ as\ int}$). Si noti la differenza fra queste due
-  situazioni: la conversione da $\mathtt{float}$ ad $\mathtt{int}$
+  situazioni: la conversione da $\mathtt{float}$ a $\mathtt{int}$
   modifica la rappresentazione binaria del valore in cima allo stack ma
   non pu\`o mai fallire (sappiamo con certezza che in cima allo stack
   c'\`e un $\mathtt{float}$). La verifica di tipo non effettua invece
@@ -988,8 +992,9 @@ ad $\mathtt{absyn/Expression.java}$:
   protected abstract CodeBlock translate(CodeBlock continuation);
 
   public final CodeBlock translateAs(Type type, CodeBlock continuation) {
-    if (staticType == Type.INT && type == Type.FLOAT)
-      continuation = new CAST(Type.INT,Type.FLOAT).followedBy(continuation);
+    if (staticType == IntType.INSTANCE && type == FloatType.INSTANCE)
+      continuation = new CAST(IntType.INSTANCE, FloatType.INSTANCE)
+                       .followedBy(continuation);
     else
       return translate(continuation);
   }
@@ -1019,7 +1024,7 @@ In \texttt{absyn/Variable.java} defininiamo
 %
 \begin{verbatim}
   public CodeBlock translate(CodeBlock continuation) {
-    return new LOAD(getVarNum(),getStaticType()).followedBy(continuation);
+    return new LOAD(getVarNum(), getStaticType()).followedBy(continuation);
   }
 \end{verbatim}
 %
@@ -1037,8 +1042,8 @@ Dentro \texttt{absyn/BinOp.java} definiamo
     Type ell = getLeft().getStaticType()
       .leastCommonSupertype(getRight().getStaticType());
     return getLeft().translateAs
-      (ell,getRight().translateAs
-       (ell,operator(ell).followedBy(continuation)));
+      (ell, getRight().translateAs
+       (ell, operator(ell).followedBy(continuation)));
   }
 
   protected abstract BinOpBytecode operator(Type type);
@@ -1053,7 +1058,7 @@ definito dentro $\mathtt{absyn/Addition.java}$ come
 %
 \begin{verbatim}
   protected BinOpBytecode operator(Type type) {
-    return new ADD((NumericalType)type);
+    return new ADD((NumericalType) type);
   }
 \end{verbatim}
 %
@@ -1063,7 +1068,7 @@ in Figura~\ref{fig:expressions_generation}.
 \subsection{La compilazione condizionale delle espressioni booleane}
   \label{subsec:conditional_generation}
 %
-Abbiamo descritto come un'espressione viene tradotta in del bytecode
+Abbiamo descritto come un'espressione venga tradotta in del bytecode
 Kitten che ne calcola il valore e lo lascia in cima allo stack degli
 operandi. Tale codice \e adeguato se quello a cui
 siamo interessati \`e il valore dell'espressione. Per esempio, di un parametro
@@ -1142,7 +1147,7 @@ aggiungendo ad \texttt{absyn.Expression} il metodo:
 %
 \begin{verbatim}
   public CodeBlock translateAsTest(CodeBlock yes, CodeBlock no) {
-    return translate(new CodeBlock(new IF_TRUE(),yes,no));
+    return translate(new CodeBlock(new IF_TRUE(), yes, no));
   }
 \end{verbatim}
 %
@@ -1259,7 +1264,6 @@ a \texttt{absyn/Lvalue.java} i due metodi
 {\small
 \begin{verbatim}
   public abstract CodeBlock translateBeforeAssignment(CodeBlock continuation);
-
   public abstract CodeBlock translateAfterAssignment(CodeBlock continuation);
 \end{verbatim}}
 %
