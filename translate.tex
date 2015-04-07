@@ -2,15 +2,16 @@
 %
 \vspace*{-2ex}
 \begin{center}
-\epsfig{file = cat9.pdf, width = 4.5cm}
+\includegraphics[width=6.5cm]{cat9.jpg}
 \end{center}
 %\vspace*{-2ex}
 %
 L'analisi semantica del Capitolo~\ref{chap:semantical} ha garantito che
-il codice Kitten non contiene alcun errore semantico. Ha inoltre
+il codice Kitten non contenga alcun errore semantico. Ha inoltre
 annotato l'albero di sintassi astratta con informazioni relative
 al tipo statico delle espressioni che vi occorrono; gli accessi a
-campi, costruttori e metodi con la dichiarazione di campo, costruttore
+campi, costruttori e metodi con la specifica dichiarazione
+del campo, costruttore
 o metodo a cui fanno riferimento. Siamo ora nelle condizioni di
 generare del codice \emph{intermedio}, \cioe indipendente dall'architettura
 verso la quale stiamo compilando, ma pensato piuttosto per essere
@@ -28,7 +29,7 @@ essere eseguito da una macchina astratta che ha a disposizione:
 %
 \begin{enumerate}
 \item un insieme di \emph{variabili locali}, potenzialmente illimitato, che
-      possono contenere valori primitivi o riferimenti ad oggetti o array;
+      possono contenere valori primitivi o riferimenti a oggetti o array;
 \item uno stack di variabili temporanee, detto \emph{stack degli operandi},
       potenzialmente illimitato, che pu\`o contenere valori primitivi o
       riferimenti a oggetti o array;
@@ -107,7 +108,7 @@ la compilazione in bytecode Kitten del metodo \texttt{fib()} in
 Figura~\ref{fig:fibonacci}. La presenza di un comando condizionale in
 Figura~\ref{fig:fibonacci} diventa un'alternativa di controllo nel
 bytecode Kitten in Figura~\ref{fig:fib_bytecode}: il risultato dell'istruzione
-\texttt{or} determina l'instradamento del controllo verso il ramo
+\texttt{or} determina l'istradamento del controllo verso il ramo
 \texttt{if\_true} o verso quello \texttt{if\_false}.
 
 L'esempio precedente mostra che il bytecode Kitten \`e in effetti un grafo
@@ -119,10 +120,10 @@ sequenziale. Un ulteriore esempio \`e la compilazione del ciclo:
 \end{verbatim}
 %
 mostrata in Figura~\ref{fig:cycle_bytecode}. Questa volta
-l'instradamento del controllo dipende dal risultato di un confronto.
+l'istradamento del controllo dipende dal risultato di un confronto.
 In particolare, il confronto fra la variabile locale $1$, che contiene
 la variabile \texttt{i} del ciclo, e la costante intera $5$ determina
-l'instradamento del codice verso il ramo \texttt{if\_cmplt}
+l'istradamento del codice verso il ramo \texttt{if\_cmplt}
 (\emph{IF the CoMParison is Less Than}) o verso quello
 \texttt{if\_cmpge} (\emph{IF the CoMParison is Greater than or Equal}).
 %
@@ -250,12 +251,12 @@ l'instradamento del codice verso il ramo \texttt{if\_cmplt}
 Esaminiamo adesso il set di istruzioni messe a disposizione dal bytecode
 Kitten. Per ognuna di esse mostriamo il suo effetto sulle variabili locali,
 sullo stack degli operandi e sulla memoria o heap. Dal momento che
-poche istruzioni operano sullo heap, lo indicheremo solo per quelle poche
+poche istruzioni operano sullo heap, nelle figure lo indicheremo solo per quelle poche
 istruzioni per cui esso \`e effettivamente significativo.
 Le istruzioni del bytecode Kitten
 sono \emph{tipate}, nel senso che \e specificato il tipo
 degli operandi su cui possono operare. Esse non effettuano mai una promozione
-di tipo, per cui quando nella loro descrizione useremo il termine
+di tipo per cui, quando nella loro descrizione useremo il termine
 \emph{sottotipo}, esso va inteso nel senso dell'operazione
 \texttt{canBeAssignedToSpecial()} della Sezione~\ref{sec:semantical_types}.
 %
@@ -270,7 +271,7 @@ di tipo, per cui quando nella loro descrizione useremo il termine
   (Figura~\ref{fig:bytecodes1}) che deve avere tipo $t$.
   Si noti che se tale valore fosse un
   riferimento a un oggetto o a un array allora verrebbe duplicato il
-  riferimento, non l'oggetto o l'array.
+  riferimento, creandone un alias, non l'oggetto o l'array.
 \item[\underline{$\mathtt{const}\ \mathit{value}$}.]
   Carica in cima allo stack un valore
   costante (Figura~\ref{fig:bytecodes2}).
@@ -402,7 +403,7 @@ Esse operano come segue:
   catena delle superclassi. Il ricevitore e i parametri attuali della chiamata
   si trovano sullo stack al momento della chiamata e vengono rimossi
   alla fine della chiamata e sostituiti con il valore di ritorno del metodo,
-  nel caso in cui $\mathit{t'}$ non \`e $\mathtt{void}$. Questo \`e
+  nel caso in cui $\mathit{t'}$ non sia $\mathtt{void}$. Questo \`e
   mostrato in Figura~\ref{fig:bytecodes8} dal punto di vista del chiamante.
   La classe del ricevitore deve essere $\kappa$ o una sottoclasse di $\kappa$.
   Se il ricevitore \`e $\mathtt{nil}$ l'esecuzione del programma termina.
@@ -427,7 +428,8 @@ chiamata, incluso il ricevitore della chiamata,
 indicato come $o$ in Figura~\ref{fig:callercallee}. Il metodo chiamato
 \`e esplicito nel caso della chiamata a un costruttore, mentre per le chiamate
 virtuali ai metodi
-\`e identificato sulla base della classe dell'oggetto a cui $o$ fa riferimento.
+\`e identificato dinamicamente
+a tempo di esecuzione sulla base della classe dell'oggetto a cui $o$ fa riferimento.
 In entrambi i casi, esso
 inizia la sua esecuzione in un frame di attivazione nuovo,
 in cui le variabili locali contengono
@@ -459,8 +461,8 @@ Le istruzioni di diramazione
 del bytecode Kitten sono sempre accoppiate all'inizio di due blocchi
 di codice con lo stesso predecessore.
 Esse indicano sotto quale condizione il controllo del
-programma deve essere instradato verso uno dei due blocchi. Ne sono esempi le
-istruzioni \texttt{if\_true} ed \texttt{if\_false} in
+programma deve essere istradato verso uno dei due blocchi. Ne sono esempi le
+istruzioni \texttt{if\_true} e \texttt{if\_false} in
 Figura~\ref{fig:led_bytecode} e le istruzioni
 \texttt{if\_cmplt int} e \texttt{if\_cmpge int} in
 Figura~\ref{fig:fib_bytecode}.
@@ -573,7 +575,7 @@ Ci sono tre contesti in cui un'espressione Kitten pu\`o trovarsi:
 \item un contesto in cui di un'espressione serve il valore, come
       nel caso in cui essa occorre come lato destro di un assegnamento;
 \item un contesto in cui di un'espressione serve sapere se \e vera o falsa
-      per decidere come instradare l'esecuzione del programma, come nel
+      per decidere come istradare l'esecuzione del programma, come nel
       caso in cui essa occorre come test di un condizionale;
 \item un contesto in cui il valore di un'espressione deve essere modificato,
       come nel caso in cui essa occorre alla sinistra di un assegnamento.
@@ -1067,13 +1069,13 @@ operandi. Tale codice \e adeguato se quello a cui
 siamo interessati \`e il valore dell'espressione. Per esempio, di un parametro
 passato a un metodo abbiamo bisogno del valore, \cosi come del lato destro
 di un assegnamento.
-Ci sono casi per\`o in cui quello che ci interessa \`e di instradare
+Ci sono casi per\`o in cui quello che ci interessa \`e di istradare
 l'esecuzione di un programma in due direzioni diverse sulla base
 del valore di un'espressione booleana. Per esempio, nel comando
 $\mathtt{if\ (\mathit{exp})\ then\ \mathit{com}_{\rm 1}
 \ else\ \mathit{com}_{\rm 2}}$
-siamo interessati ad eseguire $\mathit{com}_1$ se il valore
-di $\mathit{exp}$ \`e $\mathit{true}$ e ad eseguire $\mathit{com}_2$
+siamo interessati a eseguire $\mathit{com}_1$ se il valore
+di $\mathit{exp}$ \`e $\mathit{true}$ e a eseguire $\mathit{com}_2$
 se tale valore \`e invece $\mathit{false}$. Occorre quindi definire
 un altro modo di generare il bytecode per le espressioni,
 alternativo a quello della
@@ -1101,7 +1103,7 @@ In particolare, $\gentest{\mathit{exp}}(\beta_\mathit{true})
 (\beta_\mathit{false})$ \`e la
 compilazione condizionale dell'espressione $\mathit{exp}$:
 se l'espressione contiene $\mathit{true}$ l'esecuzione
-viene instradata verso la continuazione $\beta_\mathit{true}$;
+viene istradata verso la continuazione $\beta_\mathit{true}$;
 altrimenti verso la continuazione $\beta_\mathit{false}$.
 La sua definizione sfrutta quella in Figura~\ref{fig:expressions_generation}:
 %
@@ -1193,7 +1195,7 @@ valore in cima allo stack degli operandi
 Figura~\ref{fig:expressions_generation}), che usiamo quando
 del leftvalue ci interessa il valore, come per \texttt{a[6]} in
 \texttt{v := a[6]}, e un'altra modalit\`a che
-instrada l'esecuzione verso due direzioni diverse sulla base del valore
+istrada l'esecuzione verso due direzioni diverse sulla base del valore
 booleano che essi contengono (Sezione~\ref{subsec:conditional_generation}
 ed Equazione~\ref{eq:conditional_compilation}),
 che usiamo quando il leftvalue \`e usato come test booleano, per esempio
@@ -1202,7 +1204,7 @@ A differenza delle altre espressioni, i leftvalue possono per\`o
 essere usati anche
 alla sinistra di un assegnamento, come \texttt{v} in \texttt{v := b + c}
 oppure \texttt{a[5]} in \texttt{a[5] := b * c}. In questi casi non siamo
-interessati al valore del leftvalue, \nec a instradare l'esecuzione
+interessati al valore del leftvalue, \nec a istradare l'esecuzione
 su due continuazioni diverse sulla base del valore booleano del leftvalue.
 Vogliamo invece \emph{modificare} il valore del leftvalue. Conseguentemente,
 dobbiamo definire una terza modalit\`a di compilazione per i leftvalue,
@@ -1477,7 +1479,7 @@ aggiungendo i seguenti metodi ad \texttt{absyn/Command.java}:
 Il primo si occupa del lavoro comune a tutti i comandi, che consiste
 nel compilare il comando che potrebbe seguire ottenendo la continuazione
 da passare al metodo \texttt{translate\$0()}.
-Quest'ultimo si occupa del lavoro specifico ad ogni comando.
+Quest'ultimo si occupa del lavoro specifico a ogni comando.
 Esso implementa le regole in Figura~\ref{fig:commands_generation}.
 
 Vediamo alcuni esempi di definizione di \texttt{translate\$0()} in alcune

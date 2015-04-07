@@ -1,0 +1,11 @@
+digraph "Fibonacci.fib():void" {
+size = "11,7.5";
+codeblock_8 [ shape = box, label = "const 0\nstore 1 of type int"];
+codeblock_7 [ shape = box, label = "load 1 of type int\nconst 5"];
+codeblock_4 [ shape = box, label = "if_cmpge int\nreturn void"];
+codeblock_7->codeblock_4 [color = blue label = "" fontsize = 8]
+codeblock_6 [ shape = box, label = "if_cmplt int\nload 1 of type int\nconst 1\nadd int\nstore 1 of type int"];
+codeblock_6->codeblock_7 [color = blue label = "" fontsize = 8]
+codeblock_7->codeblock_6 [color = blue label = "" fontsize = 8]
+codeblock_8->codeblock_7 [color = blue label = "" fontsize = 8]
+}
