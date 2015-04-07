@@ -499,7 +499,7 @@ bytecode Kitten.
 %
 \begin{figure}[t]
 \begin{center}
-\epsfig{file = bytecodes_hierarchy.pdf, width = 15.5cm}
+\includegraphics[width=15.5cm]{bytecodes_hierarchy.pdf}
 \end{center}
 \caption{La gerarchia delle classi del package \texttt{bytecode} che rappresentano le istruzioni del bytecode Kitten. Le classi ovali sono classi astratte, quelle rettangolari sono classi concrete.}
   \label{fig:bytecodes_hierarchy}
@@ -508,7 +508,7 @@ bytecode Kitten.
 Le istruzioni del bytecode Kitten che abbiamo descritto nelle sezioni
 precedenti sono implementate nel package \texttt{bytecode}
 come istanze della classe \texttt{bytecode/Bytecode.java}.
-La gerachia completa \`e mostrata in Figura~\ref{fig:bytecodes_hierarchy}.
+La gerarchia completa \e mostrata in Figura~\ref{fig:bytecodes_hierarchy}.
 Le istruzioni vengono prima di tutto divise nelle due classi astratte
 \texttt{NonBranchingBytecode} e \texttt{BranchingBytecode}.
 La prima implementa le istruzioni sequenziali
@@ -522,7 +522,7 @@ Per esempio, un'istruzione \texttt{arrayload from array of int} si
 crea con l'espressione Java
 %
 \begin{verbatim}
-  new ARRAYLOAD(Type.INT)
+  new ARRAYLOAD(IntType.INSTANCE)
 \end{verbatim}
 %
 La classe \texttt{bytecode/BytecodeList.java} implementa poi una lista
