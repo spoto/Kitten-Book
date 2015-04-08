@@ -1,0 +1,178 @@
+\chapter{Generazione del Java Bytecode}\label{chap:java-bytecode}
+%
+\vspace*{-2ex}
+\begin{center}
+\includegraphics[width=6.5cm]{cat9.jpg}
+\end{center}
+%\vspace*{-2ex}
+
+Il Kitten bytecode \e molto semplice, poich\'e non \e necessario
+preoccuparsi dell'esistenza di forme ottimizzate della stessa istruzione,
+o dell'assenza di bytecode per alcune operazioni su alcuni tipi.
+\E quindi ideale per la generazione del codice intermedio e la
+sua eventuale ottimizzazione. A partire dal bytecode Kitten, \e poi possibile
+generare del codice eseguibile. Questo codice eseguibile
+potrebbe essere specifico di una data architettura su cui si intende
+eseguire il programma, come ad esempio il linguaggio macchina
+x86, oppure essere indipendente dalla macchina, basato quindi su
+un bytecode astratto eseguibile su una qualche macchina virtuale.
+In questo capitolo seguiremo la seconda strada ed esamineremo
+la generazione del codice eseguibile in Java bytecode.
+
+Il Java bytecode somiglia al Kitten bytecode, nel senso che le sue
+istruzioni operano su uno stack degli operandi, su delle variabili
+locali e su uno stack di attivazione. Anche le singole istruzioni e
+la tecnica di chiamata e ritorno da metodo sono molto simili a quelle
+del Kitten bytecode. \E per\`o un linguaggio meno esplicitamente
+tipato, nel senso che, per ridurre l'occupazione in memoria,
+molte istruzioni non riportano esplicitamente i
+tipi su cui operano, quando questi tipi possono essere inferiti a partire
+dal programma.
+Il Java bytecode \e specificato in forma binaria all'interno di file
+Java eseguibili detti \emph{file classe}.
+
+La generazione del Java bytecode all'interno dei file classe \e tecnicamente
+complessa per vari motivi:
+
+\begin{enumerate}
+\item a una singola istruzione del Kitten bytecode potrebbero corrispondere
+      \piu istruzioni alternative del Java bytecode, variamente ottimizzate.
+      Idealmente, occorre scegliere l'alternativa migliore in termini di
+      occupazione in byte e di tempo di esecuzione;
+\item ad alcune istruzioni del Kitten bytecode potrebbe non corrispondere
+      una singola istruzione del Java bytecode, ma una sequenza di \piu
+      istruzioni;
+\item la struttura a blocchi del Kitten bytecode deve essere linearizzata in
+      una sequenza di istruzioni, introducendo numeri di linea e,
+      ove necessario, delle istruzioni di salto esplicito;
+\item la sequenza di istruzioni deve infine essere trasformata in codice
+      binario, facendo corrispondere a ogni istruzioni un byte, seguito da
+      una qualche codifica dei suoi operandi, sempre in termini di byte;
+\item i salti all'interno del Java bytecode devono venire specificati come offset
+      di numeri di linea dal punto di partenza a quello di arrivo. Per
+      salti particolarmente lunghi, per cui l'offset va in overflow,
+      occorre creare dei \emph{punti di appoggio} intermedi;
+\item le costanti del linguaggio (numeriche o stringhe) devono essere
+      inserite all'interno di una tavola delle costanti del file classe.
+      Nel caso in cui occorressero \piu volte nel codice, conviene
+      riciclare la stessa costante piuttosto che inserirne due identiche
+      nella tavola delle costanti.
+\end{enumerate}
+%
+Tutti questi problemi giustificano l'utilizzo di una libreria di
+supporto per la creazione e manipolazione del Java bytecode. Abbiamo
+quindi scelto di utilizzare a tale scopo
+la libreria BCEL (ByteCode Engineering Library).
+
+\section{La generazione del Java bytecode per i bytecode Kitten sequenziali}
+
+Abbiamo detto che a una singola istruzione del Kitten bytecode potrebbero
+corrisponderne \piu di una del Java bytecode. Per questo motivo, il metodo
+di traduzione da Kitten bytecode in Java bytecode per i bytecode sequenziali
+\e definito dentro \texttt{bytecode/NonBranchingBytecode.java} come
+%
+\begin{verbatim}
+  public abstract InstructionList generateJavaBytecode
+                                   (JavaClassGenerator classGen);
+\end{verbatim}
+%
+Il tipo di ritorno di tale metodo
+\e \texttt{InstructionList}, \cioe una classe di BCEL che rappresenta
+una sequenza (eventualmente vuota) di bytecode Java.
+L'oggetto passato come argomento \e il generatore di Java bytecode, che vedremo
+alla fine del capitolo. Per adesso, ci interessa solo sapere che al
+suo interno esiste una \emph{fattoria di istruzioni}, \cioe una classe
+di BCEL che aiuta il programmatore a generare Java bytecode. Ad esempio,
+tale fattoria ci aiuter\`a nella scelta dell'istruzione \piu ottimizzata
+quando saremo davanti a \piu alternative e inserir\`a automaticamente
+delle costanti nella tavola delle costanti, per quei bytecode Java che
+utilizzano delle costanti. Tale fattoria pu\`o essere ottenuta invocando
+\texttt{classGen.getFactory()}.
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+Kitten & Java \\\hline\hline
+$\mathtt{nop}$ & $\mathtt{nop}$ \\\hline
+$\mathtt{pop}$ $t$ & $\mathtt{pop}$ \\\hline
+$\mathtt{dup}$ $t$ & $\mathtt{dup}$ \\\hline
+$\mathtt{const}\ \mathit{stringa}$ & $\mathtt{ldc}\ \mathit{stringa}$\\\hline
+$\mathtt{const}\ \mathit{nil}$ & $\mathtt{aconst\_null}$\\\hline
+$\mathtt{const}\ \mathit{float\_number}$ & $\mathtt{fconst}\ \mathit{float\_number}$\\\hline
+$\mathtt{const -1,0,1,2,3}$ & $\mathtt{iconst -1,0,1,2,3}$\\\hline
+$\mathtt{const}\ \mathit{8\_bits\_integer}$ & $\mathtt{bipush}\ \mathit{8\_bits\_integer}$\\\hline
+$\mathtt{const}\ \mathit{16\_bits\_integer}$ & $\mathtt{sipush}\ \mathit{16\_bits\_integer}$\\\hline
+$\mathtt{const}\ \mathit{32\_bits\_integer}$ & $\mathtt{ldc}\ \mathit{32\_bits\_integer}$\\\hline
+$\mathtt{const}\ \mathit{true}$ & $\mathtt{iconst\ 1}$\\\hline
+$\mathtt{const}\ \mathit{false}$ & $\mathtt{iconst\ 0}$\\\hline
+$\mathtt{load\ \mathit{l}\ of\ type\ int,boolean}$ & $\mathtt{iload\ \mathit{l}}$\\\hline
+$\mathtt{load\ \mathit{l}\ of\ type\ float}$ & $\mathtt{fload\ \mathit{l}}$\\\hline
+$\mathtt{load\ \mathit{l}\ of\ type\ nil,\mathit{reference}}$ & $\mathtt{aload\ \mathit{l}}$\\\hline
+$\mathtt{store\ \mathit{l}\ of\ type\ int,boolean}$ & $\mathtt{istore\ \mathit{l}}$\\\hline
+$\mathtt{store\ \mathit{l}\ of\ type\ float}$ & $\mathtt{fstore\ \mathit{l}}$\\\hline
+$\mathtt{store\ \mathit{l}\ of\ type\ nil,\mathit{reference}}$ & $\mathtt{astore\ \mathit{l}}$\\\hline
+$\mathtt{neg\ int}$ & $\mathtt{ineg}$\\\hline
+$\mathtt{neg\ float}$ & $\mathtt{fneg}$\\\hline
+$\mathtt{neg\ boolean}$ & $\begin{array}{rl}
+                            & \mathtt{ifeq}\ \mathit{after} \\
+                            & \mathtt{iconst\ 0} \\
+                            & \mathtt{goto}\ \mathit{end}\\
+                            \mathit{after:} & \mathtt{iconst\ 1}\\
+                            \mathit{end:} & \mathtt{nop}
+                           \end{array}$\\\hline
+$\mathtt{add\ int}$ & $\mathtt{iadd}$\\\hline
+$\mathtt{add\ float}$ & $\mathtt{fadd}$\\\hline
+$\mathtt{add/sub/div/mul\ int}$ & $\mathtt{iadd/isub/idiv/imul}$\\\hline
+$\mathtt{add/sub/div/mul\ float}$ & $\mathtt{fadd/fsub/fdiv/fmul}$\\\hline
+\end{tabular}
+\end{center}
+\caption{La traduzione da bytecode Kitten a bytecode Java (1/3).}
+  \label{fig:kitten_into_java_1}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+Kitten & Java \\\hline\hline
+$\mathtt{eq\ int}$ & $\begin{array}{rl}
+                            & \mathtt{if\_icmpeq}\ \mathit{after} \\
+                            & \mathtt{iconst\ 0} \\
+                            & \mathtt{goto}\ \mathit{end}\\
+                            \mathit{after:} & \mathtt{iconst\ 1}\\
+                            \mathit{end:} & \mathtt{nop}
+                           \end{array}$\\\hline
+$\mathtt{eq\ float}$ & $\begin{array}{rl}
+                            & \mathtt{fcmpl} \\
+                            & \mathtt{ifeq}\ \mathit{after} \\
+                            & \mathtt{iconst\ 0} \\
+                            & \mathtt{goto}\ \mathit{end}\\
+                            \mathit{after:} & \mathtt{iconst\ 1}\\
+                            \mathit{end:} & \mathtt{nop}
+                           \end{array}$\\\hline
+$\mathtt{eq\ \mathit{reference}}$ & $\begin{array}{rl}
+                            & \mathtt{if\_acmpeq}\ \mathit{after} \\
+                            & \mathtt{iconst\ 0} \\
+                            & \mathtt{goto}\ \mathit{end}\\
+                            \mathit{after:} & \mathtt{iconst\ 1}\\
+                            \mathit{end:} & \mathtt{nop}
+                           \end{array}$\\\hline
+$\mathtt{new\ }\mathit{\kappa}$ & $\mathtt{new\ }\mathit{\kappa}$ \\\hline
+$\mathtt{newstring}\ \mathit{string}$ & $\begin{array}{rl}
+                            & \mathtt{new\ runTime.String} \\
+                            & \mathtt{dup} \\
+                            & \mathtt{ldc}\ \mathit{string}\\
+                            & \mathtt{invokespecial\ runTime.String.\langle init\rangle():void}
+                           \end{array}$\\\hline
+$\mathtt{newarray\ of\ \mathtt{int/float/boolean}}$ & $\mathtt{newarray\ of\ \mathtt{int/float/boolean}}$ \\\hline
+$\mathtt{newarray\ of\ \mathit{reference}}$ & $\mathtt{anewarray\ of\ \mathit{reference}}$ \\\hline
+$\mathtt{cast\ int\ into\ float}$ & $\mathtt{i2f}$ \\\hline
+$\mathtt{cast\ float\ into\ int}$ & $\mathtt{f2i}$ \\\hline
+$\mathtt{cast}\ \mathit{reference}_1\ \mathtt{into}\ \mathit{reference}_2$ & $\mathtt{checkcast}\ \mathit{reference}_2$\\\hline
+\end{tabular}
+\end{center}
+\caption{La traduzione da bytecode Kitten a bytecode Java (2/3).}
+  \label{fig:kitten_into_java_2}
+\end{figure}
+
+Esaminiamo alcuni esempi di ridefinizione di tale metodo all'interno delle
+sottoclassi dei bytecode Kitten.
