@@ -92,14 +92,14 @@ utilizzano delle costanti. Tale fattoria pu\`o essere ottenuta invocando
 \begin{figure}
 \begin{center}
 \begin{tabular}{l|l}
-Kitten & Java \\\hline\hline
+\multicolumn{1}{c}{Kitten} &
+\multicolumn{1}{c}{Java} \\\hline\hline
 $\mathtt{nop}$ & $\mathtt{nop}$ \\\hline
 $\mathtt{pop}$ $t$ & $\mathtt{pop}$ \\\hline
 $\mathtt{dup}$ $t$ & $\mathtt{dup}$ \\\hline
-$\mathtt{const}\ \mathit{stringa}$ & $\mathtt{ldc}\ \mathit{stringa}$\\\hline
 $\mathtt{const}\ \mathit{nil}$ & $\mathtt{aconst\_null}$\\\hline
 $\mathtt{const}\ \mathit{float\_number}$ & $\mathtt{fconst}\ \mathit{float\_number}$\\\hline
-$\mathtt{const -1,0,1,2,3}$ & $\mathtt{iconst -1,0,1,2,3}$\\\hline
+$\mathtt{const -\!\!1,0,1,2,3}$ & $\mathtt{iconst -\!\!1,0,1,2,3}$\\\hline
 $\mathtt{const}\ \mathit{8\_bits\_integer}$ & $\mathtt{bipush}\ \mathit{8\_bits\_integer}$\\\hline
 $\mathtt{const}\ \mathit{16\_bits\_integer}$ & $\mathtt{sipush}\ \mathit{16\_bits\_integer}$\\\hline
 $\mathtt{const}\ \mathit{32\_bits\_integer}$ & $\mathtt{ldc}\ \mathit{32\_bits\_integer}$\\\hline
@@ -133,7 +133,8 @@ $\mathtt{add/sub/div/mul\ float}$ & $\mathtt{fadd/fsub/fdiv/fmul}$\\\hline
 \begin{figure}
 \begin{center}
 \begin{tabular}{l|l}
-Kitten & Java \\\hline\hline
+\multicolumn{1}{c}{Kitten} &
+\multicolumn{1}{c}{Java} \\\hline\hline
 $\mathtt{eq\ int}$ & $\begin{array}{rl}
                             & \mathtt{if\_icmpeq}\ \mathit{after} \\
                             & \mathtt{iconst\ 0} \\
@@ -163,16 +164,196 @@ $\mathtt{newstring}\ \mathit{string}$ & $\begin{array}{rl}
                             & \mathtt{ldc}\ \mathit{string}\\
                             & \mathtt{invokespecial\ runTime.String.\langle init\rangle():void}
                            \end{array}$\\\hline
-$\mathtt{newarray\ of\ \mathtt{int/float/boolean}}$ & $\mathtt{newarray\ of\ \mathtt{int/float/boolean}}$ \\\hline
+$\mathtt{newarray\ of\ \mathtt{int/float/boolean}}$ & $\mathtt{newarray\ \mathtt{int/float/boolean}}$ \\\hline
 $\mathtt{newarray\ of\ \mathit{reference}}$ & $\mathtt{anewarray\ of\ \mathit{reference}}$ \\\hline
 $\mathtt{cast\ int\ into\ float}$ & $\mathtt{i2f}$ \\\hline
 $\mathtt{cast\ float\ into\ int}$ & $\mathtt{f2i}$ \\\hline
 $\mathtt{cast}\ \mathit{reference}_1\ \mathtt{into}\ \mathit{reference}_2$ & $\mathtt{checkcast}\ \mathit{reference}_2$\\\hline
+$\mathtt{getfield\ }\kappa.f$ & $\mathtt{getfield\ }\kappa.f$ \\\hline
+$\mathtt{putfield\ }\kappa.f$ & $\mathtt{putfield\ }\kappa.f$ \\\hline
+$\mathtt{arrayload\ from\ array\ of\ int}$ & $\mathtt{iaload}$ \\\hline
+$\mathtt{arrayload\ from\ array\ of\ float}$ & $\mathtt{faload}$ \\\hline
+$\mathtt{arrayload\ from\ array\ of\ boolean}$ & $\mathtt{baload}$ \\\hline
+$\mathtt{arrayload\ from\ array\ of\ }\mathit{reference}$ & $\mathtt{aaload}$ \\\hline
+$\mathtt{arraystore\ into\ array\ of\ int}$ & $\mathtt{iastore}$ \\\hline
+$\mathtt{arraystore\ into\ array\ of\ float}$ & $\mathtt{fastore}$ \\\hline
+$\mathtt{arraystore\ into\ array\ of\ boolean}$ & $\mathtt{bastore}$ \\\hline
+$\mathtt{arraystore\ into\ array\ of\ }\mathit{reference}$ & $\mathtt{aastore}$ \\\hline
 \end{tabular}
 \end{center}
 \caption{La traduzione da bytecode Kitten a bytecode Java (2/3).}
   \label{fig:kitten_into_java_2}
 \end{figure}
 
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+\multicolumn{1}{c}{Kitten} &
+\multicolumn{1}{c}{Java} \\\hline\hline
+$\mathtt{constructorcall\ \kappa(}$$\vec{t}$$\mathtt{):void}$ & $\mathtt{invokespecial\ \kappa.\langle init\rangle(}$$\vec{t}$$\mathtt{):void}$ \\\hline
+$\mathtt{virtualcall\ \kappa.\mathit{m}(}$$\vec{t}$$\mathtt{):\mathit{t'}}$ & $\mathtt{invokevirtual\ \kappa.\mathit{m}(}$$\vec{t}$$\mathtt{):\mathit{t'}}$ \\\hline
+$\mathtt{return\ int}$ & $\mathtt{ireturn}$ \\\hline
+$\mathtt{return\ float}$ & $\mathtt{freturn}$ \\\hline
+$\mathtt{return\ boolean}$ & $\mathtt{ireturn}$ \\\hline
+$\mathtt{return\ void}$ & $\mathtt{return}$ \\\hline
+\end{tabular}
+\end{center}
+\caption{La traduzione da bytecode Kitten a bytecode Java (3/3).}
+  \label{fig:kitten_into_java_3}
+\end{figure}
+
 Esaminiamo alcuni esempi di ridefinizione di tale metodo all'interno delle
-sottoclassi dei bytecode Kitten.
+sottoclassi dei bytecode Kitten. Le Figure~\ref{fig:kitten_into_java_1},
+\ref{fig:kitten_into_java_2} and~\ref{fig:kitten_into_java_3} riportano
+la lista dei bytecode Kitten e la loro traduzione in bytecode Java. Il primo
+esempio \e quello del bytecode Kitten $\mathtt{nop}$, a cui corrisponde un
+identico Java bytecode. L'implementazione in \texttt{bytecode/NOP.java} \e quindi semplicissima:
+%
+\begin{verbatim}
+  public InstructionList generateJavaBytecode
+      (JavaClassGenerator classGen) {
+    return new InstructionList(InstructionFactory.NOP);
+  }
+\end{verbatim}
+%
+ritorniamo \cioe una lista di una singola istruzione, una $\mathtt{nop}$. Usiamo qui un
+campo statico
+della fattoria BCEL che ci permette di fare riferimento a un'istruzione gi\`a creata, al posto
+di costruirla ogni volta tramite un costruttore.
+
+Nel caso del bytecode Kitten $\mathtt{pop}\ \mathit{t}$, la traduzione in Java bytecode
+semplicemente non riporta esplicitamente il tipo del valore duplicato, dal momento che sar\`a
+inferibile. All'interno di \texttt{bytecode/POP.java} scriviamo:
+%
+\begin{verbatim}
+  public InstructionList generateJavaBytecode
+      (JavaClassGenerator classGen) {
+    // non usiamo il campo type
+    return new InstructionList(InstructionFactory.POP);
+  }
+\end{verbatim}
+%
+La traduzione del bytecode Kitten $\mathtt{const}\ \mathit{constant}$ \e \piu complessa,
+dal momento che ci sono \piu alternative in Java bytecode, che occupano una quantit\`a
+variabile di byte. Conseguentemente \e meglio scegliere la versione \piu ottimizzata fra le alternative
+disponibili per la specifica $\mathit{constant}$,
+come mostrato nella Figura~\ref{fig:kitten_into_java_1}. Dentro
+\texttt{bytecode/CONST.java} scriviamo quindi:
+%
+\begin{verbatim}
+  public InstructionList generateJavaBytecode
+      (JavaClassGenerator classGen) {
+    if (constant == null)
+      return new InstructionList
+                     (new org.apache.bcel.generic.ACONST_NULL());
+    else
+      return new InstructionList
+                     (classGen.getFactory().createConstant(constant));
+  }
+\end{verbatim}
+%
+Con la prima alternativa dell'\texttt{if} gestiamo il caso in cui la costante sia \texttt{nil}.
+Con la seconda gestiamo tutti gli altri casi, usando la fattoria BCEL per scegliere il bytecode
+\piu ottimizzato per la costante specifica per cui stiamo compilando. Senza l'aiuto di questa fattoria,
+avremmo dovuto considerare noi tutti i casi e il relativo bytecode Java \piu ottimizzato per
+ciascun caso.
+
+Un altro esempio di utilizzo della fattoria \e per il bytecode Kitten $\mathtt{load}$. Il
+corrispondente bytecode Java riporta il numero della variabile locale letta, ma non il suo tipo,
+\poiche \e comunque inferibile (Figura~\ref{fig:kitten_into_java_1}). Notiamo qui che
+il tipo \texttt{boolean} \e implementato tramite interi (0 significa falso e ogni altro valore vero).
+Dentro \texttt{bytecode/LOAD.java} scriviamo:
+%
+\begin{verbatim}
+  public InstructionList generateJavaBytecode
+      (JavaClassGenerator classGen) {
+    // non usiamo il campo type
+    return new InstructionList
+                 (InstructionFactory.createLoad(type.toBCEL(), varNum));
+  }
+\end{verbatim}
+%
+dove il tipo Kitten viene tradotto nel corrispondente tipo Java bytecode e quindi pasato
+alla fattoria per scegliere il bytecode Java corrispondente a quel tipo.
+
+Per adesso a ogni bytecode Kitten \e sempre corrisposta una lista di bytecode Java di lunghezza unitaria.
+Nel caso del bytecode Kitten $\mathtt{neg\ boolean}$, la sua traduzione in Java bytecode
+\e fatta invece da una lista di 5 istruzioni (Figura~\ref{fig:kitten_into_java_1}). Dentro
+\texttt{bytecode/NEG.java} scriviamo:
+%
+\begin{verbatim}
+  public InstructionList generateJavaBytecode
+      (JavaClassGenerator classGen) {
+    InstructionList il = new InstructionList();
+
+    if (type == BooleanType.INSTANCE) {
+      InstructionHandle end = il.insert(InstructionFactory.NOP);
+      InstructionHandle after = il.insert(InstructionFactory.ICONST_1);
+      il.insert(new org.apache.bcel.generic.GOTO(end));
+      il.insert(InstructionFactory.ICONST_0);
+      il.insert(new org.apache.bcel.generic.IFEQ(after));
+    }
+    else
+      ((NumericalType) type).neg(il);
+    
+    return il;
+   }
+\end{verbatim}
+%
+Il caso non booleano \e gestito da un metodo \texttt{neg(il)} che aggiunge alla
+lista di istruzioni \texttt{il} il bytecode di negazione specifico per quel tipo.
+Nel caso della negazione booleana, non esiste un corrispondente bytecode Java di negazione.
+Viene costruita invece una lista di 5 bytecode Java che
+controllano se il valore in cima allo stack \e falso (\cioe 0) e in tal caso
+lo sostituiscono con il valore 1 (\cioe vero); se il valore \e invece vero (diverso da 0)
+lo sostituiscono con il valore 0 (\cioe falso). Il metodo BCEL \texttt{insert()}
+permette di inserire un bytecode Java all'inizio di una lista di istruzioni.
+Tale metodo ritorna un riferimento (\texttt{InstructionHandle}) che \e utile nei casi
+in cui si debba costruire un salto a tale punto del codice. Si noti che il riferimento deve
+essere ottenuto prima di costruire il salto, per cui il codice viene tipicamente
+costruito dall'ultima istruzione verso la prima, come in questo esempio
+per $\mathtt{neg\ boolean}$.
+
+Passando alla Figura~\ref{fig:kitten_into_java_2}, \e interessante considerare il caso
+della creazione di un oggetto per una costante di tipo stringa. Le stringhe
+in Kitten sono implementate dalla classe di supporto
+\texttt{runTime/String.java}, per cui
+dobbiamo generare del codice che crea un'istanza di tale classe e la inizializza chiamando il
+suo costruttore. Dentro \texttt{bytecode/NEWSTRING.java} scriviamo:
+%
+\begin{verbatim}
+  public InstructionList generateJavaBytecode
+      (JavaClassGenerator classGen) {
+
+    InstructionFactory factory = classGen.getFactory();
+    InstructionList il = new InstructionList();
+    String kittenStringName = runTime.String.class.getName();
+
+    il.insert(factory.createInvoke
+      (kittenStringName, // class name of the method
+      Constants.CONSTRUCTOR_NAME, // name of the method
+      org.apache.bcel.generic.Type.VOID, // return type
+      new org.apache.bcel.generic.Type[] // parameters types
+        { org.apache.bcel.generic.Type.getType("Ljava/lang/String;") },
+      Constants.INVOKESPECIAL)); // invokespecial
+
+    il.insert(factory.createConstant(value));
+    il.insert(InstructionFactory.DUP);
+    il.insert(factory.createNew(kittenStringName));
+
+    return il;
+   }
+\end{verbatim}
+%
+Tale codice usa la fattoria BCEL per creare il Java bytecode $\mathtt{new}$ che
+crea l'oggetto (in modo da arricchiere la tabella delle costanti),
+per creare il bytecode che carica sullo stack il valore della stringa e
+per creare il bytecode di invocazione del costruttore. Qui usiamo
+il bytecode Java \texttt{invokespecial}, che \e obbligatorio per
+invocare i costruttori\footnote{Tale bytecode effettua la ricerca del metodo
+a partire dalla classe specificata staticamente nel codice ed \e quindi
+ideale anche per la compilazione delle chiamate a un metodo della superclasse,
+come con \texttt{super.m(\ldots)} in Java. Nel caso dei costruttori, il
+bytecode $\mathtt{invokespecial}$ fallisce se il costruttore non si trova nella classe
+indicata, senza effettuare la ricerca nella superclasse, \poiche in Java i
+costruttori non si ereditano.}.
