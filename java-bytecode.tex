@@ -165,7 +165,7 @@ $\mathtt{newstring}\ \mathit{string}$ & $\begin{array}{rl}
                             & \mathtt{invokespecial\ runTime.String.\langle init\rangle():void}
                            \end{array}$\\\hline
 $\mathtt{newarray\ of\ \mathtt{int/float/boolean}}$ & $\mathtt{newarray\ \mathtt{int/float/boolean}}$ \\\hline
-$\mathtt{newarray\ of\ \mathit{reference}}$ & $\mathtt{anewarray\ of\ \mathit{reference}}$ \\\hline
+$\mathtt{newarray\ of\ \mathit{reference}}$ & $\mathtt{anewarray\ \mathit{reference}}$ \\\hline
 $\mathtt{cast\ int\ into\ float}$ & $\mathtt{i2f}$ \\\hline
 $\mathtt{cast\ float\ into\ int}$ & $\mathtt{f2i}$ \\\hline
 $\mathtt{cast}\ \mathit{reference}_1\ \mathtt{into}\ \mathit{reference}_2$ & $\mathtt{checkcast}\ \mathit{reference}_2$\\\hline
@@ -195,6 +195,7 @@ $\mathtt{virtualcall\ \kappa.\mathit{m}(}$$\vec{t}$$\mathtt{):\mathit{t'}}$ & $\
 $\mathtt{return\ int}$ & $\mathtt{ireturn}$ \\\hline
 $\mathtt{return\ float}$ & $\mathtt{freturn}$ \\\hline
 $\mathtt{return\ boolean}$ & $\mathtt{ireturn}$ \\\hline
+$\mathtt{return}\ \mathit{reference}$ & $\mathtt{areturn}$ \\\hline
 $\mathtt{return\ void}$ & $\mathtt{return}$ \\\hline
 \end{tabular}
 \end{center}
@@ -315,11 +316,25 @@ costruito dall'ultima istruzione verso la prima, come in questo esempio
 per $\mathtt{neg\ boolean}$.
 
 Passando alla Figura~\ref{fig:kitten_into_java_2}, \e interessante considerare il caso
-della creazione di un oggetto per una costante di tipo stringa. Le stringhe
-in Kitten sono implementate dalla classe di supporto
+della generazione di un booleano a partire dal confronto fra due valori. Non esistendo
+Java bytecode corrispondenti, occorre costruire del codice che confronta i due valori
+in cima allo stack e lascia sullo stack il valore intero 0 (\cioe falso) se il
+confronto \e fallito e il valore intero 1 (\cioe vero) se il confronto ha avuto successo.
+Questo caso \e simile a quello del $\mathtt{neg\ boolean}$ visto prima, ma si complica
+ulteriormente per l'assenza di Java bytecode per il test di uguaglianza fra
+numeri in virgola mobile (che ipoteticamente avrebbe dovuto chiamarsi $\mathtt{if\_fcmpeq}$).
+Al suo posto, la compilazione di $\mathtt{eq\ float}$ utilizza il bytecode Java
+$\mathtt{fcmpl}$, che consuma i due \texttt{float} $f_1$ ed $f_2$ in cima allo stack
+($f_2$ sta sopra $f_1$) e li sostituisce con $-1$ se $f_1$ \e il minore,
+con $0$ se sono uguali e con $1$ se $f_2$ \e il minore. Dopo questo controllo,
+basta quindi usare il bytecode Java $\mathtt{ifeq}$ per controllare se la cima dello
+stack \e $0$, \cioe se $f_1$ era uguale a $f_2$.
+
+Per la creazione di un oggetto per un letterale di tipo stringa, occorre tenere
+conto che le stringhe in Kitten sono implementate dalla classe di supporto
 \texttt{runTime/String.java}, per cui
-dobbiamo generare del codice che crea un'istanza di tale classe e la inizializza chiamando il
-suo costruttore. Dentro \texttt{bytecode/NEWSTRING.java} scriviamo:
+dobbiamo generare del codice che crea un'istanza di tale classe e la inizializza chiamandone
+il costruttore. Dentro \texttt{bytecode/NEWSTRING.java} scriviamo:
 %
 \begin{verbatim}
   public InstructionList generateJavaBytecode
@@ -357,3 +372,99 @@ come con \texttt{super.m(\ldots)} in Java. Nel caso dei costruttori, il
 bytecode $\mathtt{invokespecial}$ fallisce se il costruttore non si trova nella classe
 indicata, senza effettuare la ricerca nella superclasse, \poiche in Java i
 costruttori non si ereditano.}.
+
+La traduzione del bytecode Kitten $\mathtt{cast}$ d\`a origine a un Java bytecode di
+conversione di tipo oppure a un vero e proprio bytecode di cast controllato ($\mathtt{checkcast}$),
+per i tipi riferimento. La lettura e scrittura sugli array genera un Java bytecode
+specifico per ogni tipo di elemento degli array, ma per i tipi riferimento astrae dal
+tipo degli elementi, \poiche esso \e inferibile dal contesto. Si noti l'esistenza di bytecode
+specifici di creazione e accesso ad array di booleani, al fine di lasciare all'implementazione
+della Java Virtual Machine la possibilit\`a di ottimizzare l'occupazione in memoria
+degli array di booleani, riservando potenzialmente un bit per ciascun elemento dell'array
+(ogni Java Virtual Machine pu\`o decidere se ottimizzare o meno questo caso).
+
+La Figura~\ref{fig:kitten_into_java_3} riporta la traduzione dei bytecode Kitten per
+l'invocazione e il ritorno da metodo e costruttore. La chiamata a un costruttore
+viene tradotta nel bytecode Java $\mathtt{invokespecial}$ mentre la chiamata a
+un metodo viene tradotta nel bytecode Java $\mathtt{invokevirtual}$, che esegue la
+ricerca dell'implementazione del metodo a partire dal tipo dinamico del ricevitore
+presente sullo stack. Il bytecode Kitten $\mathtt{return}\ \mathit{t}$ viene tradotto
+in bytecode Java diversi a seconda del tipo $\mathit{t}$.
+
+\section{La generazione del Java bytecode per i bytecode Kitten di diramazione}
+
+I bytecode Kitten di diramazione vengono tradotti in salti all'interno del Java bytecode
+corrispondente. Conseguentemente, la loro traduzione richiede di conoscere il punto
+di codice \textit{yes} a cui bisogna saltare se il test della diramazione \e vero.
+La Figura~\ref{fig:kitten_into_java_condition} riporta la traduzione di ciascun
+bytecode Kitten di diramazione, supponendo che quando la condizione \e vera il controllo
+passi al punto \textit{yes}. A partire da tale tabella e per ogni bytecode di diramazione
+$b$, \e quindi possibile generare del codice che controlla il test espresso da $b$,
+va al punto \textit{yes} se tale test \e vero e al punto \textit{no} se invece \e falso,
+usando il bytecode Java $\mathtt{goto}$:
+%
+\[\begin{array}{l}
+  \mathit{codice\ per\ b\ che\ va\ a\ yes\ se\ soddisfatto,\ come\ in\ Figura~\ref{fig:kitten_into_java_condition}} \\
+  \mathtt{goto}\ \mathit{no}
+\end{array}\]
+%
+L'implementazione di tale generazione di codice Java bytecode \e realizzata
+dentro la classe \texttt{bytecode/BranchingBytecode.java}:
+%
+\begin{verbatim}
+  public final InstructionList generateJavaBytecode
+      (JavaClassGenerator classGen,
+       InstructionHandle yes, InstructionHandle no) {
+
+    InstructionList il = new InstructionList();
+
+    // builds the instructions that go to yes if the test is true
+    generateJavaBytecodeAux(il, classGen, yes);
+
+    il.append(new org.apache.bcel.generic.GOTO(no));
+    
+    return il;
+  }
+
+  protected abstract void generateJavaBytecodeAux
+    (InstructionList il, JavaClassGenerator classGen,
+     InstructionHandle yes);
+\end{verbatim}
+%
+Si noti come le etichette \textit{yes} e \textit{no} siano realizzate tramite
+\texttt{InstructionHandle} BCEL, \cioe riferimenti a punti di codice. Il metodo
+\texttt{generateJavaBytecode()} \e \texttt{final} e delega al metodo astratto ausiliario
+\texttt{generateJavaBytecodeAux()}
+la generazione del codice specifico a ciascun bytecode di diramazione. Quest'ultimo
+metodo implementa la traduzione in Figura~\ref{fig:kitten_into_java_condition},
+in ciascuna sottoclasse di \texttt{bytecode/BranchingBytecode.java}.
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+\multicolumn{1}{c}{Kitten} &
+\multicolumn{1}{c}{Java} \\\hline\hline
+$\mathtt{if\_true}$ & $\mathtt{ifne}\ \mathit{yes}$ \\\hline
+$\mathtt{if\_false}$ & $\mathtt{ifeq}\ \mathit{yes}$ \\\hline
+$\mathtt{if\_cmplt\ int}$ & $\mathtt{if\_icmplt}\ \mathit{yes}$ \\\hline
+$\mathtt{if\_cmplt\ float}$ & $\begin{array}{rl}
+                            & \mathtt{fcmpl} \\
+                            & \mathtt{iflt}\ \mathit{yes}
+                           \end{array}$\\\hline
+$\mathtt{if\_cmpeq\ int}$ & $\mathtt{if\_icmpeq}\ \mathit{yes}$ \\\hline
+$\mathtt{if\_cmpeq\ float}$ & $\begin{array}{rl}
+                            & \mathtt{fcmpl} \\
+                            & \mathtt{ifeq}\ \mathit{yes}
+                           \end{array}$\\\hline
+$\mathtt{if\_cmpeq}\ \mathit{reference}$ & $\mathtt{if\_acmpeq}\ \mathit{yes}$ \\\hline
+\end{tabular}
+\end{center}
+\caption{La traduzione da bytecode Kitten di diramazione a bytecode Java che salta
+al punto \textit{yes} se la condizione di diramazione \e soddisfatta.
+La traduzione di $\mathtt{if\_cmpgt}$, $\mathtt{if\_cmple}$ e $\mathtt{if\_cmpge}$
+\e simile a quella di $\mathtt{if\_cmplt}$. La traduzione di
+$\mathtt{if\_cmpne}$ \e simile a quella di $\mathtt{if\_cmpeq}$.}
+  \label{fig:kitten_into_java_condition}
+\end{figure}
+
+\section{La generazione del Java bytecode per un grafo di blocchi di Kitten bytecode}
