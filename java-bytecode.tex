@@ -65,6 +65,7 @@ quindi scelto di utilizzare a tale scopo
 la libreria BCEL (ByteCode Engineering Library).
 
 \section{La generazione del Java bytecode per i bytecode Kitten sequenziali}
+  \label{sec:java_bytecode_sequenziale}
 
 Abbiamo detto che a una singola istruzione del Kitten bytecode potrebbero
 corrisponderne \piu di una del Java bytecode. Per questo motivo, il metodo
@@ -124,6 +125,8 @@ $\mathtt{add\ int}$ & $\mathtt{iadd}$\\\hline
 $\mathtt{add\ float}$ & $\mathtt{fadd}$\\\hline
 $\mathtt{add/sub/div/mul\ int}$ & $\mathtt{iadd/isub/idiv/imul}$\\\hline
 $\mathtt{add/sub/div/mul\ float}$ & $\mathtt{fadd/fsub/fdiv/fmul}$\\\hline
+$\mathtt{or}$ & $\mathtt{ior}$\\\hline
+$\mathtt{and}$ & $\mathtt{iand}$\\\hline
 \end{tabular}
 \end{center}
 \caption{La traduzione da bytecode Kitten a bytecode Java (1/3).}
@@ -392,6 +395,7 @@ presente sullo stack. Il bytecode Kitten $\mathtt{return}\ \mathit{t}$ viene tra
 in bytecode Java diversi a seconda del tipo $\mathit{t}$.
 
 \section{La generazione del Java bytecode per i bytecode Kitten di diramazione}
+  \label{sec:java_bytecode_diramazione}
 
 I bytecode Kitten di diramazione vengono tradotti in salti all'interno del Java bytecode
 corrispondente. Conseguentemente, la loro traduzione richiede di conoscere il punto
@@ -468,3 +472,323 @@ $\mathtt{if\_cmpne}$ \e simile a quella di $\mathtt{if\_cmpeq}$.}
 \end{figure}
 
 \section{La generazione del Java bytecode per un grafo di blocchi di Kitten bytecode}
+  \label{sec:kitten_into_java_block}
+
+Nelle Sezioni~\ref{sec:java_bytecode_sequenziale} e~\ref{sec:java_bytecode_diramazione}
+abbiamo visto come ogni singolo bytecode Kitten dia origina a una sequenza di uno o
+\piu bytecode Java. In questa sezione mostriamo come sia possibile generare una
+sequenza di bytecode Java a partire da un grafo di istruzioni in bytecode Kitten,
+come per esempio quello della Figura~\ref{fig:fib_bytecode}.
+
+La prima osservazione \e che un simile grafo contiene dei blocchi all'interno dei quali
+ci sono bytecode sequenziali, tranne per il primo bytecode di ciascun blocco, che
+potrebbe essere un bytecode di diramazione, accoppiato a un bytecode di diramazione
+opposto nel blocco fratello. Ne consegue che la traduzione del codice Kitten interno
+a ciascun blocco si pu\`o effettuare concatenando semplicemente la traduzione
+in Java bytecode di ciascun bytecode sequenziale al suo interno. Questo \e quello
+che accade dentro una sequenza di bytecode, \cioe dentro \texttt{bytecode/BytecodeList.java}:
+
+{\small\begin{verbatim}
+  public InstructionList generateJavaBytecode(JavaClassGenerator classGen) {
+    InstructionList result;
+
+    if (head instanceof NonBranchingBytecode)
+      result = ((NonBranchingBytecode) head).generateJavaBytecode(classGen);
+    else
+      result = new InstructionList();
+
+    if (tail != null)
+      result.append(tail.generateJavaBytecode(classGen));
+
+    if (result.isEmpty())
+      result.append(new org.apache.bcel.generic.NOP());
+
+    return result;
+  }
+\end{verbatim}}
+
+\noindent
+Si tratta di una semplice discesa ricorsiva sulla lista di bytecode Kitten,
+che concatena il bytecode Java generato per ciascun bytecode Kitten, scartando i
+bytecode di diramazione. Il test finale serve a garantire che non si ritorni mai
+una lista vuota di bytecode Java.
+
+Siamo adesso nelle condizioni di poter generare il codice per un blocco di codice
+e legarlo a quello dei blocchi che lo seguono, ricorsivamente. Si tratta di un
+algoritmo ricorsivo che scende sul grafo dei blocchi, traducendo man mano
+il codice in ciascun blocco. Dal momento che in genere si tratta di un grafo
+e non di un albero aciclico, dobbiamo garantire che questo algoritmo termini,
+evitando \cioe che entri in loop nel caso in cui ci siano dei cicli di blocchi di
+codice. A tal fine, teniamo nota dei blocchi gi\`a processati (\texttt{done}),
+annotando per ciascun di essi un riferimento
+(\texttt{InstructionHandle}) all'inizio del codice Java generato per tale blocco.
+In questo modo possiamo controllare se un blocco \e gi\`a stato tradotto e non
+ritradurlo; inoltre siamo capaci di saltare all'inizio del codice per ogni
+blocco gi\`a tradotto. Il codice \e dentro
+\texttt{javaBytecodeGenerator/JavaClassGenerator.java}:
+
+{\scriptsize
+\begin{verbatim}
+  private InstructionHandle generateJavaBytecode
+      (Block block, Map<Block, InstructionHandle> done, InstructionList instructions) {
+ 
+    InstructionHandle result = done.get(block);
+    if (result != null)  // gia' tradotto?
+      return result;  // ritorniamo un riferimento all'inizio del codice gia' tradotto
+
+    // aggiungiamo la traduzione del codice Kitten presente nel blocco
+    result = instructions.append(block.getBytecode().generateJavaBytecode(this));
+
+    // annotiamolo come traduzione per il blocco: in futuro potra' servire
+    done.put(block, result);
+
+    // procediamo ricorsivamente sui successivi blocchi
+    generateJavaBytecodeFollows(block, done, instructions);
+
+    // ritorniamo la traduzione del bytecode nel blocco
+    return result;
+  }
+
+  private void generateJavaBytecodeFollows
+      (Block block, Map<Block, InstructionHandle> done, InstructionList instructions) {
+
+    List<Block> follows = block.getFollows();
+
+    // fine del bytecode generato fino a questo momento
+    InstructionHandle ourLast = instructions.getEnd();
+
+    if (!follows.isEmpty())  // ci sono blocchi successori?
+      if (follows.get(0).getBytecode().getHead() instanceof BranchingBytecode) {
+        // una condizione segue il blocco: la estraiamo
+        BranchingBytecode condition = (BranchingBytecode) follows.get(0).getBytecode().getHead();
+
+        // generiamo e aggiungiamo il codice per le due alternative
+        InstructionHandle noH = generateJavaBytecode(follows.get(1), done, instructions);
+        InstructionHandle yesH = generateJavaBytecode(follows.get(0), done, instructions);
+
+        // nel mezzo aggiungiamo del codice che valuta la condizione e va alle due alternative
+        instructions.append(ourLast, condition.generateJavaBytecode(this, yesH, noH));
+      }
+      else {
+        // c'e' solo un successore: non e' una condizione. Generiamo il suo codice
+        InstructionHandle followJB = generateJavaBytecode(follows.get(0), done, instructions);
+
+        // nel mezzo mettiamo un salto al codice del successore
+        instructions.append(ourLast, new GOTO(followJB));
+      }
+  }
+\end{verbatim}}
+
+\noindent
+Il metodo \texttt{generateJavaBytecodeFollows()} processa i successori di un blocco,
+generandone il codice e aggiungendolo
+alla fine di \texttt{instructions}. In questo modo
+\texttt{instructions} si va arricchendo con il codice dei vari blocchi tradotti,
+distesi in una sequenza lineare. Occorre per\`o \emph{incollare} il codice di
+un blocco con quello dei suoi successori. Ecco \perche usiamo la variabile
+\texttt{ourLast}: essa contiene un riferimento alla fine delle istruzioni
+gi\`a generate all'inizio del metodo, prima di processare i suoi successori.
+Sar\`a in quel punto che dovremo aggiungere del codice che salta all'inizio del
+codice per le due alternative di una condizione (\texttt{yesH} e \texttt{noH})
+oppure per il singolo successore sequenziale (\texttt{followJB}).
+Nel primo caso usiamo il metodo di traduzione dei bvytecode di diramazione,
+visto nella Sezione~\ref{sec:java_bytecode_diramazione}. Nel secondo
+basta un semplice \texttt{goto}. Potrebbe non essere ovvio il motivo per cui
+aggiungiamo questo \texttt{goto}. In fondo, \texttt{ourLast} punta alla fine
+del codice Java bytecode gi\`a generato per un blocco, che deve essere seguito
+in questo caso dal codice per il suo unico successsore. Va per\`o osservato che
+il codice per il successore potrebbe essere stato generato in passato (abbiamo
+a che fare con un grafo, non con un albero) e quindi potrebbe non venire aggiunto
+subito dopo \texttt{ourLast} ma trovarsi gi\`a generato dentro \texttt{instructions},
+prima di \texttt{ourLast}. Il \texttt{goto} ci permette di gestire correttamente entrambe
+le situazioni. Al limite finiamo per aggiungere un \texttt{goto} all'istruzione
+successiva, inutile ma non dannoso. Se teniamo all'ottimizzazione, potremo sempre eliminarlo dopo con un
+semplice algoritmo di pulizia del Java bytecode generato, che ne elimina le ridondanze.
+Questo \e proprio quello che accade nel metodo principale di generazione del Java bytecode
+presente dentro \texttt{javaBytecodeGenerator/JavaClassGenerator.java}: esso genera il
+bytecode Java a partire da un blocco di codice, creando una mappa vuota per \texttt{done};
+poi elimina ridondanze (\texttt{goto} a istruzioni immediatamente seguenti, \texttt{nop}
+inutili) e ritorna il risultato:
+%
+\begin{verbatim}
+  public InstructionList generateJavaBytecode(Block block) {
+    InstructionList instructions = new InstructionList();
+
+    generateJavaBytecode
+      (block, new HashMap<Block, InstructionHandle>(), instructions);
+
+    return removeRedundancies(instructions);
+  }
+\end{verbatim}
+
+\section{La generazione del Java bytecode per le classi Kitten}
+  \label{sec:kitten_signatures_into_java}
+%
+Una classe Kitten \e composta da campi, costruttori e metodi. Essi devono venire tradotti
+in una classe di Java bytecode che infine verr\`a salvata sul file system. Esiste una
+classe BCEL, di nome \texttt{ClassGen}, che permette di generare file class e
+salvarli sul file system. Conviene quindi estendere tale classe in un generatore che include
+anche una fattoria e i metodi di traduzione del Kitten bytecode che abbiamo visto
+nella Sezione~\ref{sec:kitten_into_java_block}. La Figura~\ref{fig:java_class_generator}
+mostra tale estensione.
+%
+\begin{figure}
+
+{\small
+\begin{verbatim}
+public class JavaClassGenerator extends ClassGen {
+
+  private final InstructionFactory factory;
+
+  public JavaClassGenerator(ClassType clazz) {
+    super(clazz.getName(), // nome della classe
+      clazz.getSuperclass() != null ?
+        clazz.getSuperclass().getName() : "java.lang.Object", // superclasse
+      clazz.getName() + ".kit", // file sorgente
+      Constants.ACC_PUBLIC, // visibilita': public
+      new String[] {}, // nessuna interfaccia
+      new ConstantPoolGen()); // constant pool inizialmente vuoto
+
+    this.factory = new InstructionFactory(getConstantPool());
+
+    for (FieldSignature field: clazz.getFields().values())
+      field.createField(this);
+
+    for (ConstructorSignature constructor: clazz.getConstructors())
+      constructor.createConstructor(this);
+
+    for (Set<MethodSignature> s: clazz.getMethods().values())
+      for (MethodSignature method: s)
+        method.createMethod(this);
+  }
+
+  public final InstructionFactory getFactory() {
+    return factory;
+  }
+
+  public InstructionList generateJavaBytecode(Block block) { ...Sezione 7.3 }
+}
+\end{verbatim}}
+\caption{La classe \texttt{javaBytecodeGenerator/JavaClassGenerator.java} che implementa la
+traduzione di una classe Kitten in un file class contenente Java bytecode.}
+  \label{fig:java_class_generator}
+\end{figure}
+%
+Il costruttore riceve come argomento il tipo \texttt{clazz}
+della classe Kitten che si intende
+tradurre in Java bytecode. Quindi specifica
+il nome della classe, della sua superclasse e del file sorgente;
+inoltre specifica che intendiamo costruire una classe a visibilit\`a
+\texttt{public} e che non implementa alcuna interfaccia. Quindi passa
+a costruire la fattoria che abbiamo usato nella generazione del codice Java
+bytecode e aggiunge al file class la traduzione di tutti i campi, costruttori
+e metodi in \texttt{clazz}. Quest'ultima operazione viene effettuata dai
+seguenti tre metodi:
+
+\begin{itemize}
+\item Dentro \texttt{types/FieldSignature.java} definiamo
+
+{\small\begin{verbatim}
+  public void createField(JavaClassGenerator classGen) {
+    classGen.addField(new FieldGen
+      (Constants.ACC_PUBLIC, // campo pubblico
+      getType().toBCEL(), // tipo
+      name,
+      classGen.getConstantPool()) // constant pool
+      .getField());
+  }
+\end{verbatim}}
+
+\noindent
+Si noti come il tipo del campo, espresso con le classi Kitten per i tipi,
+debba venire trasformato nel corrispondente tipo BCEL prima di creare il campo.
+\item Dentro \texttt{types/ConstructorSignature.java} definiamo
+{\small\begin{verbatim}
+  public void createConstructor(JavaClassGenerator classGen) {
+    MethodGen methodGen = new MethodGen
+      (Constants.ACC_PUBLIC, // public
+      org.apache.bcel.generic.Type.VOID, // tipo di ritorno
+      getParameters().toBCEL(), // tipo dei parametri
+      null, // nomi dei parametri: irrilevante per noi
+      Constants.CONSTRUCTOR_NAME, // <init>
+      classGen.getClassName(), // nome della classe
+      classGen.generateJavaBytecode(getCode()), // istruzioni Java bytecode
+      classGen.getConstantPool()); // constant pool
+
+    methodGen.setMaxStack(); // calcoliamo quanti elementi di stack utilizza
+    methodGen.setMaxLocals(); // e quante variabili locali, al massimo
+
+    classGen.addMethod(methodGen.getMethod());
+  }
+\end{verbatim}}
+
+\noindent
+Quest'ultimo metodo traduce il codice del costruttore, col metodo visto nella
+Sezione~\ref{sec:kitten_into_java_block}, e lo usa come bytecode
+per un nuovo costruttore Java bytecode che viene aggiunto alla classe.
+Si noti che in BCEL un costruttore \e semplicemente un metodo con un nome speciale
+che lo identifica come costruttore. \E importante calcolare la quantit\`a
+massima di locali ed elementi di stack utilizzata dal costruttore, informazione
+necessaria in Java bytecode per potere determinare la dimensione del record
+di attivazione per questo costruttore.
+
+\item Dentro \texttt{types/MethodSignature.java} definiamo
+{\small\begin{verbatim}
+  public void createConstructor(JavaClassGenerator classGen) {
+    MethodGen methodGen;
+
+    if (getName().equals("main"))
+      methodGen = new MethodGen
+        (Constants.ACC_PUBLIC | Constants.ACC_STATIC, // public e static
+        org.apache.bcel.generic.Type.VOID, // tipo di ritorno
+        new org.apache.bcel.generic.Type[] // tipo dei parametri
+          { new org.apache.bcel.generic.ArrayType("java.lang.String", 1) },
+        null, // nomi dei parametri: irrilevante per noi
+        "main", // nome del metodo
+        classGen.getClassName(), // nome della classe
+        classGen.generateJavaBytecode(getCode()), // istruzioni Java bytecode
+        classGen.getConstantPool()); // constant pool
+    else
+      methodGen  = new MethodGen
+        (Constants.ACC_PUBLIC, // public
+        getReturnType().toBCEL(), // tipo di ritorno
+        getParameters().toBCEL(), // tipo dei parametri
+        null, // nomi dei parametri: irrilevante per noi
+        getName(), // nome del metodo
+        classGen.getClassName(), // nome della classe
+        classGen.generateJavaBytecode(getCode()), // istruzioni Java bytecode
+        classGen.getConstantPool()); // constant pool
+
+    methodGen.setMaxStack(); // calcoliamo quanti elementi di stack utilizza
+    methodGen.setMaxLocals(); // e quante variabili locali, al massimo
+
+    classGen.addMethod(methodGen.getMethod());
+  }
+\end{verbatim}}
+
+\noindent
+Si tratta di codice quasi identico a quello del costruttore, se non per il fatto che
+un metodo Kitten ha nome, parametri e tipo di ritorno propri e non fissi, che vanno
+quindi specificati nel file class che si sta generando. Inoltre il codice precedente
+gestisce il caso speciale del metodo Kitten \texttt{main}, che deve diventare il
+metodo \texttt{main} di Java, quindi statico e con un parametro di tipo array di stringhe.
+In questo modo, esso verr\`a invocato automaticamente dalla Java Virtual Machine come
+punto di ingresso del programma quando si prover\`a a eseguire la classe generata.
+\end{itemize}
+
+Siamo finalmente nelle condizioni di effettuare la traduzione di un programma Kitten
+in un insieme di file class sul file system. Basta costruire un \texttt{JavaClassGenerator}
+per ogni classe del programma Kitten e salvarlo su disco. Dentro \texttt{translation/Program.java}
+definiamo il metodo:
+%
+\begin{verbatim}
+public void generateJavaBytecode() {
+  for (ClassType clazz: ClassType.getAll())
+    new JavaClassGenerator(clazz).getJavaClass().dump(clazz + ".class");
+}
+\end{verbatim}
+%
+Il metodo BCEL \texttt{getJavaClass()} trasforma il generatore in una
+rappresentazione del file class in memoria. Essa viene infine salvata su disco
+con il suo metodo \texttt{dump()}, specificando il nome del file class,
+che deve coincidere con quello della classe rappresentata.
