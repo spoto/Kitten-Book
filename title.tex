@@ -54,15 +54,22 @@ di analisi e ottimizzazione del codice; infine, la stessa
 implementazione a oggetti di un compilatore
 rende pi\`u credibile la sua correttezza e permette l'implementazione
 di ottimizzazioni tramite specializzazioni di classi e metodi della
-sintassi astratta.
+sintassi astratta. Un limite del dragon book rimane
+infine l'assenza di una trattazione della generazione di codice effettivamente
+eseguibile, il che lascia lo studente di fronte a una storia interrotta,
+senza la possibilit\`a di giocare col risultato della compilazione.
 
 Ecco quindi nascere la necessit\`a di questo libro sulla
 compilazione a oggetti di un linguaggio a oggetti. Non mancano certo
 altri tentativi in questa direzione. Fra i tanti, non possiamo dimentivare
 il libro di Appel~\cite{Appel02},
-che ha inizialmente ispirato questo testo. Ma le
+che ha inizialmente ispirato questo testo, specialmente per gli
+esempi di analisi sintattica. Ma le
 nostre soluzioni per il tipaggio statico e la generazione del codice
 non sono assolutamente assimilabili alle tecniche dell'Appel, scarsamente a oggetti.
+Inoltre in questo testo si arriva alla generazione di codice effettivamente
+eseguibile in formato Java bytecode, il che rende l'utilizzo e la modifica
+del compilatore \piu interessante per gli studenti.
 
 Questo libro si offre come supporto allo studente impegnato in un corso
 di compilazione che a Verona \`e organizzato in appena
@@ -87,13 +94,15 @@ della loro, spesso involontaria, verifica.
 
 {\flushright Fausto Spoto\\\hfill Verona, gennaio 2007}
 
+\mbox{}\\
+
 La revisione di questo testo e del compilatore Kitten ha comportanto una
 semplificazione del codice e della sua presentazione, nonch\'e
 la sostituzione dei makefile con dei task Ant. Il risultato sono
 un compilatore Kitten e un libro pi\`u semplici e accessibili per
 gli studenti.
 
-{\flushright Fausto Spoto\\\hfill Verona, marzo 2015}
+{\flushright Fausto Spoto\\\hfill Verona, aprile 2015}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Acknowledgements                                                          %

@@ -621,6 +621,56 @@ inutili) e ritorna il risultato:
   }
 \end{verbatim}
 
+Consideriamo ad esempio il Kitten bytecode in Figura~\ref{fig:fib_bytecode}. La sua
+traduzione in Java bytecode risultante dal metodo precedente \e quella che segue:
+
+{\small\begin{verbatim}
+public int fib(int);
+   // traduzione del blocco in alto in Figura 6.2
+   0: iload_1
+   1: iconst_0
+   2: if_icmpeq 9
+   5: iconst_0
+   6: goto 10
+   9: iconst_1
+  10: nop
+  11: iload_1
+  12: iconst_1
+  13: if_icmpeq 20
+  16: iconst_0
+  17: goto 21
+  20: iconst_1
+  21: nop
+  22: ior
+
+  // codice risultante dalla diramazione
+  23: ifeq 31
+  26: goto 29
+
+  // traduzione del blocco in basso a destra in Figura 6.2
+  29: iconst_1
+  30: ireturn
+
+  // traduzione del blocco in basso a sinistra in Figura 6.2
+  31: aload_0
+  32: iload_1
+  33: iconst_1
+  34: isub
+  35: invokevirtual fib:(I)I
+  38: aload_0
+  39: iload_1
+  40: iconst_2
+  41: isub
+  42: invokevirtual fib:(I)I
+  45: iadd
+  46: ireturn
+\end{verbatim}}
+
+\noindent
+\E evidente la possibilit\`a di ottimizzare il codice, rimuovendo le $\mathtt{nop}$ di
+appoggio (come quelli agli offset 10 e 21)
+e i $\mathtt{goto}$ all'istruzione immediatamente successiva (come quello all'offset 26).
+
 \section{La generazione del Java bytecode per le classi Kitten}
   \label{sec:kitten_signatures_into_java}
 %
